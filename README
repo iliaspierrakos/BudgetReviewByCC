@@ -1,3 +1,7 @@
-# 🇬🇷 Greek State Budget Analysis 2026
+# Greek State Budget Analysis 2026
+## Overview
 This project focuses on the **processing and analysis of the Greek State Budget data for 2026**, aiming to **propose optimized ways of allocating national funds** across different ministries.
-## 📘 Overview
+Through data analysis and computational methods, the project seeks to gain insights into government spending patterns and suggest more efficient capital distribution models.
+## Tools & Libraries
+- **Java 17+**
+
