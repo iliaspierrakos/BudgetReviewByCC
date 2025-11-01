@@ -10,4 +10,8 @@ public class Ministry {    //Ministry class
     public static int getCounter() { //getCounter method used for making sure the array is made
         return counter;
     }
+    @Override
+    public String toString() {
+        return ministryName + "Regular Budget:" + budget;
+    }
 }
