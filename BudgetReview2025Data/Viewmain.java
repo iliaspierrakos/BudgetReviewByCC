@@ -1,4 +1,4 @@
-public class Main {
+public class Viewmain {
     public static void main(String[] args) {
         Ministries min = new Ministries();
         MinistriesBudgets budg = new MinistriesBudgets();

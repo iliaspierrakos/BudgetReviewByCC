@@ -9,6 +9,7 @@ public class View {
         Path ministriesFile = Path.of("ministries.txt");
         Path outputFile = Path.of("view.txt");
 
+
         try {
             List<String> budgetLines = Files.readAllLines(budgetsFile, StandardCharsets.UTF_8);
             List<String> ministryNames = Files.readAllLines(ministriesFile, StandardCharsets.UTF_8);
@@ -33,11 +34,12 @@ public class View {
 
                     writer.write(ministryName + " " + lastNumber);
                     writer.newLine();
+                    System.out.println(ministryName + " " + lastNumber);
+
                 }
 
-                System.out.println("Combined file created successfully: " + outputFile);
-                System.out.println("File size: " + Files.size(outputFile) + " bytes");
-                Files.lines(outputFile).forEach(System.out::println);
+
+
             }
 
         } catch (IOException e) {
