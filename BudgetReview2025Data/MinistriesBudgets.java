@@ -4,7 +4,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.regex.*;
 
 public class MinistriesBudgets {
-    public static void main(String[] args) {
+    public void budget() {
         Path inputFile = Path.of("BudgetReview2025.txt");
         Path outputFile = Path.of("MinistriesBudgets.csv");
 

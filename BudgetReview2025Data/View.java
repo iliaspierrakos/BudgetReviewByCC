@@ -4,7 +4,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 public class View {
-    public static void main(String[] args) {
+    public void view() {
         Path budgetsFile = Path.of("MINISTRIESBUDGETS.csv");
         Path ministriesFile = Path.of("ministries.txt");
         Path outputFile = Path.of("view.txt");
@@ -36,6 +36,8 @@ public class View {
                 }
 
                 System.out.println("Combined file created successfully: " + outputFile);
+                System.out.println("File size: " + Files.size(outputFile) + " bytes");
+                Files.lines(outputFile).forEach(System.out::println);
             }
 
         } catch (IOException e) {

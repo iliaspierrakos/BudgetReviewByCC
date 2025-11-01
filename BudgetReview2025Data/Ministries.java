@@ -4,7 +4,7 @@ import java.io.IOException;
 
 public class Ministries {
 
-    public static void main(String[] args) {
+    public void minlist() {
 
         String fileName = "ministries.txt";
 
@@ -32,7 +32,7 @@ public class Ministries {
             "Ministry of Climate Crisis and Civil Protection"
         };
 
-        // Προσπάθεια εγγραφής στο αρχείο
+
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
             for (String ministry : ministries) {
                 writer.write(ministry);
