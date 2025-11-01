@@ -1,10 +1,11 @@
 import java.io.*;
-import java.nio.file.*;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.*;
 import java.util.*;
 
 public class View {
-    public void view() {
+    private static Ministry[] ministries = new Ministry[20];  //array used for saving the ministry objects  
+       public void view() {
         Path budgetsFile = Path.of("MINISTRIESBUDGETS.csv");
         Path ministriesFile = Path.of("ministries.txt");
         Path outputFile = Path.of("view.txt");
@@ -19,11 +20,10 @@ public class View {
             try (BufferedWriter writer = Files.newBufferedWriter(outputFile, StandardCharsets.UTF_8)) {
                 for (int i = 0; i < total; i++) {
                     String budgetLine = budgetLines.get(i).trim();
-                    String ministryName = ministryNames.get(i).trim();
-
+                    String ministryName = ministryNames.get(i).trim();                
                     String[] tokens = budgetLine.split("\\s+");
                     String lastNumber = "N/A";
-
+                    
 
                     for (int j = tokens.length - 1; j >= 0; j--) {
                         if (tokens[j].matches("[\\d\\.]+")) {
@@ -31,10 +31,13 @@ public class View {
                             break;
                         }
                     }
+                    ministries[i]= new Ministry(ministryName, lastNumber); //making the ministry objects and saving them in the array
+                    
 
                     writer.write(ministryName + " " + lastNumber);
                     writer.newLine();
                     System.out.println(ministryName + " " + lastNumber);
+                    
 
                 }
 
