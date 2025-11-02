@@ -4,7 +4,7 @@ import java.nio.file.*;
 import java.util.*;
 
 public class View {
-    private static Ministry[] ministries = new Ministry[20];  //array used for saving the ministry objects  
+    public static Ministry[] ministries = new Ministry[20];  //array used for saving the ministry objects  
        public void view() {
         Path budgetsFile = Path.of("MINISTRIESBUDGETS.csv");
         Path ministriesFile = Path.of("ministries.txt");
