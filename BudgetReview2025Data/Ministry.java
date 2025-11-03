@@ -1,11 +1,14 @@
+import java.util.Scanner;
+
 public class Ministry {    //Ministry class
-    private String ministryName; //Ministry name 
+    private String ministryName; //Ministry name
     private String budget; //Ministry's regular budget
     private static int counter; //
+    private Scanner scanner = new Scanner(System.in);
     public Ministry (String name, String number) { //Ministry object constructor
         this.ministryName = name;
         this.budget = number;
-        counter++;      
+        counter++;
     }
     public static int getCounter() { //getCounter method used for making sure the array is made
         return counter;
@@ -26,13 +29,14 @@ public class Ministry {    //Ministry class
     public String getBudget() {
         return budget;
     }
-    public static String budgetSearchByName(String searchingMinistry) { //method for searching the regular budget of a ministry with its name 
+    public static String budgetSearchByName(String searchingMinistry) { //method for searching the regular budget of a ministry with its name
         for (Ministry m : View.ministries) {
-            if (m.ministryName.equalsIgnoreCase(searchingMinistry)) { 
+            if (m.ministryName.equalsIgnoreCase(searchingMinistry)) {
                 return m.budget;
-            }               
-        }  
-        return "Ministry not found!" ;       
+            }
+        }
+        return "Ministry not found!" ;
     }
+
 }
 
