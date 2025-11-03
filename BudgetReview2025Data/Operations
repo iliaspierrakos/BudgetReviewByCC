@@ -1,0 +1,26 @@
+public class Operations { 
+    Operations obj = new Operations();
+    String searchingName = DataCollection.ministrySelection();
+    String modification = DataCollection.upOrDown(); 
+    double amount = DataCollection.amount();
+    public static boolean Edit(String searchingName, String modification, double amount){
+        boolean found = false;
+        for (int i = 0; i < View.ministries.length; i++) {
+            if (View.ministries[i] != null && View.ministries[i].getMinistryName().equalsIgnoreCase(name)) {
+                // Βρήκαμε το σωστό υπουργείο 
+                double newBudget;
+                if (change.equalsIgnoreCase("Increase")) {
+                    newBudget = View.ministries[i].getBudget() + amount;
+                } else {
+                    newBudget = View.ministries[i].getBudget() - amount;                    
+                }
+                View.ministries[i].setBudget(newBudget);
+                System.out.println("Budget updated successfully!");
+                System.out.println("New budget: " + newBudget);
+                found = true;
+                break;
+            }
+        } 
+    }
+
+}
