@@ -21,7 +21,7 @@ The goal is to give users control over public budget data, simulate fiscal decis
 ## 🛠️ Technologies
 - **Language:** Java SE (Standard Edition)
 - **Build Tool:** Apache Maven
-- **Libraries:** JFreeChart, JavaFX
+- **Libraries:** JFreeChart
 - **Version Control:** Git / GitHub
 - **IDE:** Visual Studio Code (VS Code)
 ## System Architecture
