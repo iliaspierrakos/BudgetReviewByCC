@@ -4,7 +4,7 @@ import java.nio.file.*;
 import java.util.*;
 
 public class View {
-    public static Ministry[] ministries = new Ministry[20];  //array used for saving the ministry objects  
+    private static Ministry[] ministries = new Ministry[20];  //array used for saving the ministry objects  
        public void view() {
         Path budgetsFile = Path.of("MINISTRIESBUDGETS.csv");
         Path ministriesFile = Path.of("ministries.txt");
@@ -23,20 +23,12 @@ public class View {
                     String ministryName = ministryNames.get(i).trim();                
                     String[] tokens = budgetLine.split("\\s+");
                     String lastNumber = "N/A";
-                    
 
                     for (int j = tokens.length - 1; j >= 0; j--) {
                         if (tokens[j].matches("[\\d\\.]+")) {
                             lastNumber = tokens[j];
                             break;
                         }
-                    }
-                    double budget = 0.0;
-                    try {
-                        budget = Double.parseDouble(lastNumber);
-                    } catch (NumberFormatException e) {
-                        System.err.println("Error parsing budget for " + ministryName + ": " + lastNumber);
-                        budget = 0.0;
                     }
                     ministries[i]= new Ministry(ministryName, budget); //making the ministry objects and saving them in the array
                     
