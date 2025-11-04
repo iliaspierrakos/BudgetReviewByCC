@@ -32,7 +32,10 @@ public class View {
                         }
                     }
                     double budget = 0.0;
+                    
                     try {
+                        String cleanNumber = lastNumber.replace(".", "");
+                        cleanNumber = cleanNumber.replace(",", ".");
                         budget = Double.parseDouble(lastNumber);
                     } catch (NumberFormatException e) {
                         System.err.println("Error parsing budget for " + ministryName + ": " + lastNumber);
