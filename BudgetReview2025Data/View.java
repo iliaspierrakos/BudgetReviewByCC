@@ -32,12 +32,12 @@ public class View {
                         }
                     }
                     double budget = 0.0;
-                    
+                    lastNumber = lastNumber.replaceAll("\\.", "");
                     try {
-                        String cleanNumber = lastNumber.replace(".", "");
-                        cleanNumber = cleanNumber.replace(",", ".");
+                        //String cleanNumber = lastNumber.replace(".", "");
+                        //cleanNumber = cleanNumber.replace(",", ".");
                         budget = Double.parseDouble(lastNumber);
-                    } catch (NumberFormatException e) {
+                    } catch (Exception e) {
                         System.err.println("Error parsing budget for " + ministryName + ": " + lastNumber);
                         budget = 0.0;
                     }
