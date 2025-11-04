@@ -31,8 +31,18 @@ public class View {
                             break;
                         }
                     }
-                    ministries[i]= new Ministry(ministryName, lastNumber); //making the ministry objects and saving them in the array
-
+                    double budget = 0.0;
+                    lastNumber = lastNumber.replaceAll("\\.", "");
+                    try {
+                        //String cleanNumber = lastNumber.replace(".", "");
+                        //cleanNumber = cleanNumber.replace(",", ".");
+                        budget = Double.parseDouble(lastNumber);
+                    } catch (Exception e) {
+                        System.err.println("Error parsing budget for " + ministryName + ": " + lastNumber);
+                        budget = 0.0;
+                    }
+                    ministries[i]= new Ministry(ministryName, budget); //making the ministry objects and saving them in the array
+                    
 
                     writer.write(ministryName + " " + lastNumber);
                     writer.newLine();
