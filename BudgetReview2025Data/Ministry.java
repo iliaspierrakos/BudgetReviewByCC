@@ -1,4 +1,3 @@
-import java.util.Scanner;
 
 public class Ministry {    //Ministry class
     private String ministryName; //Ministry name 
@@ -36,5 +35,8 @@ public class Ministry {    //Ministry class
     }
     public void setBudget(double budget) {
         this.budget = budget;
+    }
+    public double getBudget() {
+        return budget;
     }
 }

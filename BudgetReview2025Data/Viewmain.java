@@ -10,15 +10,22 @@ public class ViewMain {
         System.out.println("1.View");
         System.out.println("2.Edit");
         int number = scanner.nextInt();
-        if (number==1)  {
-            View.view();//Run View
-        } else if (number==2) {
-            int a=1;// Need Object!!!!!!!
-        } else {
-            System.out.println("Invalid");
+        String answer = "no";
+        switch (number) {
+            case 1:
+                View.view(); //Run View
+                break;
+            case 2:
+                do {
+                Edit obj = new Edit();
+                obj.collectData(); // Need Object!!!!!!!
+                answer = scanner.nextLine();
+                }
+              while (answer.equalsIgnoreCase("yes"));
+                break;
+            default:
+                System.out.println("Invalid");
+                break;
         }
-
-
-        //System.out.println(Ministry.getCounter());
-    }
+    }//System.out.println(Ministry.getCounter());
 }
