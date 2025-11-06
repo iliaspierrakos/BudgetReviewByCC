@@ -1,6 +1,6 @@
 
 public class Ministry {    //Ministry class
-    private String ministryName; //Ministry name 
+    private String ministryName; //Ministry name
     private double budget; //Ministry's general budget
     private static int counter; //
     public Ministry (String name, double number) { //Ministry object constructor
@@ -15,7 +15,7 @@ public class Ministry {    //Ministry class
     public String toString() { // toString method
         return ministryName + "Regular Budget:" + budget;
     }
-    
+
     public static double budgetSearchByName(String searchingMinistry) { //method for searching the regular budget of a ministry with its name
         for (Ministry m : View.ministries) {
             if (m.ministryName.equalsIgnoreCase(searchingMinistry)) {

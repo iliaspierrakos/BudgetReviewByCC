@@ -5,7 +5,7 @@ import java.util.*;
 
 public class View {
     public static Ministry[] ministries = new Ministry[20];  //array used for saving the ministry objects
-       public static void view() {
+       public static void view(boolean print) {
         Path budgetsFile = Path.of("MINISTRIESBUDGETS.csv");
         Path ministriesFile = Path.of("ministries.txt");
         Path outputFile = Path.of("view.txt");
@@ -42,11 +42,13 @@ public class View {
                         budget = 0.0;
                     }
                     ministries[i]= new Ministry(ministryName, budget); //making the ministry objects and saving them in the array
-                    
+
 
                     writer.write(ministryName + " " + lastNumber);
                     writer.newLine();
-                    System.out.println(ministryName + " " + lastNumber);
+                    if (print==true) {
+                        System.out.println(ministryName + " " + lastNumber);
+                    }
 
 
                 }

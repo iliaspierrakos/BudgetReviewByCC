@@ -26,7 +26,7 @@ public Edit(String name, String change, double amount) {
         this.amount = amount;
         this.change = change;
 }
-public Edit() {};
+public Edit() {}; //default constructor useless
 
 public void editingbudget( Edit object) {
         for (int i = 0; i < View.ministries.length; i++) {
@@ -42,7 +42,7 @@ public void editingbudget( Edit object) {
                 System.out.println("Budget updated successfully!");
                 System.out.println("New budget: " + newBudget);
                 break;
-                }
+            }
         }
     }
 }

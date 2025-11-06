@@ -13,13 +13,14 @@ public class ViewMain {
         String answer = "no";
         switch (number) {
             case 1:
-                View.view(); //Run View
+                View.view(true); //Run View
                 break;
             case 2:
                 do {
-                Edit obj = new Edit();
-                obj.collectData(); // Need Object!!!!!!!
-                answer = scanner.nextLine();
+                    View.view(false);
+                    Edit obj = new Edit();
+                    obj.collectData();
+                    answer = scanner.nextLine();
                 }
               while (answer.equalsIgnoreCase("yes"));
                 break;
