@@ -12,9 +12,20 @@ public void collectData() {
         String tempname = scanner.nextLine();
 
         System.out.println("The budget for ministry of " + tempname + " is " + Ministry.budgetSearchByName(tempname));
-
         System.out.println("How would you like to change this budget? Increase or Decrease?");
-        String tempchange = scanner.nextLine();
+        String tempchange;
+
+
+        while (true) {
+            tempchange = scanner.nextLine();
+
+            if (tempchange.equalsIgnoreCase("Increase") || tempchange.equalsIgnoreCase("Decrease")) {
+                break;
+            } else {
+                System.out.println("Invalid input! Please enter 'Increase' or 'Decrease':");
+            }
+        }
+
 
         System.out.print("By how much? ");
         Double tempamount = scanner.nextDouble();
