@@ -15,12 +15,7 @@ public class Ministry {    //Ministry class
     public String toString() {
         return ministryName + "Regular Budget:" + budget;
     }
-<<<<<<< HEAD
 
-=======
-<<<<<<< HEAD
-    
->>>>>>> 851c8d2a69ec93ff6a05bb929f01208e3ee39617
     public static double budgetSearchByName(String searchingMinistry) { //method for searching the regular budget of a ministry with its name
         for (Ministry m : View.ministries) {
             if (m.ministryName.equalsIgnoreCase(searchingMinistry)) {
@@ -29,8 +24,7 @@ public class Ministry {    //Ministry class
         }
         return -1 ;
     }
-=======
->>>>>>> main
+
     public String getMinistryName(){
         return ministryName;
     }
@@ -40,11 +34,7 @@ public class Ministry {    //Ministry class
     public void setBudget(double budget) {
         this.budget = budget;
     }
-<<<<<<< HEAD
     public double getBudget() {
         return budget;
     }
 }
-=======
-}
->>>>>>> main
