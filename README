@@ -18,7 +18,7 @@ The goal is to give users control over public budget data, simulate fiscal decis
 - Comparison of different budget scenarios
 - Graphs and visualizations
 - Graphical or web-based user interface
-## 🛠️ Technologies
+## Technologies
 - **Language:** Java SE (Standard Edition)
 - **Build Tool:** Apache Maven
 - **Libraries:** JFreeChart
@@ -46,7 +46,12 @@ v
 | Visualization & Reporting   |
 +-----------------------------+
 ## Installation & Usage
-```bash
+bash
 # Compile and run with Maven
 mvn clean compile
 mvn exec:java -Dexec.mainClass="com.example.Main"
+#Project Structure
+/scr
+/pom.xml
+README.md
+
