@@ -27,9 +27,6 @@ public class Ministry {    //Ministry class
     public String getMinistryName(){
         return ministryName;
     }
-     public double getMinistryBudget(){
-        return budget;
-    }
     public void setMinistryName(String name){
         this.ministryName = name;
     }
