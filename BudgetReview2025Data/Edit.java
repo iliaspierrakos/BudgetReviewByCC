@@ -10,6 +10,8 @@ public void collectData() {
         System.out.println("The budget of which ministry would you like to change?");
         System.out.print("Ministry of: ");
         String tempname = scanner.nextLine();
+        String tempfullname = "Ministry of " + tempname;
+        String tempname = scanner.nextLine();
 
         System.out.println("The budget for ministry of " + tempname + " is " + Ministry.budgetSearchByName(tempname));
         System.out.println("How would you like to change this budget? Increase or Decrease?");
