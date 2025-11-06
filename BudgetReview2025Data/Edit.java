@@ -12,7 +12,10 @@ public void collectData() {
         String tempname = scanner.nextLine();
         String tempfullname = "Ministry of " + tempname; 
 
-        System.out.println("The budget for ministry of " + tempname + " is " + Ministry.budgetSearchByName(tempfullname));
+        double budget = Ministry.budgetSearchByName(tempfullname);
+        System.out.println("The budget for ministry of " + tempname + " is " + Ministry.getFormattedBudget(budget));
+
+        //System.out.println("The budget for ministry of " + tempname + " is " + Ministry.budgetSearchByName(tempfullname));
 
         System.out.println("How would you like to change this budget? Increase or Decrease?");
         String tempchange = scanner.nextLine();
@@ -41,7 +44,7 @@ public void editingbudget( Edit object) {
                 }
                 View.ministries[i].setBudget(newBudget);
                 System.out.println("Budget updated successfully!");
-                System.out.println("New budget: " + newBudget);
+                System.out.println("New budget: " + Ministry.getFormattedBudget(newBudget)); // ← ΕΔΩ
                 break;
                 }
         }
