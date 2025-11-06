@@ -1,13 +1,20 @@
+import java.io.*;
 import java.util.HashMap; //Small DataBase to store our users data
 import java.util.Map; //Interface for HashMap
 
 //This class takes care of registration, login, and user storage.
 public class UserManager {
 
-    // A Map that stores all users in memory.
+    // users.txt = a file  that stores all registered users.
     // Key: username (String)
     // Value: User object (contains username, password, role)
-     private Map<String, User> users = new HashMap<>();
+     private HashMapMap<String, User> users;
+     private static final String nameOfFile = "users.txt";
+
+     public UserManager() {
+        users = newHashMap<>();
+        loadUsersFromFile();
+     }
 
      //Registers new users.
      public boolean register(String username, String password, User.Role role) {
@@ -21,9 +28,11 @@ public class UserManager {
         //Creates new User and stores it.
         User newUser = new User(username, password, role);
         users.put(username, newUser);
+        saveUsersToFile(newUser);
         System.out.println("Registration successful! Role: " + role);
         return true;
      }
+     
      //The user logs in if the username & password are correct.
      public User login(String username, String password) {
         //Check if the username is correct.
