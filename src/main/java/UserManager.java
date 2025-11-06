@@ -34,7 +34,7 @@ public class UserManager {
      }
      
      //The user logs in if the username & password are correct.
-     public User login(String username, String password) {
+     public User loginUser(String username, String password) {
         //Check if the username is correct.
         if(!users.containsKey(username)) {
             System.out.println("User not found.");
@@ -45,12 +45,40 @@ public class UserManager {
 
         //Compares the given password with the given one.
         if (user.getPassword().equals(password)) {
-             System.out.println("Login successful! Welcome, " + user.getUsername() + " (" + user.getRole() + ")");
+             System.out.println("Login successful! Welcome, " + user.getRole() + " " + username);
              return user;
         } else {
              System.out.println ("Incorrect password. Please try again."); 
              return null; 
         }
+    }
+
+    private void loadUsersFromFile() {
+        File file = new File(nameOfFile);
+        if (!file.exists()) {
+            try {
+                file.createNewFile();
+            } catch (IOException e) {
+                System.out.println(" Could not create users.txt file: "+ e.getMessage());
+            }
+            return;
+        }
+    }
+
+    try (BufferedReader br = new BufferedReader(new FileReader(nameOfFile))) {
+        String line;
+        while ((line = br.readLine()) != null) {
+            String[] parts =line.split(",");
+            if (parts.length == 3) {
+                String username = parts[0].trim();
+                String password = parts[1].trim();
+                String role = parts[2].trim();
+                users.put(username, new User(username, password, role));
+            }
+        }
+    } catch (ΙOException e) {
+        System.out.println("⚠️ Error loading users: " + e.getMessage());
+
     }
     public void showAllUsers() {
         if (users.isEmpty()) {
