@@ -17,10 +17,10 @@ public class ViewMain {
                 break;
             case 2:
                 do {
-                    View.view(false);
-                    Edit obj = new Edit();
-                    obj.collectData();
-                    answer = scanner.nextLine();
+                View.view(false);
+                Edit obj = new Edit();
+                obj.collectData(); // Need Object!!!!!!!
+                answer = scanner.nextLine();
                 }
               while (answer.equalsIgnoreCase("yes"));
                 break;
