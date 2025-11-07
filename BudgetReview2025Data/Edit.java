@@ -49,7 +49,7 @@ public void editingbudget( Edit object) {// editing budget method
                 double newBudget;
                 if (object.change.equalsIgnoreCase("Increase")) {// checking the type of change and making the proper move to the ministry's budget
                     newBudget = View.ministries[i].getBudget() + object.amount;
-                    printNewBudget(newBudget,"Increase",i);
+                    printNewBudget(newBudget,"Increase",i); 
                 } else {
                     newBudget = View.ministries[i].getBudget() - object.amount ;
                     printNewBudget(newBudget, "Decrease", i);
@@ -59,7 +59,7 @@ public void editingbudget( Edit object) {// editing budget method
             }
         }
     }
-    public void printNewBudget(double finalBudget, String type, int i) {
+    public void printNewBudget(double finalBudget, String type, int i) { // method for printing the Edit results
         View.ministries[i].setBudget(finalBudget);
                 System.out.println("Budget updated successfully!");
                 System.out.println("New budget for " + View.ministries[i].getMinistryName() + " " + finalBudget);// printing the new result
