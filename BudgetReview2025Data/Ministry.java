@@ -17,6 +17,7 @@ public class Ministry {    //Ministry class
     public String toString() {
         return ministryName + "Regular Budget:" + budget;
     }
+
     public static double budgetSearchByName(String searchingMinistry) { //method for searching the regular budget of a ministry with its name
         for (Ministry m : View.ministries) {
             if (m.ministryName.equalsIgnoreCase(searchingMinistry)) {
@@ -25,6 +26,7 @@ public class Ministry {    //Ministry class
         }
         return -1 ;
     }
+    
     public String getMinistryName(){
         return ministryName;
     }
