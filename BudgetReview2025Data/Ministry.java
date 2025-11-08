@@ -1,4 +1,6 @@
-
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.Locale;
 public class Ministry {    //Ministry class
     private String ministryName; //Ministry name
     private double budget; //Ministry's general budget
@@ -15,12 +17,6 @@ public class Ministry {    //Ministry class
     public String toString() {
         return ministryName + "Regular Budget:" + budget;
     }
-<<<<<<< HEAD
-
-=======
-<<<<<<< HEAD
-    
->>>>>>> 851c8d2a69ec93ff6a05bb929f01208e3ee39617
     public static double budgetSearchByName(String searchingMinistry) { //method for searching the regular budget of a ministry with its name
         for (Ministry m : View.ministries) {
             if (m.ministryName.equalsIgnoreCase(searchingMinistry)) {
@@ -29,8 +25,6 @@ public class Ministry {    //Ministry class
         }
         return -1 ;
     }
-=======
->>>>>>> main
     public String getMinistryName(){
         return ministryName;
     }
@@ -40,11 +34,13 @@ public class Ministry {    //Ministry class
     public void setBudget(double budget) {
         this.budget = budget;
     }
-<<<<<<< HEAD
     public double getBudget() {
         return budget;
     }
+    public static String getFormattedBudget(double budget) {
+    DecimalFormatSymbols symbols = new DecimalFormatSymbols(Locale.GERMAN);
+    symbols.setGroupingSeparator('.');
+    DecimalFormat df = new DecimalFormat("#,###", symbols);
+    return df.format(budget);
+    }
 }
-=======
-}
->>>>>>> main

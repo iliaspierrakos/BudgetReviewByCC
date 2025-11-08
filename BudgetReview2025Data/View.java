@@ -46,16 +46,9 @@ public class View {
 
                     writer.write(ministryName + " " + lastNumber);
                     writer.newLine();
-<<<<<<< HEAD
-                    if (print==true) {
-                        System.out.println(ministryName + " " + lastNumber);
-                    }
-
-=======
                     if (print) {
                         System.out.println(ministryName + " " + lastNumber);
                     }
->>>>>>> 851c8d2a69ec93ff6a05bb929f01208e3ee39617
 
                 }
 
