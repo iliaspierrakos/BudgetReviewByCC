@@ -1,6 +1,6 @@
 import java.util.Scanner;
 
-public class AuthUI {
+    public class AuthUI {
     private UserManager userManager;
     private Scanner scanner; 
 
@@ -17,9 +17,9 @@ public class AuthUI {
             System.out.println("(2) ->Login");
             System.out.println("(3) -> Exit");
             System.out.print("Choose an option: ");
-            String usersChoise = scanner.nextLine();
+            String usersChoice = scanner.nextLine();
 
-            switch (usersChoise) {
+            switch (usersChoice) {
                 case "1":
                     registerUserUI();
                     break;
@@ -28,7 +28,7 @@ public class AuthUI {
                     break;
                 case "3":
                     on = false;
-                    System.out.println("Exit");
+                    System.out.println("Goodbye!");
                     break;
                 default:
                      System.out.println("Invalid choice. Try again.");
@@ -44,24 +44,41 @@ public class AuthUI {
         String password = scanner.nextLine();
 
         System.out.println("Select role: ");
-        System.out.println("(1) -> Minister");
-        System.out.println("(2)-> Governor");
-        System.out.println("(3)-> Citizen");
+        System.out.println("(1) -> Citizen -- view only");
+        System.out.println("(2)-> MinistryMember -- manage assigned ministry");
+        System.out.println("(3)-> Governor -- full access to regional and national info");
         System.out.print("Choice: ");
-        String roleChoise = scanner.nextLine();
+        String roleChoice = scanner.nextLine();
+
+        String ministryName = null;
 
         User.Role role;
-        switch (roleChoise) {
+        switch (roleChoice) {
             case "1":
-                role = User.Role.MINISTER;
+                role = User.Role.CITIZEN;
                 break;
             case "2":
+                role = User.Role.MINISTRYMEMBER;
+                System.out.println("Enter ministry name");
+                ministryName = scanner.nextLine();
+                if (ministryName.isEmpty()) {
+                System.out.println("Ministry name cannot be empty!");
+                return;
+                }
+                break;
+            case "3":
                 role = User.Role.GOVERNOR;
                 break;
             default:
-                role = User.Role.CITIZEN;    
+                System.out.println("Invalid choice!");
+                return; 
         }
-        userManager.registerUser(username, password, role);
+        if (role == User.Role.MINISTRYMEMBER ? 
+        userManager.registerUser(username, password, role, ministryName) :
+        userManager.registerUser(username, password, role)) {
+    System.out.println("Registration successful!");
+}
+
     }
     
     private void loginUser() {
@@ -79,11 +96,11 @@ public class AuthUI {
     }
     private void showRoleMenu(User user) {
             switch (user.getRole()) {
-            case MINISTER:
-                System.out.println("Minister — full access");
+            case MINISTRYMEMBER:
+                System.out.println("MinistryMember — regional access");
                 break;
             case GOVERNOR:
-                System.out.println("Governor — regional access");
+                System.out.println("Governor — full access");
                 break;
             case CITIZEN:
                 System.out.println("Citizen — view only");
@@ -91,3 +108,4 @@ public class AuthUI {
         }
     }
 }
+
