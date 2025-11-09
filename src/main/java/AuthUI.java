@@ -36,7 +36,7 @@ public class AuthUI {
         }
     }
     
-    private void registerUser() {
+    private void registerUserUI() {
         System.out.println("\n=== Register New User ===");
         System.out.print("Enter username: ");
         String username = scanner.nextLine();
