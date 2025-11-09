@@ -1,0 +1,2 @@
+ilias,1234,CITIZEN
+dimitris,2345,CITIZEN
