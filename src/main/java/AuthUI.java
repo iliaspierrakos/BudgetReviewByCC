@@ -21,7 +21,7 @@ public class AuthUI {
 
             switch (usersChoise) {
                 case "1":
-                    registerUser();
+                    registerUserUI();
                     break;
                 case "2": 
                     loginUser();
