@@ -61,7 +61,7 @@ public class AuthUI {
             default:
                 role = User.Role.CITIZEN;    
         }
-        userManager.register(username, password, role);
+        userManager.registerUser(username, password, role);
     }
     
     private void loginUser() {
@@ -71,7 +71,7 @@ public class AuthUI {
         System.out.print("Enter password: ");
         String password = scanner.nextLine();
 
-        User user = userManager.login(username,password);
+        User user = userManager.loginUser(username,password);
         if (user != null) {
             System.out.println("Welcome, " + user.getUsername() + "! Role: " + user.getRole());
             showRoleMenu(user); 
