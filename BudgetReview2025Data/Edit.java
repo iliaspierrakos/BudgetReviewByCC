@@ -10,21 +10,22 @@ public void collectData() { // class for collecting user input
         System.out.println("The budget of which ministry would you like to change?");
         System.out.print("Ministry of: ");
         boolean minfound = false;
-        String tempfullname=null;
         String tempname = scanner.nextLine();
-        while (minfound = false) {
-            tempfullname = "Ministry of " + tempname;
+        String tempfullname = "Ministry of " + tempname;
+        do {
+
             for (int i = 0; i < View.ministries.length; i++) {
                 if (View.ministries[i].getMinistryName().equalsIgnoreCase(tempfullname)) {
                     minfound=true;
                     break;
                 }
             }
-            if (minfound=false) {
+            if (minfound==false) {
                 System.out.println("Invalid name of Ministry.Please type again ");
                 tempname = scanner.nextLine();
+                tempfullname = "Ministry of " + tempname;
             }
-        }
+        } while (minfound == false);
         double budget = Ministry.budgetSearchByName(tempfullname);
         System.out.println("The budget for ministry of " + tempname + " is " + Ministry.getFormattedBudget(budget)); // printing the fullname of the ministry and its current budget
 
