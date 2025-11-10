@@ -1,19 +1,32 @@
 import java.util.Scanner;
 
 public class Edit {
-private String name; //instance variables: ministryname , the type of change, the amount of the change
+private String name; //instance variables ministryname, the user's change, the amount of the change
 private String change;
 private double amount;
 private Scanner scanner = new Scanner(System.in);
 
-public void collectData() { // method for collecting user input
+public void collectData() { // class for collecting user input
         System.out.println("The budget of which ministry would you like to change?");
         System.out.print("Ministry of: ");
+        boolean minfound = false;
+        String tempfullname=null;
         String tempname = scanner.nextLine();
-        String tempfullname = "Ministry of " + tempname; 
-
+        while (minfound = false) {
+            tempfullname = "Ministry of " + tempname;
+            for (int i = 0; i < View.ministries.length; i++) {
+                if (View.ministries[i].getMinistryName().equalsIgnoreCase(tempfullname)) {
+                    minfound=true;
+                    break;
+                }
+            }
+            if (minfound=false) {
+                System.out.println("Invalid name of Ministry.Please type again ");
+                tempname = scanner.nextLine();
+            }
+        }
         double budget = Ministry.budgetSearchByName(tempfullname);
-        System.out.println("The budget for ministry of " + tempname + " is " + Ministry.getFormattedBudget(budget)); // printing the fullname of the ministry and its current budget 
+        System.out.println("The budget for ministry of " + tempname + " is " + Ministry.getFormattedBudget(budget)); // printing the fullname of the ministry and its current budget
 
         //System.out.println("The budget for ministry of " + tempname + " is " + Ministry.budgetSearchByName(tempfullname));
 
@@ -21,7 +34,7 @@ public void collectData() { // method for collecting user input
         String tempchange;
         while (true) {
             tempchange = scanner.nextLine();
-            
+
             if (tempchange.equalsIgnoreCase("Increase") || tempchange.equalsIgnoreCase("Decrease")) {
                 break; // Έγκυρη είσοδος, βγαίνουμε από το loop
             } else {
@@ -32,22 +45,22 @@ public void collectData() { // method for collecting user input
 
         System.out.print("By how much? ");
         Double tempamount = scanner.nextDouble();
-        Edit obj2 = new Edit(tempfullname,tempchange,tempamount);// creating the Edit object with the user input 
+        Edit obj2 = new Edit(tempfullname,tempchange,tempamount);// creating the Edit object with the user input
         obj2.editingbudget(obj2);
-}
-public Edit(String name, String change, double amount) {// edit constructor 
+    }
+    public Edit(String name, String change, double amount) {
         this.name = name;
         this.amount = amount;
         this.change = change;
-}
-public Edit() {}; //default constructor useless
+    }
+    public Edit() {}; //default constructor useless
 
-public void editingbudget( Edit object) {// editing budget method
-        for (int i = 0; i < View.ministries.length; i++) {// loop used for searching the ministry's name 
+    public void editingbudget( Edit object) {
+        for (int i = 0; i < View.ministries.length; i++) {
             if (View.ministries[i] != null && View.ministries[i].getMinistryName().equalsIgnoreCase(object.name)) {
-                // found the correct ministry
+                // Βρήκαμε το σωστό υπουργείο
                 double newBudget;
-                if (object.change.equalsIgnoreCase("Increase")) {// checking the type of change and making the proper move to the ministry's budget
+                if (object.change.equalsIgnoreCase("Increase")) {
                     newBudget = View.ministries[i].getBudget() + object.amount;
                 } else {
                     newBudget = View.ministries[i].getBudget() - object.amount ;

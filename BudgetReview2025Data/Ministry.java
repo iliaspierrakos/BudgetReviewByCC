@@ -26,7 +26,6 @@ public class Ministry {    //Ministry class
         }
         return -1 ;
     }
-    
     public String getMinistryName(){
         return ministryName;
     }
