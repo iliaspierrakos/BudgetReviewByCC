@@ -11,17 +11,17 @@ public void collectData() { // method for collecting user input
 
     // Ask for source ministry 
     System.out.print("Transfer from (Ministry of): ");
-    String fromName = "Ministry of " + scanner.nextLine(); 
-    fromName = validityCheck(fromName);
-
+    String fromName = "Ministry of " + scanner.nextLine();
+    
     // Ask for destination ministry 
     System.out.print("Transfer to (Ministry of): ");
     String toName = "Ministry of " + scanner.nextLine();
-    toName = validityCheck(toName);
 
     // Show their current budgets
-    System.out.println(fromName + " current budget: " + Ministry.budgetSearchByName(fromName));
-    System.out.println(toName + " current budget: " + Ministry.budgetSearchByName(toName));
+    double budget1 = Ministry.budgetSearchByName(fromName);
+    double budget2 = Ministry.budgetSearchByName(toName);
+    System.out.println(fromName + " current budget: " + Ministry.getFormattedBudget(budget1));
+    System.out.println(toName + " current budget: " + Ministry.getFormattedBudget(budget2));
 
     // Ask for transfer amount
     System.out.print("Enter amount to transfer: ");
@@ -63,24 +63,7 @@ public void editingbudget( Edit object) {// editing budget method
     }
     public void printNewBudget(double finalBudget, String type, int i) { // method for printing the Edit results
         View.ministries[i].setBudget(finalBudget);
-                System.out.println("Budget updated successfully!");
-                System.out.println("New budget for " + View.ministries[i].getMinistryName() + " " + finalBudget);// printing the new result
-    }
-
-    public String validityCheck(String name){ // method used for validating the name of the ministry exists
-       boolean minfound=false;
-        do {
-              for (int i = 0; i < View.ministries.length; i++) {
-                if (View.ministries[i].getMinistryName().equalsIgnoreCase(name)) {
-                    minfound=true;
-                    break;
-                }
-            }
-            if (minfound==false) {
-                System.out.println("Invalid name of Ministry. Please type again!");
-                name = "Ministry of " + scanner.nextLine();
-            }
-        } while (minfound == false);
-        return name;
+            System.out.println("Budget updated successfully!");
+            System.out.println("New budget for " + View.ministries[i].getMinistryName() + " " + Ministry.getFormattedBudget(finalBudget));// printing the new result
     }
 }
