@@ -1,4 +1,6 @@
-
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.Locale;
 public class Ministry {    //Ministry class
     private String ministryName; //Ministry name
     private double budget; //Ministry's general budget
@@ -24,6 +26,7 @@ public class Ministry {    //Ministry class
         }
         return -1 ;
     }
+    
     public String getMinistryName(){
         return ministryName;
     }
@@ -35,5 +38,11 @@ public class Ministry {    //Ministry class
     }
     public double getBudget() {
         return budget;
+    }
+    public static String getFormattedBudget(double budget) {
+    DecimalFormatSymbols symbols = new DecimalFormatSymbols(Locale.GERMAN);
+    symbols.setGroupingSeparator('.');
+    DecimalFormat df = new DecimalFormat("#,###", symbols);
+    return df.format(budget);
     }
 }
