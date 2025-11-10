@@ -10,26 +10,26 @@ public void collectData() { // class for collecting user input
         System.out.println("The budget of which ministry would you like to change?");
         System.out.print("Ministry of: ");
         String tempname = scanner.nextLine();
-        String tempfullname = "Ministry of " + tempname; //saving the full name of the ministry as a variable 
+        String tempfullname = "Ministry of " + tempname; //saving the full name of the ministry as a variable
 
-        System.out.println("The budget for ministry of " + tempname + " is " + Ministry.budgetSearchByName(tempfullname)); //searching the budget and printing the result 
+        System.out.println("The budget for ministry of " + tempname + " is " + Ministry.budgetSearchByName(tempfullname)); //searching the budget and printing the result
         System.out.println("How would you like to change this budget? Increase or Decrease?");
         String tempchange;
         tempchange = scanner.nextLine();
 
         System.out.print("By how much? ");
         Double tempamount = scanner.nextDouble();
-        Edit obj2 = new Edit(tempfullname,tempchange,tempamount); // creating the Edit object 
+        Edit obj2 = new Edit(tempname,tempchange,tempamount);
         obj2.editingbudget(obj2);
-}
-public Edit(String name, String change, double amount) { // Edit constructor
+    }
+    public Edit(String name, String change, double amount) {
         this.name = name;
         this.amount = amount;
         this.change = change;
-}
-public Edit() {}; //default constructor useless
+    }
+    public Edit() {}; //default constructor useless
 
-public void editingbudget( Edit object) { // 
+    public void editingbudget( Edit object) {
         for (int i = 0; i < View.ministries.length; i++) {
             if (View.ministries[i] != null && View.ministries[i].getMinistryName().equalsIgnoreCase(object.name)) {
                 // Βρήκαμε το σωστό υπουργείο
