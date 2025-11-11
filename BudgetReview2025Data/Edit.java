@@ -5,16 +5,17 @@ private String name; //instance variables: ministryname , the type of change, th
 private String change;
 private double amount;
 private Scanner scanner = new Scanner(System.in);
+public static double balance = 0;
 
-public void collectData() { // method for collecting user input 
+public void collectData() { // method for collecting user input
     System.out.println("=== Ministry Budget Transfer ===");
 
-    // Ask for source ministry 
+    // Ask for source ministry
     System.out.print("Transfer from (Ministry of): ");
-    String fromName = "Ministry of " + scanner.nextLine(); 
+    String fromName = "Ministry of " + scanner.nextLine();
     fromName = validityCheck(fromName);
 
-    // Ask for destination ministry 
+    // Ask for destination ministry
     System.out.print("Transfer to (Ministry of): ");
     String toName = "Ministry of " + scanner.nextLine();
     toName = validityCheck(toName);
@@ -26,7 +27,7 @@ public void collectData() { // method for collecting user input
     // Ask for transfer amount
     System.out.print("Enter amount to transfer: ");
     double amount = scanner.nextDouble();
-    scanner.nextLine(); 
+    scanner.nextLine();
 
     // Perform the transfer (Decrease from source, Increase to destination)
     Edit obj1 = new Edit(fromName, "Decrease", amount);
@@ -37,7 +38,7 @@ public void collectData() { // method for collecting user input
 
 }
 
-public Edit(String name, String change, double amount) {// edit constructor 
+public Edit(String name, String change, double amount) {// edit constructor
         this.name = name;
         this.amount = amount;
         this.change = change;
@@ -45,17 +46,17 @@ public Edit(String name, String change, double amount) {// edit constructor
 public Edit() {}; //default constructor useless
 
 public void editingbudget( Edit object) {// editing budget method
-        for (int i = 0; i < View.ministries.length; i++) {// loop used for searching the ministry's name 
+        for (int i = 0; i < View.ministries.length; i++) {// loop used for searching the ministry's name
             if (View.ministries[i] != null && View.ministries[i].getMinistryName().equalsIgnoreCase(object.name)) {
                 // found the correct ministry
                 double newBudget;
                 if (object.change.equalsIgnoreCase("Increase")) {// checking the type of change and making the proper move to the ministry's budget
                     newBudget = View.ministries[i].getBudget() + object.amount;
-                    printNewBudget(newBudget,"Increase",i); 
+                    printNewBudget(newBudget,"Increase",i);
                 } else {
                     newBudget = View.ministries[i].getBudget() - object.amount ;
                     printNewBudget(newBudget, "Decrease", i);
-                    
+
                 }
                 break;
             }
