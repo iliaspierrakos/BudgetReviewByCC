@@ -5,28 +5,29 @@ private String name; //instance variables: ministryname , the type of change, th
 private String change;
 private double amount;
 private Scanner scanner = new Scanner(System.in);
+public static double balance = 0;
 
-public void collectData() { // method for collecting user input 
+public void collectData() { // method for collecting user input
     System.out.println("=== Ministry Budget Transfer ===");
 
-    // Ask for source ministry 
+    // Ask for source ministry
     System.out.print("Transfer from (Ministry of): ");
     String fromName = "Ministry of " + scanner.nextLine();
-    
-    // Ask for destination ministry 
+    fromName = validityCheck(fromName);
+
+    // Ask for destination ministry
     System.out.print("Transfer to (Ministry of): ");
     String toName = "Ministry of " + scanner.nextLine();
+    toName = validityCheck(toName);
 
     // Show their current budgets
-    double budget1 = Ministry.budgetSearchByName(fromName);
-    double budget2 = Ministry.budgetSearchByName(toName);
-    System.out.println(fromName + " current budget: " + Ministry.getFormattedBudget(budget1));
-    System.out.println(toName + " current budget: " + Ministry.getFormattedBudget(budget2));
+    System.out.println(fromName + " current budget: " + Ministry.budgetSearchByName(fromName));
+    System.out.println(toName + " current budget: " + Ministry.budgetSearchByName(toName));
 
     // Ask for transfer amount
     System.out.print("Enter amount to transfer: ");
     double amount = scanner.nextDouble();
-    scanner.nextLine(); 
+    scanner.nextLine();
 
     // Perform the transfer (Decrease from source, Increase to destination)
     Edit obj1 = new Edit(fromName, "Decrease", amount);
@@ -37,7 +38,7 @@ public void collectData() { // method for collecting user input
 
 }
 
-public Edit(String name, String change, double amount) {// edit constructor 
+public Edit(String name, String change, double amount) {// edit constructor
         this.name = name;
         this.amount = amount;
         this.change = change;
@@ -45,17 +46,17 @@ public Edit(String name, String change, double amount) {// edit constructor
 public Edit() {}; //default constructor useless
 
 public void editingbudget( Edit object) {// editing budget method
-        for (int i = 0; i < View.ministries.length; i++) {// loop used for searching the ministry's name 
+        for (int i = 0; i < View.ministries.length; i++) {// loop used for searching the ministry's name
             if (View.ministries[i] != null && View.ministries[i].getMinistryName().equalsIgnoreCase(object.name)) {
                 // found the correct ministry
                 double newBudget;
                 if (object.change.equalsIgnoreCase("Increase")) {// checking the type of change and making the proper move to the ministry's budget
                     newBudget = View.ministries[i].getBudget() + object.amount;
-                    printNewBudget(newBudget,"Increase",i); 
+                    printNewBudget(newBudget,"Increase",i);
                 } else {
                     newBudget = View.ministries[i].getBudget() - object.amount ;
                     printNewBudget(newBudget, "Decrease", i);
-                    
+
                 }
                 break;
             }
@@ -63,7 +64,24 @@ public void editingbudget( Edit object) {// editing budget method
     }
     public void printNewBudget(double finalBudget, String type, int i) { // method for printing the Edit results
         View.ministries[i].setBudget(finalBudget);
-            System.out.println("Budget updated successfully!");
-            System.out.println("New budget for " + View.ministries[i].getMinistryName() + " " + Ministry.getFormattedBudget(finalBudget));// printing the new result
+                System.out.println("Budget updated successfully!");
+                System.out.println("New budget for " + View.ministries[i].getMinistryName() + " " + finalBudget);// printing the new result
+    }
+
+    public String validityCheck(String name){ // method used for validating the name of the ministry exists
+       boolean minfound=false;
+        do {
+              for (int i = 0; i < View.ministries.length; i++) {
+                if (View.ministries[i].getMinistryName().equalsIgnoreCase(name)) {
+                    minfound=true;
+                    break;
+                }
+            }
+            if (minfound==false) {
+                System.out.println("Invalid name of Ministry. Please type again!");
+                name = "Ministry of " + scanner.nextLine();
+            }
+        } while (minfound == false);
+        return name;
     }
 }
