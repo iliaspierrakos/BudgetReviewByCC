@@ -19,7 +19,7 @@ public class ViewMain {
                 do {
                 View.view(false);
                 Edit obj = new Edit();
-                obj.collectData(); // Need Object!!!!!!!
+                obj.collectData(); 
                 answer = scanner.nextLine();
                 }
               while (answer.equalsIgnoreCase("yes"));

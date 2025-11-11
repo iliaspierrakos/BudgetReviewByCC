@@ -11,11 +11,13 @@ public void collectData() { // method for collecting user input
 
     // Ask for source ministry 
     System.out.print("Transfer from (Ministry of): ");
-    String fromName = "Ministry of " + scanner.nextLine();
+    String fromName = "Ministry of " + scanner.nextLine(); 
+    fromName = validityCheck(fromName);
 
     // Ask for destination ministry 
     System.out.print("Transfer to (Ministry of): ");
     String toName = "Ministry of " + scanner.nextLine();
+    toName = validityCheck(toName);
 
     // Show their current budgets
     System.out.println(fromName + " current budget: " + Ministry.budgetSearchByName(fromName));
@@ -63,5 +65,22 @@ public void editingbudget( Edit object) {// editing budget method
         View.ministries[i].setBudget(finalBudget);
                 System.out.println("Budget updated successfully!");
                 System.out.println("New budget for " + View.ministries[i].getMinistryName() + " " + finalBudget);// printing the new result
+    }
+
+    public String validityCheck(String name){ // method used for validating the name of the ministry exists
+       boolean minfound=false;
+        do {
+              for (int i = 0; i < View.ministries.length; i++) {
+                if (View.ministries[i].getMinistryName().equalsIgnoreCase(name)) {
+                    minfound=true;
+                    break;
+                }
+            }
+            if (minfound==false) {
+                System.out.println("Invalid name of Ministry. Please type again!");
+                name = "Ministry of " + scanner.nextLine();
+            }
+        } while (minfound == false);
+        return name;
     }
 }
