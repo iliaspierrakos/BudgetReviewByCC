@@ -1,17 +1,83 @@
 import java.util.Scanner;
 
 public class Edit {
-private String name; //instance variables: ministryname , the type of change, the amount of the change
-private String change;
-private double amount;
-private Scanner scanner = new Scanner(System.in);
-public static double balance = 0;
+    private String name; //instance variables: ministryname , the type of change, the amount of the change
+    private String change;
+    private double amount;
+    private Scanner scanner = new Scanner(System.in);
+    public static double balance = 0;
 
-public void collectData() { // method for collecting user input
-    System.out.println("*** Ministry Budget Transfer ***");
+    public void collectData() { // method for collecting user input
+        System.out.println("*** Ministry Budget Transfer ***");
 
-    if (balance==0) {
+        if (balance==0) {
+            zerobalance();
+        } else {
+            nonzerobalance();
+        }
+    }
+
+
+    public Edit(String name, String change, double amount) {// edit constructor
+        this.name = name;
+        this.amount = amount;
+        this.change = change;
+    }
+
+
+    public Edit() {}; //default constructor useless
+
+
+
+    public void editingbudget( Edit object) {// editing budget method
+        for (int i = 0; i < View.ministries.length; i++) {// loop used for searching the ministry's name
+            if (View.ministries[i] != null && View.ministries[i].getMinistryName().equalsIgnoreCase(object.name)) {
+                // found the correct ministry
+                double newBudget;
+                if (object.change.equalsIgnoreCase("Increase")) {// checking the type of change and making the proper move to the ministry's budget
+                    newBudget = View.ministries[i].getBudget() + object.amount;
+                    printNewBudget(newBudget,"Increase",i);
+                } else {
+                    newBudget = View.ministries[i].getBudget() - object.amount ;
+                    printNewBudget(newBudget, "Decrease", i);
+
+                }
+                break;
+            }
+        }
+    }
+
+
+    public void printNewBudget(double finalBudget, String type, int i) { // method for printing the Edit results
+        View.ministries[i].setBudget(finalBudget);
+        System.out.println("Budget updated successfully!");
+        System.out.println("New budget for " + View.ministries[i].getMinistryName() + " " + finalBudget);// printing the new result
+    }
+
+
+
+    public String validityCheck(String name){ // method used for validating the name of the ministry exists
+       boolean minfound=false;
+        do {
+            for (int i = 0; i < View.ministries.length; i++) {
+                if (View.ministries[i].getMinistryName().equalsIgnoreCase(name)) {
+                    minfound=true;
+                    break;
+                }
+            }
+            if (minfound==false) {
+                System.out.println("Invalid name of Ministry. Please type again!");
+                name = "Ministry of " + scanner.nextLine();
+            }
+        } while (minfound == false);
+        return name;
+    }
+
+
+
+    public void zerobalance(){
         // Ask for source ministry
+        System.out.println("You have to decrease first a ministries' budget because you do not have available money ");
         System.out.println("Which ministries' budgets do you want to decrease?");
         String fromName = "Ministry of " + scanner.nextLine();
         fromName = validityCheck(fromName);
@@ -29,64 +95,19 @@ public void collectData() { // method for collecting user input
 
         //Ask for edit either increase or decrease
         System.out.println("Would you like to edit the budget of another ministry? ");
-        String answer=scanner.nextLine(); //need validation
+        String answer=scanner.nextLine();
+        //Validation for answer
+        answer=validityAnswer(answer);
 
-        if (answer.equalsIgnoreCase("no")) { //need validation
+        if (answer.equalsIgnoreCase("no")) {
             return; //exit
         }
-        newedit();
-    } else {
-        newedit();
-    }
-}
-
-public Edit(String name, String change, double amount) {// edit constructor
-        this.name = name;
-        this.amount = amount;
-        this.change = change;
-}
-public Edit() {}; //default constructor useless
-
-public void editingbudget( Edit object) {// editing budget method
-        for (int i = 0; i < View.ministries.length; i++) {// loop used for searching the ministry's name
-            if (View.ministries[i] != null && View.ministries[i].getMinistryName().equalsIgnoreCase(object.name)) {
-                // found the correct ministry
-                double newBudget;
-                if (object.change.equalsIgnoreCase("Increase")) {// checking the type of change and making the proper move to the ministry's budget
-                    newBudget = View.ministries[i].getBudget() + object.amount;
-                    printNewBudget(newBudget,"Increase",i);
-                } else {
-                    newBudget = View.ministries[i].getBudget() - object.amount ;
-                    printNewBudget(newBudget, "Decrease", i);
-
-                }
-                break;
-            }
-        }
-    }
-    public void printNewBudget(double finalBudget, String type, int i) { // method for printing the Edit results
-        View.ministries[i].setBudget(finalBudget);
-                System.out.println("Budget updated successfully!");
-                System.out.println("New budget for " + View.ministries[i].getMinistryName() + " " + finalBudget);// printing the new result
+        nonzerobalance();
     }
 
-    public String validityCheck(String name){ // method used for validating the name of the ministry exists
-       boolean minfound=false;
-        do {
-              for (int i = 0; i < View.ministries.length; i++) {
-                if (View.ministries[i].getMinistryName().equalsIgnoreCase(name)) {
-                    minfound=true;
-                    break;
-                }
-            }
-            if (minfound==false) {
-                System.out.println("Invalid name of Ministry. Please type again!");
-                name = "Ministry of " + scanner.nextLine();
-            }
-        } while (minfound == false);
-        return name;
-    }
-    public void newedit () {
+
+
+    public void nonzerobalance () {
         String newanswer;
         do {
             // Ask for destination ministry
@@ -95,7 +116,9 @@ public void editingbudget( Edit object) {// editing budget method
             toName = validityCheck(toName);
 
             System.out.println("Do you want to Increase or Decrease the budget of " + toName + "?" );
-            String change=scanner.nextLine(); //need validation
+            String change=scanner.nextLine();
+            //Validation for change
+            change = validityChange(change);
             System.out.println("By how much?");
             double changeamount = scanner.nextDouble(); //need validation
             scanner.nextLine();
@@ -103,9 +126,8 @@ public void editingbudget( Edit object) {// editing budget method
             if (change.equalsIgnoreCase("Decrease")) {
                 balance=balance + changeamount;
             } else {
-                balance = balance - changeamount; //need validation changeamount more that balance
+                balance = balance - changeamount; //need validation changeamount more than balance
             }
-
             // Show their current budgets
             System.out.println(toName + " current budget: " + Ministry.budgetSearchByName(toName));
 
@@ -115,7 +137,40 @@ public void editingbudget( Edit object) {// editing budget method
             System.out.println("Available money for Investment : " +balance);
             //Ask for edit either increase or decrease
             System.out.println("Would you like to edit the budget of another ministry? ");
-            newanswer=scanner.nextLine(); //need validation
+            newanswer=scanner.nextLine();
+            newanswer=validityAnswer(newanswer);
+            if (balance==0 && newanswer.equalsIgnoreCase("yes")){
+                zerobalance();
+            }
         } while (newanswer.equalsIgnoreCase("yes"));
+    }
+
+
+
+    public String validityChange(String validChange) {
+        while (true) {
+            if (!validChange.equalsIgnoreCase("Increase") && !validChange.equalsIgnoreCase("Decrease")) {
+                System.out.println("Invalid input, please type Increase or Decrease");
+            } else {
+                break;
+            }
+            validChange=scanner.nextLine();
+        }
+        return validChange;
+    }
+
+
+
+    public String validityAnswer(String validAnswer) {
+        boolean valid = false ;
+        do {
+            if (validAnswer.equalsIgnoreCase("yes") || validAnswer.equalsIgnoreCase("no")) {
+                valid = true;
+            } else {
+                System.out.println("Error: Invalid input. Your answer must be either Yes or No.");
+                validAnswer=scanner.nextLine();
+            }
+        } while(!valid);
+        return validAnswer;
     }
 }
