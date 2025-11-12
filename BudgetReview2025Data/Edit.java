@@ -11,34 +11,9 @@ public class Edit {
         System.out.println("*** Ministry Budget Transfer ***");
 
         if (balance==0) {
-            // Ask for source ministry
-            System.out.println("Which ministries' budgets do you want to decrease?");
-            String fromName = "Ministry of " + scanner.nextLine();
-            fromName = validityCheck(fromName);
-
-            // Ask for transfer amount
-            System.out.println("Enter amount to decrease:");
-            double amount = scanner.nextDouble(); //need validation
-            scanner.nextLine();
-            balance = balance + amount;
-            System.out.println(fromName + " previous budget: " + Ministry.budgetSearchByName(fromName));
-            Edit obj1 = new Edit(fromName, "Decrease", amount);
-            obj1.editingbudget(obj1);
-            System.out.println("Available money for Investment : " + balance);
-
-
-            //Ask for edit either increase or decrease
-            System.out.println("Would you like to edit the budget of another ministry? ");
-            String answer=scanner.nextLine(); //need validation
-            //Validation for answer
-            answer=validityAnswer(answer);
-
-            if (answer.equalsIgnoreCase("no")) { //need validation
-                return; //exit
-            }
-            newedit();
+            zerobalance();
         } else {
-            newedit();
+            nonzerobalance();
         }
     }
 
@@ -100,7 +75,39 @@ public class Edit {
 
 
 
-    public void newedit () {
+    public void zerobalance(){
+        // Ask for source ministry
+        System.out.println("You have to decrease first a ministries' budget because you do not have available money ");
+        System.out.println("Which ministries' budgets do you want to decrease?");
+        String fromName = "Ministry of " + scanner.nextLine();
+        fromName = validityCheck(fromName);
+
+        // Ask for transfer amount
+        System.out.println("Enter amount to decrease:");
+        double amount = scanner.nextDouble(); //need validation
+        scanner.nextLine();
+        balance = balance + amount;
+        System.out.println(fromName + " previous budget: " + Ministry.budgetSearchByName(fromName));
+        Edit obj1 = new Edit(fromName, "Decrease", amount);
+        obj1.editingbudget(obj1);
+        System.out.println("Available money for Investment : " + balance);
+
+
+        //Ask for edit either increase or decrease
+        System.out.println("Would you like to edit the budget of another ministry? ");
+        String answer=scanner.nextLine();
+        //Validation for answer
+        answer=validityAnswer(answer);
+
+        if (answer.equalsIgnoreCase("no")) {
+            return; //exit
+        }
+        nonzerobalance();
+    }
+
+
+
+    public void nonzerobalance () {
         String newanswer;
         do {
             // Ask for destination ministry
@@ -121,7 +128,6 @@ public class Edit {
             } else {
                 balance = balance - changeamount; //need validation changeamount more than balance
             }
-            //if balance = balance - changeamount=0 then you have to go to the start and ask the user the first question
             // Show their current budgets
             System.out.println(toName + " current budget: " + Ministry.budgetSearchByName(toName));
 
@@ -131,7 +137,11 @@ public class Edit {
             System.out.println("Available money for Investment : " +balance);
             //Ask for edit either increase or decrease
             System.out.println("Would you like to edit the budget of another ministry? ");
-            newanswer=scanner.nextLine(); //need validation
+            newanswer=scanner.nextLine();
+            newanswer=validityAnswer(newanswer);
+            if (balance==0 && newanswer.equalsIgnoreCase("yes")){
+                zerobalance();
+            }
         } while (newanswer.equalsIgnoreCase("yes"));
     }
 
