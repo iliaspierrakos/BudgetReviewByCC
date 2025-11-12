@@ -26,15 +26,15 @@ public void collectData() { // method for collecting user input
                 scanner.nextLine();
 
                 if (amount > currentBudget){
-                System.out.println("Error:The amount ("+ amount + ") exceeds the Ministry's currnet budget ("+ currentBudget + 
+                System.out.println("Error: The amount ("+ amount + ") exceeds the Ministry's current budget ("+ currentBudget + 
                 "). Please enter a smaller amount");
-                }else if (amount<=0) {
-               System.out.println("Error:The amount must be a positive number. Please enter a new amount"); 
-                }else {
+                } else if (amount<=0) {
+               System.out.println("Error: The amount must be a positive number. Please enter a new amount"); 
+                } else {
                 validInput = true;
             }
-        }else {
-            System.out.println("Error:Invalid input. Please enter a valid number");
+        } else {
+            System.out.println("Error: Invalid input. Please enter a valid number");
             scanner.nextLine();
         }
     }    
@@ -47,8 +47,18 @@ public void collectData() { // method for collecting user input
 
 
     //Ask for edit either increase or decrease
-    System.out.println("Would you like to edit the budget of another ministry? ");
-    String answer=scanner.nextLine(); //need validation
+    String answer; 
+    boolean validAnswer = false ;
+    do {
+        System.out.println("Would you like to edit the budget of another ministry? "); 
+        answer = scanner.nextLine();
+         if (answer.equalsIgnoreCase("yes") || answer.equalsIgnoreCase("no")) {
+            validAnswer = true;
+         } else {
+            System.out.println("Error: Invalid input. Your answer must be either yes or no.");
+         }
+    } while(!validAnswer);
+
 
     if (answer.equalsIgnoreCase("no")) { //need validation
             return; //exit

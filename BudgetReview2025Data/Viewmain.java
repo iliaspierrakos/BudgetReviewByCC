@@ -1,5 +1,5 @@
 import java.util.Scanner;
-public class ViewMain {
+public class Viewmain {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         Ministries min = new Ministries();
