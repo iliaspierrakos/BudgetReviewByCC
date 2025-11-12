@@ -15,23 +15,42 @@ public void collectData() { // method for collecting user input
         System.out.println("Which ministries' budgets do you want to decrease?");
         String fromName = "Ministry of " + scanner.nextLine();
         fromName = validityCheck(fromName);
+        //Input validation check 
+        double currentBudget = Ministry.budgetSearchByName(fromName);
+        double amount = 0;
+        boolean validInput = false ;
+        while (!validInput) {
+            System.out.println("Enter amount to decrease:");// Ask for transfer amount
+            if (scanner.hasNextDouble()) {
+                amount = scanner.nextDouble();
+                scanner.nextLine();
 
-        // Ask for transfer amount
-        System.out.println("Enter amount to decrease:");
-        double amount = scanner.nextDouble(); //need validation
-        scanner.nextLine();
-        balance = balance + amount;
-        System.out.println(fromName + " previous budget: " + Ministry.budgetSearchByName(fromName));
-        Edit obj1 = new Edit(fromName, "Decrease", amount);
-        obj1.editingbudget(obj1);
-        System.out.println("Available money for Investment : " + balance);
+                if (amount > currentBudget){
+                System.out.println("Error:The amount ("+ amount + ") exceeds the Ministry's currnet budget ("+ currentBudget + 
+                "). Please enter a smaller amount");
+                }else if (amount<=0) {
+               System.out.println("Error:The amount must be a positive number. Please enter a new amount"); 
+                }else {
+                validInput = true;
+            }
+        }else {
+            System.out.println("Error:Invalid input. Please enter a valid number");
+            scanner.nextLine();
+        }
+    }    
+        
+    balance = balance + amount;
+    System.out.println(fromName + " previous budget: " + Ministry.budgetSearchByName(fromName));
+    Edit obj1 = new Edit(fromName, "Decrease", amount);
+    obj1.editingbudget(obj1);
+    System.out.println("Available money for Investment : " + balance);
 
 
-        //Ask for edit either increase or decrease
-        System.out.println("Would you like to edit the budget of another ministry? ");
-        String answer=scanner.nextLine(); //need validation
+    //Ask for edit either increase or decrease
+    System.out.println("Would you like to edit the budget of another ministry? ");
+    String answer=scanner.nextLine(); //need validation
 
-        if (answer.equalsIgnoreCase("no")) { //need validation
+    if (answer.equalsIgnoreCase("no")) { //need validation
             return; //exit
         }
         newedit();
