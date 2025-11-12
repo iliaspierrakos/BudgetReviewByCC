@@ -4,8 +4,8 @@ import java.nio.file.*;
 import java.util.*;
 
 public class View {
-    public static Ministry[] ministries = new Ministry[20];  //array used for saving the ministry objects  
-       public void view() {
+    public static Ministry[] ministries = new Ministry[20];  //array used for saving the ministry objects
+       public static void view(boolean print) {
         Path budgetsFile = Path.of("MINISTRIESBUDGETS.csv");
         Path ministriesFile = Path.of("ministries.txt");
         Path outputFile = Path.of("view.txt");
@@ -20,10 +20,10 @@ public class View {
             try (BufferedWriter writer = Files.newBufferedWriter(outputFile, StandardCharsets.UTF_8)) {
                 for (int i = 0; i < total; i++) {
                     String budgetLine = budgetLines.get(i).trim();
-                    String ministryName = ministryNames.get(i).trim();                
+                    String ministryName = ministryNames.get(i).trim();
                     String[] tokens = budgetLine.split("\\s+");
                     String lastNumber = "N/A";
-                    
+
 
                     for (int j = tokens.length - 1; j >= 0; j--) {
                         if (tokens[j].matches("[\\d\\.]+")) {
@@ -32,19 +32,23 @@ public class View {
                         }
                     }
                     double budget = 0.0;
+                    lastNumber = lastNumber.replaceAll("\\.", "");
                     try {
+                        //String cleanNumber = lastNumber.replace(".", "");
+                        //cleanNumber = cleanNumber.replace(",", ".");
                         budget = Double.parseDouble(lastNumber);
-                    } catch (NumberFormatException e) {
+                    } catch (Exception e) {
                         System.err.println("Error parsing budget for " + ministryName + ": " + lastNumber);
                         budget = 0.0;
                     }
                     ministries[i]= new Ministry(ministryName, budget); //making the ministry objects and saving them in the array
-                    
+
 
                     writer.write(ministryName + " " + lastNumber);
                     writer.newLine();
-                    System.out.println(ministryName + " " + lastNumber);
-                    
+                    if (print) {
+                        System.out.println(ministryName + " " + lastNumber);
+                    }
 
                 }
 

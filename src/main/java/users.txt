@@ -1,0 +1,3 @@
+ilias,1234,CITIZEN
+dimitris,2345,CITIZEN
+myrto ,12345,CITIZEN

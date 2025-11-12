@@ -3,7 +3,7 @@ public class User {
         // The Role enum defines the possible user roles.
     public enum Role {
         GOVERNOR, // Full access — can modify the national budget
-        MINISTER, // Limited access — can propose regional changes
+        MINISTRYMEMBER, // Limited access — can propose regional changes
         CITIZEN   // Read-only access — can only view public data
     }
 
