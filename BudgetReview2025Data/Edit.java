@@ -96,6 +96,15 @@ public class Edit {
 
             System.out.println("Do you want to Increase or Decrease the budget of " + toName + "?" );
             String change=scanner.nextLine(); //need validation
+            boolean validchange = false;
+            while (validchange == false) {
+                if (!change.equalsIgnoreCase("Increase") && !change.equalsIgnoreCase("Decrease")) {
+                    System.out.println("Invalid input, please type Increase or Decrease");
+                } else {
+                  break;
+                }
+                change=scanner.nextLine();
+            }
             System.out.println("By how much?");
             double changeamount = scanner.nextDouble(); //need validation
             scanner.nextLine();
@@ -103,7 +112,7 @@ public class Edit {
             if (change.equalsIgnoreCase("Decrease")) {
                 balance=balance + changeamount;
             } else {
-                balance = balance - changeamount; //need validation changeamount more that balance
+                balance = balance - changeamount; //need validation changeamount more than balance
             }
 
             // Show their current budgets
