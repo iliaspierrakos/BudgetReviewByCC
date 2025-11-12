@@ -30,6 +30,8 @@ public class Edit {
             //Ask for edit either increase or decrease
             System.out.println("Would you like to edit the budget of another ministry? ");
             String answer=scanner.nextLine(); //need validation
+            //Validation for answer
+            answer=validityAnswer(answer);
 
             if (answer.equalsIgnoreCase("no")) { //need validation
                 return; //exit
@@ -40,12 +42,17 @@ public class Edit {
         }
     }
 
+
     public Edit(String name, String change, double amount) {// edit constructor
         this.name = name;
         this.amount = amount;
         this.change = change;
     }
+
+
     public Edit() {}; //default constructor useless
+
+
 
     public void editingbudget( Edit object) {// editing budget method
         for (int i = 0; i < View.ministries.length; i++) {// loop used for searching the ministry's name
@@ -64,11 +71,15 @@ public class Edit {
             }
         }
     }
+
+
     public void printNewBudget(double finalBudget, String type, int i) { // method for printing the Edit results
         View.ministries[i].setBudget(finalBudget);
         System.out.println("Budget updated successfully!");
         System.out.println("New budget for " + View.ministries[i].getMinistryName() + " " + finalBudget);// printing the new result
     }
+
+
 
     public String validityCheck(String name){ // method used for validating the name of the ministry exists
        boolean minfound=false;
@@ -86,6 +97,9 @@ public class Edit {
         } while (minfound == false);
         return name;
     }
+
+
+
     public void newedit () {
         String newanswer;
         do {
@@ -95,16 +109,9 @@ public class Edit {
             toName = validityCheck(toName);
 
             System.out.println("Do you want to Increase or Decrease the budget of " + toName + "?" );
-            String change=scanner.nextLine(); //need validation
-            boolean validchange = false;
-            while (validchange == false) {
-                if (!change.equalsIgnoreCase("Increase") && !change.equalsIgnoreCase("Decrease")) {
-                    System.out.println("Invalid input, please type Increase or Decrease");
-                } else {
-                  break;
-                }
-                change=scanner.nextLine();
-            }
+            String change=scanner.nextLine();
+            //Validation for change
+            change = validityChange(change);
             System.out.println("By how much?");
             double changeamount = scanner.nextDouble(); //need validation
             scanner.nextLine();
@@ -114,7 +121,7 @@ public class Edit {
             } else {
                 balance = balance - changeamount; //need validation changeamount more than balance
             }
-
+            //if balance = balance - changeamount=0 then you have to go to the start and ask the user the first question
             // Show their current budgets
             System.out.println(toName + " current budget: " + Ministry.budgetSearchByName(toName));
 
@@ -126,5 +133,34 @@ public class Edit {
             System.out.println("Would you like to edit the budget of another ministry? ");
             newanswer=scanner.nextLine(); //need validation
         } while (newanswer.equalsIgnoreCase("yes"));
+    }
+
+
+
+    public String validityChange(String validChange) {
+        while (true) {
+            if (!validChange.equalsIgnoreCase("Increase") && !validChange.equalsIgnoreCase("Decrease")) {
+                System.out.println("Invalid input, please type Increase or Decrease");
+            } else {
+                break;
+            }
+            validChange=scanner.nextLine();
+        }
+        return validChange;
+    }
+
+
+
+    public String validityAnswer(String validAnswer) {
+        boolean valid = false ;
+        do {
+            if (validAnswer.equalsIgnoreCase("yes") || validAnswer.equalsIgnoreCase("no")) {
+                valid = true;
+            } else {
+                System.out.println("Error: Invalid input. Your answer must be either Yes or No.");
+                validAnswer=scanner.nextLine();
+            }
+        } while(!valid);
+        return validAnswer;
     }
 }
