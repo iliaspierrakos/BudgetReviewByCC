@@ -1,12 +1,13 @@
-/** 
+/**
 * The ViewEditBudget class creates the necessary files for the application.
-* It also creates the ministry objects and saves them in a static array, 
+* It also creates the ministry objects and saves them in a static array,
 * which is essential for the operations this application will support.
-* It also prints the menu that allows users to view, edit and manage 
-* ministry budgets. 
-*/ 
+* It also prints the menu that allows users to view, edit and manage
+* ministry budgets.
+*/
 
 import java.util.Scanner;
+import java.util.prefs.BackingStoreException;
 public class ViewEditBudget {
     public static void budgetMenu() {
         Scanner scanner = new Scanner(System.in);
@@ -19,7 +20,8 @@ public class ViewEditBudget {
             System.out.println("Do you want to :");
             System.out.println("1.View");
             System.out.println("2.Edit");
-            System.out.println("3.Exit");
+            System.out.println("3.Return");
+            System.out.println("4.Exit");
             int number = scanner.nextInt();
             String answer = "no";
             switch (number) {
@@ -35,6 +37,8 @@ public class ViewEditBudget {
                 }while (answer.equalsIgnoreCase("yes"));
                 break;
             case 3:
+                return;
+            case 4:
                 System.exit(0);
                 break;
             default:
