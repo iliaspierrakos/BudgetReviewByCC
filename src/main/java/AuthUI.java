@@ -93,6 +93,7 @@ import java.util.Scanner;
             System.out.println("Welcome, " + user.getUsername() + "! Role: " + user.getRole());
             showRoleMenu(user); 
         }
+        ViewEditBudget.budgetMenu();
     }
     private void showRoleMenu(User user) {
             switch (user.getRole()) {
