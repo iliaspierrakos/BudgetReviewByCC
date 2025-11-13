@@ -19,7 +19,7 @@ public class Ministry {    //Ministry class
     }
 
     public static double budgetSearchByName(String searchingMinistry) { //method for searching the regular budget of a ministry with its name
-        for (Ministry m : View.ministries) {
+        for (Ministry m : CreatingMinistries.ministries) {
             if (m.ministryName.equalsIgnoreCase(searchingMinistry)) {
                 return m.budget;
             }

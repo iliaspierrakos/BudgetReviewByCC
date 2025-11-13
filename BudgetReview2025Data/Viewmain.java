@@ -15,12 +15,13 @@ public class ViewMain {
             String answer = "no";
             switch (number) {
             case 1:
-                View.view(true); //Run View
+                CreatingMinistries.view(); // Creating Ministries
+                View.ViewGovBudget();
                 System.out.println("Available=" + Edit.balance);
                 break;
             case 2:
                 do {
-                    View.view(false);
+                    CreatingMinistries.view();
                     Edit obj = new Edit();
                     obj.collectData();
                     answer = scanner.nextLine();

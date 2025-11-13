@@ -31,15 +31,15 @@ public class Edit {
 
 
     public void editingbudget( Edit object) {// Editing budget method
-        for (int i = 0; i < View.ministries.length; i++) {// Loop used for searching the ministry's name
-            if (View.ministries[i] != null && View.ministries[i].getMinistryName().equalsIgnoreCase(object.name)) {
+        for (int i = 0; i < CreatingMinistries.ministries.length; i++) {// Loop used for searching the ministry's name
+            if (CreatingMinistries.ministries[i] != null && CreatingMinistries.ministries[i].getMinistryName().equalsIgnoreCase(object.name)) {
                 // found the correct ministry
                 double newBudget;
                 if (object.change.equalsIgnoreCase("Increase")) {// checking the type of change and making the proper move to the ministry's budget
-                    newBudget = View.ministries[i].getBudget() + object.amount;
+                    newBudget = CreatingMinistries.ministries[i].getBudget() + object.amount;
                     printNewBudget(newBudget,"Increase",i);
                 } else {
-                    newBudget = View.ministries[i].getBudget() - object.amount ;
+                    newBudget = CreatingMinistries.ministries[i].getBudget() - object.amount ;
                     printNewBudget(newBudget, "Decrease", i);
 
                 }
@@ -50,9 +50,9 @@ public class Edit {
 
 
     public void printNewBudget(double finalBudget, String type, int i) { // method for printing the Edit results
-        View.ministries[i].setBudget(finalBudget);
+        CreatingMinistries.ministries[i].setBudget(finalBudget);
         System.out.println("Budget updated successfully!");
-        System.out.println("New budget for " + View.ministries[i].getMinistryName() + " " + finalBudget);// printing the new result
+        System.out.println("New budget for " + CreatingMinistries.ministries[i].getMinistryName() + " " + finalBudget);// printing the new result
     }
 
 
@@ -60,8 +60,8 @@ public class Edit {
     public String validityCheck(String name){
        boolean minfound=false;
         do {
-            for (int i = 0; i < View.ministries.length; i++) {
-                if (View.ministries[i].getMinistryName().equalsIgnoreCase(name)) {
+            for (int i = 0; i < CreatingMinistries.ministries.length; i++) {
+                if (CreatingMinistries.ministries[i].getMinistryName().equalsIgnoreCase(name)) {
                     minfound=true;
                     break;
                 }
