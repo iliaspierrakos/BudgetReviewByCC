@@ -1,7 +1,8 @@
 import java.util.Scanner;
 
 public class Edit {
-    private String name; //instance variables: ministryname , the type of change, the amount of the change
+    //instance variables: ministryname , the type of change, the amount of the change
+    private String name;
     private String change;
     private double amount;
     private Scanner scanner = new Scanner(System.in);
@@ -11,9 +12,9 @@ public class Edit {
         System.out.println("*** Ministry Budget Transfer ***");
 
         if (balance==0) {
-            zerobalance();
+            zerobalance(); // No money available, must decrease first
         } else {
-            nonzerobalance();
+            nonzerobalance(); // Money available, can increase or decrease
         }
     }
 
@@ -29,8 +30,8 @@ public class Edit {
 
 
 
-    public void editingbudget( Edit object) {// editing budget method
-        for (int i = 0; i < View.ministries.length; i++) {// loop used for searching the ministry's name
+    public void editingbudget( Edit object) {// Editing budget method
+        for (int i = 0; i < View.ministries.length; i++) {// Loop used for searching the ministry's name
             if (View.ministries[i] != null && View.ministries[i].getMinistryName().equalsIgnoreCase(object.name)) {
                 // found the correct ministry
                 double newBudget;
@@ -42,7 +43,7 @@ public class Edit {
                     printNewBudget(newBudget, "Decrease", i);
 
                 }
-                break;
+                break; // Exit loop once ministry is found
             }
         }
     }
@@ -55,8 +56,8 @@ public class Edit {
     }
 
 
-
-    public String validityCheck(String name){ // method used for validating the name of the ministry exists
+    // Validate the ministry name
+    public String validityCheck(String name){
        boolean minfound=false;
         do {
             for (int i = 0; i < View.ministries.length; i++) {
@@ -74,30 +75,29 @@ public class Edit {
     }
 
 
-
+    // Edit when balance is zero (must decrease first)
     public void zerobalance(){
         // Ask for source ministry
-        System.out.println("You have to decrease first a ministries' budget because you do not have available money ");
-        System.out.println("Which ministries' budgets do you want to decrease?");
+        System.out.println("You have to decrease first a ministry's budget because you do not have available money ");
+        System.out.println("Which ministry's budgets do you want to decrease?");
         String fromName = "Ministry of " + scanner.nextLine();
-        fromName = validityCheck(fromName);
+        fromName = validityCheck(fromName); //Validate the ministry's name
 
-        // Ask for transfer amount
+        // Ask for amount
         System.out.println("Enter amount to decrease:");
-        double amount = scanner.nextDouble(); //need validation
-        scanner.nextLine();
+        double amount = validityAmount(Ministry.budgetSearchByName(fromName)); //Validate the amount with ministry's budget
         balance = balance + amount;
+        // Show previous budget and perform the decrease
         System.out.println(fromName + " previous budget: " + Ministry.budgetSearchByName(fromName));
         Edit obj1 = new Edit(fromName, "Decrease", amount);
         obj1.editingbudget(obj1);
         System.out.println("Available money for Investment : " + balance);
 
 
-        //Ask for edit either increase or decrease
+        //Ask for a new edit either increase or decrease
         System.out.println("Would you like to edit the budget of another ministry? ");
         String answer=scanner.nextLine();
-        //Validation for answer
-        answer=validityAnswer(answer);
+        answer=validityAnswer(answer);  //Validation for answer
 
         if (answer.equalsIgnoreCase("no")) {
             return; //exit
@@ -106,27 +106,27 @@ public class Edit {
     }
 
 
-
+    //Edit when balance is available
     public void nonzerobalance () {
         String newanswer;
         do {
             // Ask for destination ministry
-            System.out.println("Which ministries' budgets do you want to edit?");
+            System.out.println("Which ministry's budgets do you want to edit?");
             String toName = "Ministry of " + scanner.nextLine();
-            toName = validityCheck(toName);
+            toName = validityCheck(toName); //Validate
 
             System.out.println("Do you want to Increase or Decrease the budget of " + toName + "?" );
             String change=scanner.nextLine();
-            //Validation for change
-            change = validityChange(change);
+            change = validityChange(change); //Validation for change
             System.out.println("By how much?");
-            double changeamount = scanner.nextDouble(); //need validation
-            scanner.nextLine();
+            double changeamount = 0;
 
             if (change.equalsIgnoreCase("Decrease")) {
+                changeamount = validityAmount(Ministry.budgetSearchByName(toName)); //Validate the amount with ministry's budget
                 balance=balance + changeamount;
             } else {
-                balance = balance - changeamount; //need validation changeamount more than balance
+                changeamount = validityAmount(balance); //Validate the amount with balance
+                balance = balance - changeamount;
             }
             // Show their current budgets
             System.out.println(toName + " current budget: " + Ministry.budgetSearchByName(toName));
@@ -139,6 +139,7 @@ public class Edit {
             System.out.println("Would you like to edit the budget of another ministry? ");
             newanswer=scanner.nextLine();
             newanswer=validityAnswer(newanswer);
+            // If balance is 0 and user wants a new edit , go to zerobalance
             if (balance==0 && newanswer.equalsIgnoreCase("yes")){
                 zerobalance();
             }
@@ -146,7 +147,7 @@ public class Edit {
     }
 
 
-
+    // Validate that the change type is either Increase or Decrease
     public String validityChange(String validChange) {
         while (true) {
             if (!validChange.equalsIgnoreCase("Increase") && !validChange.equalsIgnoreCase("Decrease")) {
@@ -160,17 +161,45 @@ public class Edit {
     }
 
 
-
+    // Validate that the change type is either yes or no
     public String validityAnswer(String validAnswer) {
         boolean valid = false ;
         do {
             if (validAnswer.equalsIgnoreCase("yes") || validAnswer.equalsIgnoreCase("no")) {
                 valid = true;
             } else {
-                System.out.println("Error: Invalid input. Your answer must be either Yes or No.");
+                System.out.println("Invalid input. Your answer must be either Yes or No.");
                 validAnswer=scanner.nextLine();
             }
         } while(!valid);
         return validAnswer;
+    }
+
+    //Validate the amount
+    public double validityAmount(double budgetOrBalance) {
+        boolean validInput = false;
+        double validAmount = 0;
+        while (!validInput) {
+            if (scanner.hasNextDouble()) {
+                // Check if input is a valid double
+                validAmount = scanner.nextDouble();
+                scanner.nextLine(); // Clear
+                if (validAmount>0) {
+                    if (budgetOrBalance < validAmount) {//if decrease takes the current budget if decrease takes the balance
+                        System.out.println("The amount "+ validAmount + " exceeds the maximum limit "+ budgetOrBalance +
+                        ". Please enter a smaller amount");
+                    } else {
+                        break;
+                    }
+                } else {
+                    System.out.println("The amount must be a positive number. Please enter a new amount");
+                }
+            } else {
+                System.out.println("Invalid input! Please enter a numeric value.");
+                scanner.nextLine();
+            }
+
+        }
+        return validAmount;
     }
 }
