@@ -1,4 +1,6 @@
 import java.util.Scanner;
+import java.text.NumberFormat;
+import java.util.Locale;
 
 public class Edit {
     //instance variables: ministryname , the type of change, the amount of the change
@@ -26,7 +28,6 @@ public class Edit {
     }
 
 
-    public Edit() {}; //default constructor useless
 
 
 
@@ -52,7 +53,7 @@ public class Edit {
     public void printNewBudget(double finalBudget, String type, int i) { // method for printing the Edit results
         CreatingMinistries.ministries[i].setBudget(finalBudget);
         System.out.println("Budget updated successfully!");
-        System.out.println("New budget for " + CreatingMinistries.ministries[i].getMinistryName() + " " + CreatingMinistries.ministries[i].getBudget());// printing the new result
+        System.out.println("New budget for " + CreatingMinistries.ministries[i].getMinistryName() + " " + formatNumber(CreatingMinistries.ministries[i].getBudget()));// printing the new result
     }
 
 
@@ -88,7 +89,7 @@ public class Edit {
         double amount = validityAmount(Ministry.budgetSearchByName(fromName)); //Validate the amount with ministry's budget
         balance = balance + amount;
         // Show previous budget and perform the decrease
-        System.out.println(fromName + " previous budget: " + Ministry.budgetSearchByName(fromName));
+        System.out.println(fromName + " previous budget: " + formatNumber(Ministry.budgetSearchByName(fromName)));
         Edit obj1 = new Edit(fromName, "Decrease", amount);
         obj1.editingbudget(obj1);
         System.out.println("Available money for Investment : " + balance);
@@ -129,7 +130,7 @@ public class Edit {
                 balance = balance - changeamount;
             }
             // Show their current budgets
-            System.out.println(toName + " current budget: " + Ministry.budgetSearchByName(toName));
+            System.out.println(toName + " current budget: " + formatNumber(Ministry.budgetSearchByName(toName)));
 
             // Perform the transfer (Decrease from source, Increase to destination)
             Edit obj2 = new Edit(toName, change, changeamount);
@@ -201,5 +202,17 @@ public class Edit {
 
         }
         return validAmount;
+    }
+
+
+    NumberFormat df = NumberFormat.getNumberInstance(Locale.US);//make number readable
+
+
+    //make number readable
+    public Edit() {
+        df.setMaximumFractionDigits(2);
+    }
+    public String formatNumber(double number) {
+        return df.format(number);
     }
 }
