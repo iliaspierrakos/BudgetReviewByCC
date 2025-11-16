@@ -52,7 +52,7 @@ public class Edit {
     public void printNewBudget(double finalBudget, String type, int i) { // method for printing the Edit results
         CreatingMinistries.ministries[i].setBudget(finalBudget);
         System.out.println("Budget updated successfully!");
-        System.out.println("New budget for " + CreatingMinistries.ministries[i].getMinistryName() + " " + CreatingMinistries.ministries[i].getBudget());// printing the new result
+        System.out.println("New budget for " + CreatingMinistries.ministries[i].getMinistryName() + " " + Ministry.getFormattedBudget(CreatingMinistries.ministries[i].getBudget()));// printing the new result
     }
 
 
@@ -88,10 +88,10 @@ public class Edit {
         double amount = validityAmount(Ministry.budgetSearchByName(fromName)); //Validate the amount with ministry's budget
         balance = balance + amount;
         // Show previous budget and perform the decrease
-        System.out.println(fromName + " previous budget: " + Ministry.budgetSearchByName(fromName));
+        System.out.println(fromName + " previous budget: " + Ministry.getFormattedBudget(Ministry.budgetSearchByName(fromName)));
         Edit obj1 = new Edit(fromName, "Decrease", amount);
         obj1.editingbudget(obj1);
-        System.out.println("Available money for Investment : " + balance);
+        System.out.println("Available money for Investment : " + Ministry.getFormattedBudget(balance));
 
 
         //Ask for a new edit either increase or decrease
@@ -129,12 +129,12 @@ public class Edit {
                 balance = balance - changeamount;
             }
             // Show their current budgets
-            System.out.println(toName + " current budget: " + Ministry.budgetSearchByName(toName));
+            System.out.println(toName + " current budget: " + Ministry.getFormattedBudget(Ministry.budgetSearchByName(toName)));
 
             // Perform the transfer (Decrease from source, Increase to destination)
             Edit obj2 = new Edit(toName, change, changeamount);
             obj2.editingbudget(obj2);
-            System.out.println("Available money for Investment : " +balance);
+            System.out.println("Available money for Investment : " + Ministry.getFormattedBudget(balance));
             //Ask for edit either increase or decrease
             System.out.println("Would you like to edit the budget of another ministry? ");
             newanswer=scanner.nextLine();
@@ -186,7 +186,7 @@ public class Edit {
                 scanner.nextLine(); // Clear
                 if (validAmount>0) {
                     if (budgetOrBalance < validAmount) {//if decrease takes the current budget if decrease takes the balance
-                        System.out.println("The amount "+ validAmount + " exceeds the maximum limit "+ budgetOrBalance +
+                        System.out.println("The amount "+ Ministry.getFormattedBudget(validAmount) + " exceeds the maximum limit of "+ Ministry.getFormattedBudget(budgetOrBalance) +
                         ". Please enter a smaller amount");
                     } else {
                         break;
