@@ -115,7 +115,7 @@ public class Edit {
             System.out.println("Which ministry's budgets do you want to edit?");
             String toName = "Ministry of " + scanner.nextLine();
             toName = validityCheck(toName); //Validate
-
+            System.out.println("Available money for Investment : " + Ministry.getFormattedBudget(balance));
             System.out.println("Do you want to Increase or Decrease the budget of " + toName + "?" );
             String change=scanner.nextLine();
             change = validityChange(change); //Validation for change
@@ -204,15 +204,4 @@ public class Edit {
         return validAmount;
     }
 
-
-    NumberFormat df = NumberFormat.getNumberInstance(Locale.US);//make number readable
-
-
-    //make number readable
-    public Edit() {
-        df.setMaximumFractionDigits(2);
-    }
-    public String formatNumber(double number) {
-        return df.format(number);
-    }
 }
