@@ -8,9 +8,7 @@ public class View {
         df.setMaximumFractionDigits(2);
         String readable;
         for (Ministry m : CreatingMinistries.ministries) {
-            mbudg=m.getBudget();
-            readable = df.format(mbudg); //Caution readble variable is String it is used only for readable print in View
-            System.out.println(m.getMinistryName() + ": " + readable);
+            System.out.println(m.getMinistryName() + ": " + Ministry.getFormattedBudget(m.getBudget()));
         }
     }
 }
