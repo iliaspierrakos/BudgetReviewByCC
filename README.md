@@ -25,6 +25,16 @@ The goal is to give users control over public budget data, simulate fiscal decis
 - **Version Control:** Git / GitHub
 - **IDE:** Visual Studio Code (VS Code)
 ## System Architecture
+
+## Installation & Usage
+bash
+# Compile and run with Maven
+mvn clean compile
+mvn exec:java -Dexec.mainClass="com.example.Main"
+#Project Structure
+/scr
+/pom.xml
+README.md
 <pre>
 +------------------------------------------------------+
 |                      USER INPUT                      |
@@ -66,13 +76,4 @@ The goal is to give users control over public budget data, simulate fiscal decis
 +------------------------------------------------------+
 <pre>
 
-## Installation & Usage
-bash
-# Compile and run with Maven
-mvn clean compile
-mvn exec:java -Dexec.mainClass="com.example.Main"
-#Project Structure
-/scr
-/pom.xml
-README.md
 
