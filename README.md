@@ -25,20 +25,46 @@ The goal is to give users control over public budget data, simulate fiscal decis
 - **Version Control:** Git / GitHub
 - **IDE:** Visual Studio Code (VS Code)
 ## System Architecture
-<pre> 
-```text
- +-----------------------------+ | User Input | +--------------+--------------+ 
-| 
-v
- +--------------+--------------+ | Core Logic (Validation, | | Budget Editing, Scenarios)| +--------------+--------------+ 
-|
-v 
-+--------------+--------------+ | Data Layer (Import/Export, | | Storage, Comparison) | +--------------+--------------+
-|
-v
-+--------------+--------------+ | Visualization & Reporting | +-----------------------------+ 
-``` </pre>
-
+<pre>
++------------------------------------------------------+
+|                      USER INPUT                      |
+|------------------------------------------------------|
+| CLI / GUI Interface (AuthUI, View, ViewEditBudget)   |
+| - Login / Register                                   |
+| - Role selection (Minister, Governor, Citizen)        |
++-------------------------------+----------------------+
+                                |
+                                v
++------------------------------------------------------+
+|                    CORE LOGIC                        |
+|------------------------------------------------------|
+| UserManager, Ministry, Governor, Edit, CreatingMinistries |
+| - Validation & Authentication                        |
+| - Budget editing & restrictions                      |
+| - Role-based access control                          |
+| - Scenario simulation (planned)                      |
++-------------------------------+----------------------+
+                                |
+                                v
++------------------------------------------------------+
+|                     DATA LAYER                       |
+|------------------------------------------------------|
+| users.txt, ministries.txt, MinistriesBudgets.csv     |
+| - File I/O (read, write, update)                     |
+| - Persistent user & budget storage                   |
+| - Import / export of financial data                  |
++-------------------------------+----------------------+
+                                |
+                                v
++------------------------------------------------------+
+|                 VISUALIZATION & REPORTING            |
+|------------------------------------------------------|
+| View.java, ViewEditBudget.java                       |
+| - Display budget summaries                           |
+| - Generate text-based reports                        |
+| - (Future) Graphs, charts, comparative analysis      |
++------------------------------------------------------+
+<pre>
 
 ## Installation & Usage
 bash
