@@ -25,32 +25,19 @@ The goal is to give users control over public budget data, simulate fiscal decis
 - **Version Control:** Git / GitHub
 - **IDE:** Visual Studio Code (VS Code)
 ## System Architecture
-+-----------------------------+
-|         User Input          |
-+--------------+--------------+
-
-
+<pre> 
+```text
+ +-----------------------------+ | User Input | +--------------+--------------+ 
+| 
+v
+ +--------------+--------------+ | Core Logic (Validation, | | Budget Editing, Scenarios)| +--------------+--------------+ 
+|
+v 
++--------------+--------------+ | Data Layer (Import/Export, | | Storage, Comparison) | +--------------+--------------+
 |
 v
-+--------------+--------------+
-|   Core Logic (Validation,   |
-|   Budget Editing, Scenarios) |
-+--------------+--------------+
-
-
-|
-v
-+--------------+--------------+
-| Data Layer (Import/Export,  |
-|    Storage, Comparison)     |
-+--------------+--------------+
-
-
-|
-v
-+--------------+--------------+
-| Visualization & Reporting   |
-+-----------------------------+
++--------------+--------------+ | Visualization & Reporting | +-----------------------------+ 
+``` </pre>
 
 
 ## Installation & Usage
