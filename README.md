@@ -28,23 +28,31 @@ The goal is to give users control over public budget data, simulate fiscal decis
 +-----------------------------+
 |         User Input          |
 +--------------+--------------+
+
+
 |
 v
 +--------------+--------------+
 |   Core Logic (Validation,   |
 |   Budget Editing, Scenarios) |
 +--------------+--------------+
+
+
 |
 v
 +--------------+--------------+
 | Data Layer (Import/Export,  |
 |    Storage, Comparison)     |
 +--------------+--------------+
+
+
 |
 v
 +--------------+--------------+
 | Visualization & Reporting   |
 +-----------------------------+
+
+
 ## Installation & Usage
 bash
 # Compile and run with Maven
