@@ -1,3 +1,5 @@
+package UserFeatures;
+
 import java.text.NumberFormat;
 import java.util.Locale;
 // Class for operating the View option of the menu

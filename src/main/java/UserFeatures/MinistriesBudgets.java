@@ -1,3 +1,5 @@
+package UserFeatures;
+
 import java.io.*;
 import java.nio.file.*;
 import java.nio.charset.StandardCharsets;
@@ -5,8 +7,8 @@ import java.util.regex.*;
 
 public class MinistriesBudgets {
     public void budget() {
-        Path inputFile = Path.of("BudgetReview2025.txt");
-        Path outputFile = Path.of("MinistriesBudgets.csv");
+        Path inputFile = Path.of("NecessaryFilesAndData/BudgetReview2025.txt");
+        Path outputFile = Path.of("NecessaryFilesAndData/MinistriesBudgets.csv");
 
         // Regular expressions for filtering
         Pattern startsWith10 = Pattern.compile("^10");
@@ -29,9 +31,6 @@ public class MinistriesBudgets {
                     count++;
                 }
             }
-
-            System.out.println("Extracted " + count + " lines to " + outputFile);
-
         } catch (IOException e) {
             e.printStackTrace();
         }
