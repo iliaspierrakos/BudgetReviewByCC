@@ -1,7 +1,6 @@
 import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
-
 /**
  * The UserManager class handles user registration, login,
  * and persistent storage of users in a local text file (users.txt).
