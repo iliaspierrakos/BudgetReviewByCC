@@ -1,6 +1,10 @@
-// The User class represents a single user in the system 
-public class User {
-        // The Role enum defines the possible user roles.
+/**
+ * The User class represents a single user in the system
+ */
+public abstract class User {
+        /**
+         * The Role enum defines the possible user roles.
+         */
     public enum Role {
         GOVERNOR, // Full access — can modify the national budget
         MINISTRYMEMBER, // Limited access — can propose regional changes
@@ -16,7 +20,10 @@ public class User {
         this.password = password;
         this.role = role;
     }
-// These methods provide read-only access to the user's information.
+/**
+ * These methods provide read-only access to the user's information.
+ * @return value
+ */
     public String getUsername() { 
         return username; 
     }
@@ -26,7 +33,9 @@ public class User {
     public Role getRole() { 
         return role;
     }
- // Prints the version of the user
+ /**
+  * Prints the version of the user
+  */
     @Override
     public String toString() {
         return username + " (" + role + ")";
