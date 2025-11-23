@@ -1,7 +1,7 @@
 /**
  * The User class represents a single user in the system
  */
-public abstract class User {
+public class User {
         /**
          * The Role enum defines the possible user roles.
          */
