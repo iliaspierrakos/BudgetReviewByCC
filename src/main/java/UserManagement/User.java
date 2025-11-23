@@ -1,3 +1,5 @@
+package UserManagement;
+
 // The User class represents a single user in the system 
 public class User {
         // The Role enum defines the possible user roles.

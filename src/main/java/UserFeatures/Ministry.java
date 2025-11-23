@@ -1,3 +1,5 @@
+package UserFeatures;
+
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
@@ -19,13 +21,14 @@ public class Ministry {    //Ministry class
     }
 
     public static double budgetSearchByName(String searchingMinistry) { //method for searching the regular budget of a ministry with its name
-        for (Ministry m : View.ministries) {
+        for (Ministry m : CreatingMinistries.ministries) {
             if (m.ministryName.equalsIgnoreCase(searchingMinistry)) {
                 return m.budget;
             }
         }
         return -1 ;
     }
+    
     public String getMinistryName(){
         return ministryName;
     }
@@ -34,6 +37,7 @@ public class Ministry {    //Ministry class
     }
     public void setBudget(double budget) {
         this.budget = budget;
+        System.out.println("yes");
     }
     public double getBudget() {
         return budget;

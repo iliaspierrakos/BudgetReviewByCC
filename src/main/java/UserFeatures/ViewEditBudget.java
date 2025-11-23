@@ -1,32 +1,50 @@
+/**
+* The ViewEditBudget class creates the necessary files for the application.
+* It also creates the ministry objects and saves them in a static array,
+* which is essential for the operations this application will support.
+* It also prints the menu that allows users to view, edit and manage
+* ministry budgets.
+*/
+package UserFeatures;
+
 import java.util.Scanner;
+<<<<<<< HEAD:BudgetReview2025Data/Viewmain.java
 public class Viewmain {
     public static void main(String[] args) {
+=======
+import java.util.prefs.BackingStoreException;
+public class ViewEditBudget {
+    public static void budgetMenu() {
+>>>>>>> 917c2e5f645868c2cad64d4b9fd0a103c0585fa5:src/main/java/UserFeatures/ViewEditBudget.java
         Scanner scanner = new Scanner(System.in);
         Ministries min = new Ministries();
         MinistriesBudgets budg = new MinistriesBudgets();
         budg.budget();
         min.minlist();
+        CreatingMinistries.ministryCreation(); // Initializing Ministry objects
         do {
             System.out.println("Do you want to :");
             System.out.println("1.View");
             System.out.println("2.Edit");
-            System.out.println("3.Exit");
+            System.out.println("3.Return");
+            System.out.println("4.Exit");
             int number = scanner.nextInt();
             String answer = "no";
             switch (number) {
             case 1:
-                View.view(true); //Run View
+                View.viewGovBudget();
                 System.out.println("Available=" + Edit.balance);
                 break;
             case 2:
                 do {
-                    View.view(false);
                     Edit obj = new Edit();
                     obj.collectData();
                     answer = scanner.nextLine();
                 }while (answer.equalsIgnoreCase("yes"));
                 break;
             case 3:
+                return;
+            case 4:
                 System.exit(0);
                 break;
             default:
@@ -34,5 +52,5 @@ public class Viewmain {
                 break;
             }
         } while (true);
-    }//System.out.println(Ministry.getCounter());
+    }
 }

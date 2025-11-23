@@ -1,6 +1,9 @@
-import java.util.Scanner;
+package UserManagement;
 
-    public class AuthUI {
+import java.util.Scanner;
+import UserFeatures.ViewEditBudget;
+
+public class AuthUI {
     private UserManager userManager;
     private Scanner scanner; 
 
@@ -90,20 +93,21 @@ import java.util.Scanner;
 
         User user = userManager.loginUser(username,password);
         if (user != null) {
-            System.out.println("Welcome, " + user.getUsername() + "! Role: " + user.getRole());
+            System.out.println("Welcome, " + user.getUsername());
             showRoleMenu(user); 
         }
+        ViewEditBudget.budgetMenu();
     }
     private void showRoleMenu(User user) {
             switch (user.getRole()) {
             case MINISTRYMEMBER:
-                System.out.println("MinistryMember — regional access");
+                System.out.println("Role: MinistryMember — regional access");
                 break;
             case GOVERNOR:
-                System.out.println("Governor — full access");
+                System.out.println("Role: Governor — full access");
                 break;
             case CITIZEN:
-                System.out.println("Citizen — view only");
+                System.out.println("Role: Citizen — view only");
                 break;
         }
     }
