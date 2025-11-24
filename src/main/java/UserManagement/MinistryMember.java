@@ -1,4 +1,6 @@
- /**
+package UserManagement;
+
+/**
  * Represents a member of a Ministry in the system.
  * This class extends User and adds ministry-specific information.
  * 
@@ -18,18 +20,18 @@ public class MinistryMember extends User {
      * @param password      the password of the user
      * @param ministryName  the name of the ministry this member belongs to
      */
-public MinistryMember(String username, String password, String ministryName) {
+    public MinistryMember(String username, String password, String ministryName) {
     super(username, password, Role.MINISTRYMEMBER);
     this.ministryName = ministryName;
-}
+    }
 /**
      * Returns the name of the ministry this member belongs to.
      * 
      * @return the ministry name
      */
-public String getMinistryName() {
+    public String getMinistryName() {
     return ministryName;
-}
+    }
 /**
      * Updates the name of the ministry this member belongs to.
      * 
@@ -50,8 +52,8 @@ public String getMinistryName() {
      * @return a string describing the MinistryMember
      * 
     */    
-@Override
-public String toString() {
+    @Override
+    public String toString() {
     return "MinistryMember: " + getUsername() + " (" + ministryName + ")";
-}
+    }
 }

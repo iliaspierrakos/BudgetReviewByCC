@@ -1,3 +1,5 @@
+package UserManagement;
+
 /**
  * Represents a Citizen in the system.
  * This class extends User and sets the role to CITIZEN.

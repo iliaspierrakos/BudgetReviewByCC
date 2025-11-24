@@ -1,3 +1,5 @@
+package UserFeatures;
+
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
@@ -6,9 +8,9 @@ import java.util.*;
 public class CreatingMinistries {
     public static Ministry[] ministries = new Ministry[20];  //array used for saving the ministry objects
        public static void ministryCreation() {
-        Path budgetsFile = Path.of("MINISTRIESBUDGETS.csv");
-        Path ministriesFile = Path.of("ministries.txt");
-        Path outputFile = Path.of("view.txt");
+        Path budgetsFile = Path.of("NecessaryFilesAndData/MINISTRIESBUDGETS.csv");
+        Path ministriesFile = Path.of("NecessaryFilesAndData/ministries.txt");
+        Path outputFile = Path.of("NecessaryFilesAndData/view.txt");
 
 
         try {

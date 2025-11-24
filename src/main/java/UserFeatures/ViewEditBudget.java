@@ -5,6 +5,7 @@
 * It also prints the menu that allows users to view, edit and manage
 * ministry budgets.
 */
+package UserFeatures;
 
 import java.util.Scanner;
 import java.util.prefs.BackingStoreException;

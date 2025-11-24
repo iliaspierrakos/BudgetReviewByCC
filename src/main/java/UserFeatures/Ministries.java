@@ -1,13 +1,13 @@
+package UserFeatures;
+
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-
 public class Ministries {
 
     public void minlist() {
 
-        String fileName = "ministries.txt";
-
+        String fileName = "NecessaryFilesAndData/ministries.txt";
 
         String[] ministries = {
             "Ministry of Interior",
@@ -38,7 +38,6 @@ public class Ministries {
                 writer.write(ministry);
                 writer.newLine();
             }
-            System.out.println("Ministries successfully written to " + fileName);
         } catch (IOException e) {
             System.err.println("Error writing to file: " + e.getMessage());
         }
