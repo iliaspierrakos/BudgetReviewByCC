@@ -8,14 +8,9 @@
 package UserFeatures;
 
 import java.util.Scanner;
-<<<<<<< HEAD:BudgetReview2025Data/Viewmain.java
-public class Viewmain {
-    public static void main(String[] args) {
-=======
 import java.util.prefs.BackingStoreException;
 public class ViewEditBudget {
     public static void budgetMenu() {
->>>>>>> 917c2e5f645868c2cad64d4b9fd0a103c0585fa5:src/main/java/UserFeatures/ViewEditBudget.java
         Scanner scanner = new Scanner(System.in);
         Ministries min = new Ministries();
         MinistriesBudgets budg = new MinistriesBudgets();
