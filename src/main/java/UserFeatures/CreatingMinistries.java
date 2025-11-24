@@ -7,7 +7,7 @@ import java.util.*;
 
 /**
  * This class provides a static method to read ministry names and budgets
- * from files, create Ministry objets and then write a summary to an output file.
+ * from files, create Ministry objects and then write a summary to an output file.
  * It requires the existence of a "Ministry" class with a constructor that accepts a String 
  * for the name and a double for the budget.
  */
