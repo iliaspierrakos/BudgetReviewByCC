@@ -1,8 +1,8 @@
 package UserFeatures;
 
-import java.util.Scanner;
 import java.text.NumberFormat;
 import java.util.Locale;
+import java.util.Scanner;
 
 public class Edit {
     //instance variables: ministryname , the type of change, the amount of the change
@@ -90,7 +90,7 @@ public class Edit {
         System.out.println("Enter amount to decrease:");
         double amount = validityAmount(Ministry.budgetSearchByName(fromName)); //Validate the amount with ministry's budget
         balance = balance + amount;
-        // Show previous budget and perform the decrease
+        // Show previous budget and perform the decreases
         System.out.println(fromName + " previous budget: " + formatNumber(Ministry.budgetSearchByName(fromName)));
         Edit obj1 = new Edit(fromName, "Decrease", amount);
         obj1.editingbudget(obj1);
@@ -211,7 +211,7 @@ public class Edit {
 
 
     //make number readable
-    public Edit() {
+    public void makingNumbersReadable() {
         df.setMaximumFractionDigits(2);
     }
     public String formatNumber(double number) {
