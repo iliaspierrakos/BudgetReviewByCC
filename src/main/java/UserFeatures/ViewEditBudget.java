@@ -22,7 +22,6 @@ public class ViewEditBudget {
             System.out.println("1.View");
             System.out.println("2.Edit");
             System.out.println("3.Return");
-            System.out.println("4.Exit");
             int number = scanner.nextInt();
             String answer = "no";
             switch (number) {
@@ -39,9 +38,6 @@ public class ViewEditBudget {
                 break;
             case 3:
                 return;
-            case 4:
-                System.exit(0);
-                break;
             default:
                 System.out.println("Invalid");
                 break;
