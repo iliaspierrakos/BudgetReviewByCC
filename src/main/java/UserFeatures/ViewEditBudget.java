@@ -9,6 +9,9 @@ package UserFeatures;
 
 import java.util.Scanner;
 import java.util.prefs.BackingStoreException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.io.IOException;
 public class ViewEditBudget {
     public static void budgetMenu() {
         Scanner scanner = new Scanner(System.in);
@@ -21,7 +24,8 @@ public class ViewEditBudget {
             System.out.println("Do you want to :");
             System.out.println("1.View");
             System.out.println("2.Edit");
-            System.out.println("3.Return");
+            System.out.println("3.Edit History");
+            System.out.println("4.Return");
             int number = scanner.nextInt();
             String answer = "no";
             switch (number) {
@@ -37,6 +41,11 @@ public class ViewEditBudget {
                 }while (answer.equalsIgnoreCase("yes"));
                 break;
             case 3:
+                try {
+                    System.out.println(Files.readString(Paths.get("NecessaryFilesAndData/edithistory.txt")));
+                } catch (IOException e) {}
+                break;
+            case 4:
                 return;
             default:
                 System.out.println("Invalid");
