@@ -1,0 +1,4 @@
+Ministry of Health previous budget: 7.177424E9
+Ministry of Health new budget: 7.177414E9
+Ministry of Health previous budget: 7.177.424.000
+Ministry of Health new budget: 7.177.414.000
