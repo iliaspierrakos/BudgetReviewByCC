@@ -1,6 +1,6 @@
 package UserManagement;
 
-import UserFeatures.Edit;
+import UserFeatures.EditHistory;
 import java.util.Scanner;
 import UserFeatures.ViewEditBudget;
 import java.nio.file.Files;
@@ -36,8 +36,9 @@ public class AuthUI {
                 case "3":
                     on = false;
                     System.out.println("Goodbye!");
+                    EditHistory.clearHistory();
                     try {
-                        Files.deleteIfExists(Paths.get("NecessaryFilesAndData/edithistory.txt"));
+                        Files.deleteIfExists(Paths.get("NecessaryFilesAndData/MinistriesBudgets.csv"));
                     } catch (IOException e) {}
                     break;
                 default:
