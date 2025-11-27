@@ -1,11 +1,15 @@
 package UserManagement;
 
+import UserFeatures.Edit;
 import java.util.Scanner;
 import UserFeatures.ViewEditBudget;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.io.IOException;
 
 public class AuthUI {
     private UserManager userManager;
-    private Scanner scanner; 
+    private Scanner scanner;
 
     public AuthUI(UserManager userManager) {
         this.userManager = userManager;
@@ -13,7 +17,7 @@ public class AuthUI {
     }
     public void start() {
         boolean on = true;
-        
+
         while(on) {
             System.out.println("\n=== PRIME MINISTER FOR A DAY ===");
             System.out.println("(1) -> Register");
@@ -26,19 +30,22 @@ public class AuthUI {
                 case "1":
                     registerUserUI();
                     break;
-                case "2": 
+                case "2":
                     loginUser();
                     break;
                 case "3":
                     on = false;
                     System.out.println("Goodbye!");
+                    try {
+                        Files.deleteIfExists(Paths.get("NecessaryFilesAndData/edithistory.txt"));
+                    } catch (IOException e) {}
                     break;
                 default:
-                     System.out.println("Invalid choice. Try again.");
+                    System.out.println("Invalid choice. Try again.");
             }
         }
     }
-    
+
     private void registerUserUI() {
         System.out.println("\n=== Register New User ===");
         System.out.print("Enter username: ");
@@ -74,27 +81,27 @@ public class AuthUI {
                 break;
             default:
                 System.out.println("Invalid choice!");
-                return; 
+                return;
         }
-        if (role == User.Role.MINISTRYMEMBER ? 
+        if (role == User.Role.MINISTRYMEMBER ?
         userManager.registerUser(username, password, role, ministryName) :
         userManager.registerUser(username, password, role)) {
     System.out.println("Registration successful!");
 }
 
     }
-    
+
     private void loginUser() {
         System.out.println("\n=== Login ===");
         System.out.print("Enter username: ");
-        String username = scanner.nextLine(); 
+        String username = scanner.nextLine();
         System.out.print("Enter password: ");
         String password = scanner.nextLine();
 
         User user = userManager.loginUser(username,password);
         if (user != null) {
             System.out.println("Welcome, " + user.getUsername());
-            showRoleMenu(user); 
+            showRoleMenu(user);
         }
         ViewEditBudget.budgetMenu();
     }
