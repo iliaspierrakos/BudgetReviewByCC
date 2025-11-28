@@ -6,13 +6,23 @@ import java.util.Locale;
 public class View {
     public static void viewGovBudget() {
         double mbudg;
-        NumberFormat df = NumberFormat.getNumberInstance(Locale.US);//make number readable
-        df.setMaximumFractionDigits(2);
         String readable;
+        String readablePercent;
+        double inUseBudget = 0;
         for (Ministry m : CreatingMinistries.ministries) {
             mbudg=m.getBudget();
-            readable = df.format(mbudg); //Caution readble variable is String it is used only for readable print in View
-            System.out.println(m.getMinistryName() + ": " + readable);
+            inUseBudget += mbudg;
+        }
+        if (inUseBudget == 0) {
+            System.out.println("Total budget is 0 — cannot calculate percentages.");
+            return;
+        }
+        for (Ministry m : CreatingMinistries.ministries) {
+            mbudg=m.getBudget();
+            readable = Ministry.getFormattedBudget(mbudg); //Caution readble variable is String it is used only for readable print in View
+            double percent = (mbudg / inUseBudget) * 100;
+            readablePercent =  Ministry.getFormattedBudget(percent);
+            System.out.println(m.getMinistryName() + ": " + readable + "$" + " , " + readablePercent + " % of total budget" );
         }
     }
 }

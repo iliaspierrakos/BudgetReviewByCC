@@ -28,7 +28,7 @@ public class Ministry {    //Ministry class
         }
         return -1 ;
     }
-    
+
     public String getMinistryName(){
         return ministryName;
     }
@@ -43,9 +43,10 @@ public class Ministry {    //Ministry class
         return budget;
     }
     public static String getFormattedBudget(double budget) {
-    DecimalFormatSymbols symbols = new DecimalFormatSymbols(Locale.GERMAN);
-    symbols.setGroupingSeparator('.');
-    DecimalFormat df = new DecimalFormat("#,###", symbols);
-    return df.format(budget);
+        DecimalFormatSymbols symbols = new DecimalFormatSymbols(Locale.GERMAN);
+        symbols.setGroupingSeparator('.');
+        symbols.setDecimalSeparator(',');
+        DecimalFormat df = new DecimalFormat("#,###.##", symbols);
+        return df.format(budget);
     }
 }
