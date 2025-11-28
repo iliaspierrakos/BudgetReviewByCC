@@ -8,7 +8,7 @@ import java.util.Locale;
  * It provides methods for displaying data related to the budgets of the selected Ministries.
  */
 public class View {
-    
+
     /**
      * Displays the name and budget of every Ministry object currently stored
      * in the {@code CreatingMinistries.ministries} array.
@@ -25,9 +25,6 @@ public class View {
         String readablePercent;
         double inUseBudget = 0;
         for (Ministry m : CreatingMinistries.ministries) {
-<<<<<<< HEAD
-            System.out.println(m.getMinistryName() + ": " + Ministry.getFormattedBudget(m.getBudget()));
-=======
             mbudg=m.getBudget();
             inUseBudget += mbudg;
         }
@@ -41,7 +38,6 @@ public class View {
             double percent = (mbudg / inUseBudget) * 100;
             readablePercent =  Ministry.getFormattedBudget(percent);
             System.out.println(m.getMinistryName() + ": " + readable + "$" + " , " + readablePercent + " % of total budget" );
->>>>>>> d20a546222961f7863d0a820a8ac1bbc34b3ad4f
         }
     }
 }
