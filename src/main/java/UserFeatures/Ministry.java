@@ -13,7 +13,7 @@ public class Ministry {    //Ministry class
     private String ministryName; //Ministry name
     private double budget; //Ministry's general budget
     private static int counter; //
-    
+
       /**
      * Constructs a new {@code Ministry} object.
      * Increments the static counter upon creation.
@@ -59,16 +59,10 @@ public class Ministry {    //Ministry class
         }
         return -1 ;
     }
-    
-    /**
-     * Returns the name of the ministry.
-     *
-     * @return The ministry's name.
-     */
     public String getMinistryName(){
         return ministryName;
     }
-    
+
     /**
      * Sets a new name for the ministry.
      *
@@ -106,9 +100,10 @@ public class Ministry {    //Ministry class
      * @return A string with the formatted budget.
      */
     public static String getFormattedBudget(double budget) {
-    DecimalFormatSymbols symbols = new DecimalFormatSymbols(Locale.GERMAN);
-    symbols.setGroupingSeparator('.');
-    DecimalFormat df = new DecimalFormat("#,###", symbols);
-    return df.format(budget);
+        DecimalFormatSymbols symbols = new DecimalFormatSymbols(Locale.GERMAN);
+        symbols.setGroupingSeparator('.');
+        symbols.setDecimalSeparator(',');
+        DecimalFormat df = new DecimalFormat("#,###.##", symbols);
+        return df.format(budget);
     }
 }

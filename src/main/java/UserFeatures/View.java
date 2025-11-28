@@ -21,11 +21,27 @@ public class View {
      */
     public static void viewGovBudget() {
         double mbudg;
-        NumberFormat df = NumberFormat.getNumberInstance(Locale.US);//make number readable
-        df.setMaximumFractionDigits(2);
         String readable;
+        String readablePercent;
+        double inUseBudget = 0;
         for (Ministry m : CreatingMinistries.ministries) {
+<<<<<<< HEAD
             System.out.println(m.getMinistryName() + ": " + Ministry.getFormattedBudget(m.getBudget()));
+=======
+            mbudg=m.getBudget();
+            inUseBudget += mbudg;
+        }
+        if (inUseBudget == 0) {
+            System.out.println("Total budget is 0 — cannot calculate percentages.");
+            return;
+        }
+        for (Ministry m : CreatingMinistries.ministries) {
+            mbudg=m.getBudget();
+            readable = Ministry.getFormattedBudget(mbudg); //Caution readble variable is String it is used only for readable print in View
+            double percent = (mbudg / inUseBudget) * 100;
+            readablePercent =  Ministry.getFormattedBudget(percent);
+            System.out.println(m.getMinistryName() + ": " + readable + "$" + " , " + readablePercent + " % of total budget" );
+>>>>>>> d20a546222961f7863d0a820a8ac1bbc34b3ad4f
         }
     }
 }
