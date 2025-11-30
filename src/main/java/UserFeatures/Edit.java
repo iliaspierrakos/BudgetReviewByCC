@@ -1,8 +1,8 @@
 package UserFeatures;
 
-import java.util.Scanner;
 import java.text.NumberFormat;
 import java.util.Locale;
+import java.util.Scanner;
 
 /**
  * The {@code Edit} class provides the methods for transferring and editing ministry budgets.
