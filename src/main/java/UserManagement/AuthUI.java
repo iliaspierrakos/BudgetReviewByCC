@@ -1,6 +1,6 @@
 package UserManagement;
 
-import UserFeatures.EditHistory;
+import UserFeatures.ClearHistory;
 import java.util.Scanner;
 import UserFeatures.ViewEditBudget;
 import java.nio.file.Files;
@@ -36,10 +36,8 @@ public class AuthUI {
                 case "3":
                     on = false;
                     System.out.println("Goodbye!");
-                    EditHistory.clearHistory();
-                    try {
-                        Files.deleteIfExists(Paths.get("NecessaryFilesAndData/MinistriesBudgets.csv"));
-                    } catch (IOException e) {}
+                    ClearHistory.clearFile("NecessaryFilesAndData/edithistory.txt");
+                    ClearHistory.clearFile("NecessaryFilesAndData/MinistriesBudgets2025.csv");
                     break;
                 default:
                     System.out.println("Invalid choice. Try again.");

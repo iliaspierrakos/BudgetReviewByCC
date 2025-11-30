@@ -8,7 +8,7 @@ import java.util.regex.*;
 public class MinistriesBudgets {
     public void budget() {
         Path inputFile = Path.of("NecessaryFilesAndData/BudgetReview2025.txt");
-        Path outputFile = Path.of("NecessaryFilesAndData/MinistriesBudgets.csv");
+        Path outputFile = Path.of("NecessaryFilesAndData/MinistriesBudgets2025.csv");
 
         // Regular expressions for filtering
         Pattern startsWith10 = Pattern.compile("^10");
