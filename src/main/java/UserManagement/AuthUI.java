@@ -3,9 +3,7 @@ package UserManagement;
 import UserFeatures.ClearHistory;
 import java.util.Scanner;
 import UserFeatures.ViewEditBudget;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.io.IOException;
+import java.nio.file.Path;
 
 public class AuthUI {
     private UserManager userManager;
@@ -36,8 +34,8 @@ public class AuthUI {
                 case "3":
                     on = false;
                     System.out.println("Goodbye!");
-                    ClearHistory.clearFile("NecessaryFilesAndData/edithistory.txt");
-                    ClearHistory.clearFile("NecessaryFilesAndData/MinistriesBudgets2025.csv");
+                    ClearHistory.clearFile(Path.of("NecessaryFilesAndData/edithistory.txt"));
+                    ClearHistory.clearFile(Path.of("NecessaryFilesAndData/MinistriesBudgets2025.csv"));
                     break;
                 default:
                     System.out.println("Invalid choice. Try again.");
