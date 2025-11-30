@@ -280,15 +280,10 @@ public class Edit {
     NumberFormat df = NumberFormat.getNumberInstance(Locale.US);//make number readable
 
 
-<<<<<<< HEAD
-    //make number readable
-    public void makingNumbersReadable() {
-=======
     /**
      * Default constructor. Configures the {@code NumberFormat} object for readable output.
      */
     public Edit() {
->>>>>>> 31a41d87be7dd98151ad2be7a8769e86acae6267
         df.setMaximumFractionDigits(2);
     }
 

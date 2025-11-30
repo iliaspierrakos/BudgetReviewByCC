@@ -20,6 +20,8 @@ public class View {
      *
      * Note: This method depends on the existence and accessibility of a static array
      * named {@code ministries} in a class named {@code CreatingMinistries}.
+     * The name, the budget and the percentage of each ministry are stored and shown to 
+     * the user as a txt file.
      */
     public static void viewGovBudget() {
         FileWriter fw = null;
@@ -44,7 +46,7 @@ public class View {
                 readable = Ministry.getFormattedBudget(mbudg); //Caution readble variable is String it is used only for readable print in View
                 double percent = (mbudg / inUseBudget) * 100;
                 readablePercent =  Ministry.getFormattedBudget(percent);
-                pw.println(m.getMinistryName() + " : " + readable + "€" + " , " + readablePercent + " % of total budget" ) ;
+                pw.println(m.getMinistryName() + " : " + readable + "$" + " , " + readablePercent + " % of total budget" ) ;
                 
             }
             pw.close();
