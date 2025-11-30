@@ -4,11 +4,6 @@ import java.io.PrintWriter;
 import java.io.IOException;
 
 public class EditHistory {
-    public static void clearHistory() {
-        try (FileWriter fw = new FileWriter("NecessaryFilesAndData/edithistory.txt", false)) {
-
-        } catch (IOException e) {}
-    }
 
     public static void historyOfEdit(String ministryName, double previousBudget, double newBudget) {
 

@@ -8,24 +8,16 @@ import java.util.*;
 /**
  * This class provides a static method to read ministry names and budgets
  * from files, create Ministry objects and then write a summary to an output file.
- * It requires the existence of a "Ministry" class with a constructor that accepts a String 
+ * It requires the existence of a "Ministry" class with a constructor that accepts a String
  * for the name and a double for the budget.
  */
 public class CreatingMinistries {
     public static Ministry[] ministries = new Ministry[20];  //array used for saving the ministry objects
-       
-     /**
-     * The files "MINISTRIESBUDGETS.csv", "ministries.txt" are used to read the 
-     * ministry names and budget data. This class then pairs this data, 
-     * extracts the last numerical value from the budget line as the budget ,
-     * creates a Ministry object
-     * that is stored in the Ministry array, and writes the
-     * ministry name and the raw extracted number to "view.txt".
-    */       
-        public static void ministryCreation() {
-        Path budgetsFile = Path.of("NecessaryFilesAndData/MINISTRIESBUDGETS.csv");
+       public static void ministryCreation(Path budgetsFile) {
+        String fileName = budgetsFile.getFileName().toString();
+        String year = fileName.replaceAll("\\D+", "");
         Path ministriesFile = Path.of("NecessaryFilesAndData/ministries.txt");
-        Path outputFile = Path.of("NecessaryFilesAndData/view.txt");
+        Path outputFile = Path.of("NecessaryFilesAndData/view" + year + ".txt");
 
 
         try {
@@ -64,7 +56,7 @@ public class CreatingMinistries {
                     writer.write(ministryName + " " + lastNumber);
                     writer.newLine();
                     //System.out.println(ministryName + " " + lastNumber);
-                    
+
 
                 }
 

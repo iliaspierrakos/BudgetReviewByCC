@@ -10,6 +10,7 @@ package UserFeatures;
 import java.util.Scanner;
 import java.util.prefs.BackingStoreException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.io.IOException;
 public class ViewEditBudget {
@@ -17,9 +18,9 @@ public class ViewEditBudget {
         Scanner scanner = new Scanner(System.in);
         Ministries min = new Ministries();
         MinistriesBudgets budg = new MinistriesBudgets();
-        budg.budget();
+        budg.budget(Path.of("NecessaryFilesAndData/BudgetReview2026.txt"));
         min.minlist();
-        CreatingMinistries.ministryCreation(); // Initializing Ministry objects
+        CreatingMinistries.ministryCreation(Path.of("NecessaryFilesAndData/MinistriesBudgets2026.csv")); // Initializing Ministry objects
         do {
             System.out.println("Do you want to :");
             System.out.println("1.View");

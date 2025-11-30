@@ -130,7 +130,7 @@ public class Edit {
         System.out.println("Which ministry's budgets do you want to decrease?");
         String fromName = "Ministry of " + scanner.nextLine();
         fromName = validityCheck(fromName); //Validate the ministry's name
-        System.out.println("The budget of the " + fromName + "is " + Ministry.getFormattedBudget(Ministry.budgetSearchByName(fromName)));
+        System.out.println("The budget of the " + fromName + " is " + Ministry.getFormattedBudget(Ministry.budgetSearchByName(fromName)));
         // Ask for amount
         System.out.println("Enter amount to decrease:");
         double amount = validityAmount(Ministry.budgetSearchByName(fromName)); //Validate the amount with ministry's budget
