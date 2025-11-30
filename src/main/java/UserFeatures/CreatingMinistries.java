@@ -7,10 +7,11 @@ import java.util.*;
 
 public class CreatingMinistries {
     public static Ministry[] ministries = new Ministry[20];  //array used for saving the ministry objects
-       public static void ministryCreation() {
-        Path budgetsFile = Path.of("NecessaryFilesAndData/MINISTRIESBUDGETS2025.csv");
+       public static void ministryCreation(Path budgetsFile) {
+        String fileName = budgetsFile.getFileName().toString();
+        String year = fileName.replaceAll("\\D+", "");
         Path ministriesFile = Path.of("NecessaryFilesAndData/ministries.txt");
-        Path outputFile = Path.of("NecessaryFilesAndData/view.txt");
+        Path outputFile = Path.of("NecessaryFilesAndData/view" + year + ".txt");
 
 
         try {

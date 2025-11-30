@@ -20,7 +20,7 @@ public class ViewEditBudget {
         MinistriesBudgets budg = new MinistriesBudgets();
         budg.budget(Path.of("NecessaryFilesAndData/BudgetReview2025.txt"));
         min.minlist();
-        CreatingMinistries.ministryCreation(); // Initializing Ministry objects
+        CreatingMinistries.ministryCreation(Path.of("NecessaryFilesAndData/MinistriesBudgets2025.csv")); // Initializing Ministry objects
         do {
             System.out.println("Do you want to :");
             System.out.println("1.View");
