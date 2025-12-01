@@ -61,7 +61,7 @@ public class ViewEditBudget {
                 }
                 View.viewGovBudget(selectedYear);
                 if (selectedYear == 2026) {
-                    System.out.println("Available=" + Edit.balance);
+                    System.out.println("Available=" + Ministry.getFormattedBudget(Edit.balance));
                 }
                 break;
             case 2:
