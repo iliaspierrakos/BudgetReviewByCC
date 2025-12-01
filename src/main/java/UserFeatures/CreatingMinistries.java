@@ -8,24 +8,22 @@ import java.util.*;
 /**
  * This class provides a static method to read ministry names and budgets
  * from files, create Ministry objects and then write a summary to an output file.
- * It requires the existence of a "Ministry" class with a constructor that accepts a String 
+ * It requires the existence of a "Ministry" class with a constructor that accepts a String
  * for the name and a double for the budget.
  */
 public class CreatingMinistries {
-    public static Ministry[] ministries = new Ministry[20];  //array used for saving the ministry objects
-       
-     /**
-     * The files "MINISTRIESBUDGETS.csv", "ministries.txt" are used to read the 
-     * ministry names and budget data. This class then pairs this data, 
-     * extracts the last numerical value from the budget line as the budget ,
-     * creates a Ministry object
-     * that is stored in the Ministry array, and writes the
-     * ministry name and the raw extracted number to "view.txt".
-    */       
-        public static void ministryCreation() {
-        Path budgetsFile = Path.of("NecessaryFilesAndData/MINISTRIESBUDGETS.csv");
+    public static Ministry[] ministries2020 = new Ministry[20];  //array used for saving the ministry objects
+    public static Ministry[] ministries2021 = new Ministry[20];
+    public static Ministry[] ministries2022 = new Ministry[20];
+    public static Ministry[] ministries2023 = new Ministry[20];
+    public static Ministry[] ministries2024 = new Ministry[20];
+    public static Ministry[] ministries2025 = new Ministry[20];
+    public static Ministry[] ministries2026 = new Ministry[20];
+    public static void ministryCreation(Path budgetsFile) {
+        String fileName = budgetsFile.getFileName().toString();
+        String year = fileName.replaceAll("\\D+", "");
         Path ministriesFile = Path.of("NecessaryFilesAndData/ministries.txt");
-        Path outputFile = Path.of("NecessaryFilesAndData/view.txt");
+        Path outputFile = Path.of("NecessaryFilesAndData/view" + year + ".txt");
 
 
         try {
@@ -58,13 +56,26 @@ public class CreatingMinistries {
                         System.err.println("Error parsing budget for " + ministryName + ": " + lastNumber);
                         budget = 0.0;
                     }
-                    ministries[i]= new Ministry(ministryName, budget); //making the ministry objects and saving them in the array
-
+                    if (year.equalsIgnoreCase("2020")) {
+                        ministries2020[i]= new Ministry(ministryName, budget); //making the ministry objects and saving them in the array
+                    } else if (year.equalsIgnoreCase("2021")) {
+                        ministries2021[i]= new Ministry(ministryName, budget);
+                    } else if (year.equalsIgnoreCase("2022")) {
+                        ministries2022[i]= new Ministry(ministryName, budget);
+                    } else if (year.equalsIgnoreCase("2023")) {
+                        ministries2023[i]= new Ministry(ministryName, budget);
+                    } else if (year.equalsIgnoreCase("2024")) {
+                        ministries2024[i]= new Ministry(ministryName, budget);
+                    } else if (year.equalsIgnoreCase("2025")) {
+                        ministries2025[i]= new Ministry(ministryName, budget);
+                    } else if (year.equalsIgnoreCase("2026")) {
+                        ministries2026[i]= new Ministry(ministryName, budget);
+                    }
 
                     writer.write(ministryName + " " + lastNumber);
                     writer.newLine();
                     //System.out.println(ministryName + " " + lastNumber);
-                    
+
 
                 }
 
@@ -75,5 +86,7 @@ public class CreatingMinistries {
         } catch (IOException e) {
             System.err.println("Error processing files: " + e.getMessage());
         }
+
+
     }
 }

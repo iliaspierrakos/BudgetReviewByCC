@@ -8,23 +8,15 @@ import java.util.regex.*;
 /**
  * The MinistriesBudgets class processes budget data from an external text file and
  * proceeds into extracting relevant lines into a CSV format.
- * The procedure is based on regular expressions 
+ * The procedure is based on regular expressions
  * to filter the records and pick out the ones that belong to specific ministries
- * and have certain expense codes. 
+ * and have certain expense codes.
  */
 public class MinistriesBudgets {
-    
-    /**
-     * Executes the process of reading the input file, filtering the data,
-     * and creating the output file, in accordance with the specifications.
-     * 
-     * * The method uses **try-with-resources** to ensure automatic
-     * management of resources (BufferedReader, BufferedWriter) and handles any
-     * input/output errors ({@code IOException}).
-     */
-    public void budget() {
-        Path inputFile = Path.of("NecessaryFilesAndData/BudgetReview2025.txt");
-        Path outputFile = Path.of("NecessaryFilesAndData/MinistriesBudgets.csv");
+    public void budget(Path inputFile) {
+        String fileName = inputFile.getFileName().toString();
+        String year = fileName.replaceAll("\\D+", "");
+        Path outputFile = Path.of("NecessaryFilesAndData/MinistriesBudgets" + year +".csv");
 
         // Regular expressions for filtering
         Pattern startsWith10 = Pattern.compile("^10");

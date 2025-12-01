@@ -1,0 +1,20 @@
+Ministry of Interior 4163668000
+Ministry of Foreign Affairs 483237000
+Ministry of National Defense 7063272000
+Ministry of Health 7841945000
+Ministry of Justice 679577000
+Ministry of Education, Religious Affairs, and Sports 6763933000
+Ministry of Culture 653109000
+Ministry of National Economy and Finance 1717408920000
+Ministry of Rural Development and Food 1503877000
+Ministry of Environment and Energy 3133452000
+Ministry of Labor and Social Security 19101078000
+Ministry of Social Cohesion and Family 3803316000
+Ministry of Development 798476000
+Ministry of Infrastructure and Transport 3391756000
+Ministry of Shipping and Island Policy 756593000
+Ministry of Tourism 237992000
+Ministry of Digital Governance 1391403000
+Ministry of Migration and Asylum 536133000
+Ministry of Citizen Protection 2603285000
+Ministry of Climate Crisis and Civil Protection 1438115000
