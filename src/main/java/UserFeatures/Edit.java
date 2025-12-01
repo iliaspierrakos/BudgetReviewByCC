@@ -19,6 +19,7 @@ public class Edit {
     private double amount;
     private Scanner scanner = new Scanner(System.in);
     public static double balance = 0;
+    EditHistoryList history = new EditHistoryList();
 
     /**
      * Collects user input for a budget transfer.
@@ -138,7 +139,8 @@ public class Edit {
         // Show previous budget and perform the decrease
         System.out.println(fromName + " previous budget: " + Ministry.getFormattedBudget(Ministry.budgetSearchByName(fromName, CreatingMinistries.ministries2026)));
         Edit obj1 = new Edit(fromName, "Decrease", amount);
-        obj1.editingbudget(obj1);
+        history.addEdit(obj1);
+        obj1.editingbudget(obj1);        
         System.out.println("Available money for Investment : " + Ministry.getFormattedBudget(balance));
 
         //Ask for a new edit either increase or decrease
@@ -184,6 +186,7 @@ public class Edit {
 
             // Perform the transfer (Decrease from source, Increase to destination)
             Edit obj2 = new Edit(toName, change, changeamount);
+            history.addEdit(obj2);
             obj2.editingbudget(obj2);
             System.out.println("Available money for Investment : " + Ministry.getFormattedBudget(balance));
             //Ask for edit either increase or decrease
@@ -295,5 +298,18 @@ public class Edit {
      */
     public String formatNumber(double number) {
         return df.format(number);
+    }
+    public String getName() {
+        return name;
+    }
+    public double getAmount() {
+        return amount;
+    }
+    public String getChange() {
+        return change;
+    }
+    @Override
+    public String toString() {
+        return name + " " + change + " " + amount;
     }
 }

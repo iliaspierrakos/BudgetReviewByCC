@@ -7,12 +7,11 @@
 */
 package UserFeatures;
 
-import java.util.Scanner;
-import java.util.prefs.BackingStoreException;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.io.IOException;
+import java.util.Scanner;
 public class ViewEditBudget {
     public static void budgetMenu() {
         Scanner scanner = new Scanner(System.in);
@@ -74,6 +73,7 @@ public class ViewEditBudget {
             case 3:
                 try {
                     System.out.println(Files.readString(Paths.get("NecessaryFilesAndData/edithistory.txt")));
+                    System.out.println("Number of changes:" + EditHistoryList.editList.size());
                 } catch (IOException e) {}
                 break;
             case 4:
