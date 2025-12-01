@@ -19,8 +19,20 @@ public class ViewEditBudget {
         Ministries min = new Ministries();
         MinistriesBudgets budg = new MinistriesBudgets();
         budg.budget(Path.of("NecessaryFilesAndData/BudgetReview2026.txt"));
+        budg.budget(Path.of("NecessaryFilesAndData/BudgetReview2025.txt"));
+        budg.budget(Path.of("NecessaryFilesAndData/BudgetReview2024.txt"));
+        budg.budget(Path.of("NecessaryFilesAndData/BudgetReview2023.txt"));
+        budg.budget(Path.of("NecessaryFilesAndData/BudgetReview2022.txt"));
+        budg.budget(Path.of("NecessaryFilesAndData/BudgetReview2021.txt"));
+        budg.budget(Path.of("NecessaryFilesAndData/BudgetReview2020.txt"));
         min.minlist();
         CreatingMinistries.ministryCreation(Path.of("NecessaryFilesAndData/MinistriesBudgets2026.csv")); // Initializing Ministry objects
+        CreatingMinistries.ministryCreation(Path.of("NecessaryFilesAndData/MinistriesBudgets2025.csv"));
+        CreatingMinistries.ministryCreation(Path.of("NecessaryFilesAndData/MinistriesBudgets2024.csv"));
+        CreatingMinistries.ministryCreation(Path.of("NecessaryFilesAndData/MinistriesBudgets2023.csv"));
+        CreatingMinistries.ministryCreation(Path.of("NecessaryFilesAndData/MinistriesBudgets2022.csv"));
+        CreatingMinistries.ministryCreation(Path.of("NecessaryFilesAndData/MinistriesBudgets2021.csv"));
+        CreatingMinistries.ministryCreation(Path.of("NecessaryFilesAndData/MinistriesBudgets2020.csv"));
         do {
             System.out.println("Do you want to :");
             System.out.println("1.View");

@@ -1,20 +1,20 @@
-Ministry of Interior : 3.548.748.000$ , 0,44 % of total budget
-Ministry of Foreign Affairs : 282.175.000$ , 0,03 % of total budget
-Ministry of National Defense : 5.707.800.000$ , 0,71 % of total budget
-Ministry of Health : 5.202.388.000$ , 0,64 % of total budget
-Ministry of Justice : 566.374.000$ , 0,07 % of total budget
-Ministry of Education, Religious Affairs, and Sports : 6.080.504.000$ , 0,75 % of total budget
-Ministry of Culture : 458.563.000$ , 0,06 % of total budget
-Ministry of National Economy and Finance : 748.592.323.000$ , 92,81 % of total budget
-Ministry of Rural Development and Food : 1.547.980.000$ , 0,19 % of total budget
-Ministry of Environment and Energy : 1.707.333.000$ , 0,21 % of total budget
-Ministry of Labor and Social Security : 22.492.686.000$ , 2,79 % of total budget
-Ministry of Social Cohesion and Family : 0$ , 0 % of total budget
-Ministry of Development : 3.295.349.000$ , 0,41 % of total budget
-Ministry of Infrastructure and Transport : 2.346.259.000$ , 0,29 % of total budget
-Ministry of Shipping and Island Policy : 498.453.000$ , 0,06 % of total budget
-Ministry of Tourism : 239.360.000$ , 0,03 % of total budget
-Ministry of Digital Governance : 972.937.000$ , 0,12 % of total budget
-Ministry of Migration and Asylum : 418.728.000$ , 0,05 % of total budget
-Ministry of Citizen Protection : 2.012.833.000$ , 0,25 % of total budget
-Ministry of Climate Crisis and Civil Protection : 643.473.000$ , 0,08 % of total budget
+Ministry of Interior 3548748000
+Ministry of Foreign Affairs 282175000
+Ministry of National Defense 5707800000
+Ministry of Health 5202388000
+Ministry of Justice 566374000
+Ministry of Education, Religious Affairs, and Sports 6080504000
+Ministry of Culture 458563000
+Ministry of National Economy and Finance 748592323000
+Ministry of Rural Development and Food 1547980000
+Ministry of Environment and Energy 1707333000
+Ministry of Labor and Social Security 22492686000
+Ministry of Social Cohesion and Family 0
+Ministry of Development 3295349000
+Ministry of Infrastructure and Transport 2346259000
+Ministry of Shipping and Island Policy 498453000
+Ministry of Tourism 239360000
+Ministry of Digital Governance 972937000
+Ministry of Migration and Asylum 418728000
+Ministry of Citizen Protection 2012833000
+Ministry of Climate Crisis and Civil Protection 643473000

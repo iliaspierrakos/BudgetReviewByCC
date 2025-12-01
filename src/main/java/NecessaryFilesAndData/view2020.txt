@@ -1,20 +1,20 @@
-Ministry of Interior 2997671000
-Ministry of Foreign Affairs 278109000
-Ministry of National Defense 3397000000
-Ministry of Health 3858660000
-Ministry of Justice 532754000
-Ministry of Education, Religious Affairs, and Sports 5463000000
-Ministry of Culture 335200000
-Ministry of National Economy and Finance 632788383000
-Ministry of Rural Development and Food 1071473000
-Ministry of Environment and Energy 660805000
-Ministry of Labor and Social Security 19891800000
-Ministry of Social Cohesion and Family 0
-Ministry of Development 2419846000
-Ministry of Infrastructure and Transport 2000867000
-Ministry of Shipping and Island Policy 406800000
-Ministry of Tourism 69680000
-Ministry of Digital Governance 2470481000
-Ministry of Migration and Asylum 192279000
-Ministry of Citizen Protection 0
-Ministry of Climate Crisis and Civil Protection 0
+Ministry of Interior : 2.997.671.000$ , 0,44 % of total budget
+Ministry of Foreign Affairs : 278.109.000$ , 0,04 % of total budget
+Ministry of National Defense : 3.397.000.000$ , 0,5 % of total budget
+Ministry of Health : 3.858.660.000$ , 0,57 % of total budget
+Ministry of Justice : 532.754.000$ , 0,08 % of total budget
+Ministry of Education, Religious Affairs, and Sports : 5.463.000.000$ , 0,8 % of total budget
+Ministry of Culture : 335.200.000$ , 0,05 % of total budget
+Ministry of National Economy and Finance : 632.788.383.000$ , 93,22 % of total budget
+Ministry of Rural Development and Food : 1.071.473.000$ , 0,16 % of total budget
+Ministry of Environment and Energy : 660.805.000$ , 0,1 % of total budget
+Ministry of Labor and Social Security : 19.891.800.000$ , 2,93 % of total budget
+Ministry of Social Cohesion and Family : 0$ , 0 % of total budget
+Ministry of Development : 2.419.846.000$ , 0,36 % of total budget
+Ministry of Infrastructure and Transport : 2.000.867.000$ , 0,29 % of total budget
+Ministry of Shipping and Island Policy : 406.800.000$ , 0,06 % of total budget
+Ministry of Tourism : 69.680.000$ , 0,01 % of total budget
+Ministry of Digital Governance : 2.470.481.000$ , 0,36 % of total budget
+Ministry of Migration and Asylum : 192.279.000$ , 0,03 % of total budget
+Ministry of Citizen Protection : 0$ , 0 % of total budget
+Ministry of Climate Crisis and Civil Protection : 0$ , 0 % of total budget
