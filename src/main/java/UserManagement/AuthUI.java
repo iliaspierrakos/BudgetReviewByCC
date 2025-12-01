@@ -38,6 +38,10 @@ public class AuthUI {
                     ClearHistory.clearFile(Path.of("NecessaryFilesAndData/MinistriesBudgets2025.csv"));
                     ClearHistory.clearFile(Path.of("NecessaryFilesAndData/MinistriesBudgets2026.csv"));
                     ClearHistory.clearFile(Path.of("NecessaryFilesAndData/MinistriesBudgets2024.csv"));
+                    ClearHistory.clearFile(Path.of("NecessaryFilesAndData/MinistriesBudgets2023.csv"));
+                    ClearHistory.clearFile(Path.of("NecessaryFilesAndData/MinistriesBudgets2022.csv"));
+                    ClearHistory.clearFile(Path.of("NecessaryFilesAndData/MinistriesBudgets2021.csv"));
+                    ClearHistory.clearFile(Path.of("NecessaryFilesAndData/MinistriesBudgets2020.csv"));
                     break;
                 default:
                     System.out.println("Invalid choice. Try again.");

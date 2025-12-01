@@ -44,15 +44,9 @@ public class Ministry {    //Ministry class
     public String toString() {
         return ministryName + "Regular Budget:" + budget;
     }
-    /**
-     * Searches for a ministry by name in the {@code CreatingMinistries.ministries} array
-     * and returns its regular budget.
-     *
-     * @param searchingMinistry The name of the ministry to search for.
-     * @return The budget of the found ministry, or -1 if the ministry is not found.
-     */
-    public static double budgetSearchByName(String searchingMinistry) { //method for searching the regular budget of a ministry with its name
-        for (Ministry m : CreatingMinistries.ministries) {
+
+    public static double budgetSearchByName(String searchingMinistry, Ministry[] ministriesArray) { //method for searching the regular budget of a ministry with its name
+        for (Ministry m : ministriesArray) {
             if (m.ministryName.equalsIgnoreCase(searchingMinistry)) {
                 return m.budget;
             }

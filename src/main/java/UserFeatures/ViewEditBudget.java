@@ -19,8 +19,20 @@ public class ViewEditBudget {
         Ministries min = new Ministries();
         MinistriesBudgets budg = new MinistriesBudgets();
         budg.budget(Path.of("NecessaryFilesAndData/BudgetReview2026.txt"));
+        budg.budget(Path.of("NecessaryFilesAndData/BudgetReview2025.txt"));
+        budg.budget(Path.of("NecessaryFilesAndData/BudgetReview2024.txt"));
+        budg.budget(Path.of("NecessaryFilesAndData/BudgetReview2023.txt"));
+        budg.budget(Path.of("NecessaryFilesAndData/BudgetReview2022.txt"));
+        budg.budget(Path.of("NecessaryFilesAndData/BudgetReview2021.txt"));
+        budg.budget(Path.of("NecessaryFilesAndData/BudgetReview2020.txt"));
         min.minlist();
         CreatingMinistries.ministryCreation(Path.of("NecessaryFilesAndData/MinistriesBudgets2026.csv")); // Initializing Ministry objects
+        CreatingMinistries.ministryCreation(Path.of("NecessaryFilesAndData/MinistriesBudgets2025.csv"));
+        CreatingMinistries.ministryCreation(Path.of("NecessaryFilesAndData/MinistriesBudgets2024.csv"));
+        CreatingMinistries.ministryCreation(Path.of("NecessaryFilesAndData/MinistriesBudgets2023.csv"));
+        CreatingMinistries.ministryCreation(Path.of("NecessaryFilesAndData/MinistriesBudgets2022.csv"));
+        CreatingMinistries.ministryCreation(Path.of("NecessaryFilesAndData/MinistriesBudgets2021.csv"));
+        CreatingMinistries.ministryCreation(Path.of("NecessaryFilesAndData/MinistriesBudgets2020.csv"));
         do {
             System.out.println("Do you want to :");
             System.out.println("1.View");
@@ -31,8 +43,26 @@ public class ViewEditBudget {
             String answer = "no";
             switch (number) {
             case 1:
-                View.viewGovBudget();
-                System.out.println("Available=" + Edit.balance);
+                int selectedYear = 0;
+                boolean validYear = false;
+                while (!validYear) {
+                    System.out.println("Please select a year (2020-2026):");
+                    try {
+                        selectedYear = scanner.nextInt();
+                        if (selectedYear >= 2020 && selectedYear <= 2026) {
+                            validYear = true;
+                        } else {
+                            System.out.println("Invalid year. Please enter a year between 2020 and 2026.");
+                        }
+                    } catch (Exception e) {
+                        System.out.println("Invalid input. Please enter a valid year.");
+                        scanner.nextLine();
+                    }
+                }
+                View.viewGovBudget(selectedYear);
+                if (selectedYear == 2026) {
+                    System.out.println("Available=" + Edit.balance);
+                }
                 break;
             case 2:
                 do {
