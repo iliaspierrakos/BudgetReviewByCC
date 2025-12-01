@@ -114,8 +114,8 @@ public class AuthUI {
         if (user != null) {
             System.out.println("Welcome, " + user.getUsername());
             showRoleMenu(user);
+            ViewEditBudget.budgetMenu();
         }
-        ViewEditBudget.budgetMenu();
     }
     private void showRoleMenu(User user) {
             switch (user.getRole()) {
