@@ -20,8 +20,8 @@ public class Ministry {    //Ministry class
         return ministryName + "Regular Budget:" + budget;
     }
 
-    public static double budgetSearchByName(String searchingMinistry) { //method for searching the regular budget of a ministry with its name
-        for (Ministry m : CreatingMinistries.ministries) {
+    public static double budgetSearchByName(String searchingMinistry, Ministry[] ministriesArray) { //method for searching the regular budget of a ministry with its name
+        for (Ministry m : ministriesArray) {
             if (m.ministryName.equalsIgnoreCase(searchingMinistry)) {
                 return m.budget;
             }
