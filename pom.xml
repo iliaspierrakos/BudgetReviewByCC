@@ -23,6 +23,18 @@
             <version>5.10.0</version>
             <scope>test</scope>
         </dependency>
+        <!-- JavaFX FXML -->
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-fxml</artifactId>
+            <version>22.0.1</version>
+        </dependency>
+        <!-- JavaFX controls -->
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-controls</artifactId>
+            <version>22.0.1</version>
+        </dependency>    
     </dependencies>
 
     <build>
@@ -57,7 +69,16 @@
                     </execution>
                 </executions>
             </plugin>
-        </plugins>
+            <!-- JavaFX plugin -->
+            <plugin>
+                <groupId>org.openjfx</groupId>
+                <artifactId>javafx-maven-plugin</artifactId>
+                <version>0.0.8</version>
+                <configuration>
+                    <mainClass>BudgetReviewByCC</mainClass>
+                </configuration>
+            </plugin>   
+        </plugins>     
     </build>
 
 </project>
