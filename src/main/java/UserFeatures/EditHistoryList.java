@@ -13,19 +13,24 @@ public class EditHistoryList {
     public void undo() {
         if (index >= 0) {
             Edit lastEdit = editList.get(index);
-            reverseEdit(lastEdit); 
+            reverseEdit(lastEdit);
+            editList.remove(index);
             index--;
-        } else {
-            System.out.println("Nothing to undo");
-         }
+        } else {    
+        System.out.println("Nothing to undo");
+        }
     }
     public void reverseEdit(Edit lastEdit) {
         if (lastEdit.getChange().equalsIgnoreCase("Increase")) {
             var e = new Edit(lastEdit.getName(), "Decrease", lastEdit.getAmount());
-            e.editingbudget(e);
+            //System.out.println(lastEdit);
+            Edit.balance += lastEdit.getAmount();
+            e.editingbudget(e,  true);
         } else {
             var e = new Edit(lastEdit.getName(), "Increase", lastEdit.getAmount());
-            e.editingbudget(e);
+            //System.out.println(lastEdit);
+            Edit.balance += lastEdit.getAmount();
+            e.editingbudget(e, true);
         }
     }
 }

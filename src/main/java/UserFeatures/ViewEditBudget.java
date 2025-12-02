@@ -16,7 +16,7 @@ public class ViewEditBudget {
     public static void budgetMenu() {
         Scanner scanner = new Scanner(System.in);
         Ministries min = new Ministries();
-        MinistriesBudgets budg = new MinistriesBudgets();
+        MinistriesBudgets budg = new MinistriesBudgets();        
         budg.budget(Path.of("NecessaryFilesAndData/BudgetReview2026.txt"));
         budg.budget(Path.of("NecessaryFilesAndData/BudgetReview2025.txt"));
         budg.budget(Path.of("NecessaryFilesAndData/BudgetReview2024.txt"));
@@ -48,6 +48,7 @@ public class ViewEditBudget {
                     System.out.println("Please select a year (2020-2026):");
                     try {
                         selectedYear = scanner.nextInt();
+                        scanner.nextLine();
                         if (selectedYear >= 2020 && selectedYear <= 2026) {
                             validYear = true;
                         } else {
@@ -73,7 +74,13 @@ public class ViewEditBudget {
             case 3:
                 try {
                     System.out.println(Files.readString(Paths.get("NecessaryFilesAndData/edithistory.txt")));
-                    System.out.println("Number of changes:" + EditHistoryList.editList.size());
+                    System.out.println("Changes made:" + EditHistoryList.editList.size());
+                    System.out.println("Do you want to undo?");
+                    scanner.nextLine();
+                    answer = scanner.nextLine();
+                    if (answer.equalsIgnoreCase("yes")) {
+                    Edit.history.undo();
+                    }
                 } catch (IOException e) {}
                 break;
             case 4:
