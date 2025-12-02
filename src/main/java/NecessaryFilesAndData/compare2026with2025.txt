@@ -1,20 +1,20 @@
-Ministry of Interior|2026 budget: 4.163.668.000$ | 2025 budget: 3.830.276.000$
-Ministry of Foreign Affairs|2026 budget: 483.237.000$ | 2025 budget: 420.237.000$
-Ministry of National Defense|2026 budget: 7.063.272.000$ | 2025 budget: 6.130.000.000$
-Ministry of Health|2026 budget: 7.841.945.000$ | 2025 budget: 7.177.424.000$
-Ministry of Justice|2026 budget: 679.577.000$ | 2025 budget: 650.803.000$
-Ministry of Education, Religious Affairs, and Sports|2026 budget: 6.763.933.000$ | 2025 budget: 6.606.000.000$
-Ministry of Culture|2026 budget: 653.109.000$ | 2025 budget: 575.419.000$
-Ministry of National Economy and Finance|2026 budget: 1.717.408.920.000$ | 2025 budget: 1.246.518.464.000$
-Ministry of Rural Development and Food|2026 budget: 1.503.877.000$ | 2025 budget: 1.281.403.000$
-Ministry of Environment and Energy|2026 budget: 3.133.452.000$ | 2025 budget: 2.341.227.000$
-Ministry of Labor and Social Security|2026 budget: 19.101.078.000$ | 2025 budget: 18.678.084.000$
-Ministry of Social Cohesion and Family|2026 budget: 3.803.316.000$ | 2025 budget: 3.989.553.000$
-Ministry of Development|2026 budget: 798.476.000$ | 2025 budget: 818.045.000$
-Ministry of Infrastructure and Transport|2026 budget: 3.391.756.000$ | 2025 budget: 2.694.810.000$
-Ministry of Shipping and Island Policy|2026 budget: 756.593.000$ | 2025 budget: 651.864.000$
-Ministry of Tourism|2026 budget: 237.992.000$ | 2025 budget: 189.293.000$
-Ministry of Digital Governance|2026 budget: 1.391.403.000$ | 2025 budget: 1.073.928.000$
-Ministry of Migration and Asylum|2026 budget: 536.133.000$ | 2025 budget: 475.871.000$
-Ministry of Citizen Protection|2026 budget: 2.603.285.000$ | 2025 budget: 2.285.820.000$
-Ministry of Climate Crisis and Civil Protection|2026 budget: 1.438.115.000$ | 2025 budget: 1.221.116.000$
+Ministry of Interior| 2026 budget: 4.163.668.000$ | 2025 budget: 3.830.276.000$
+Ministry of Foreign Affairs| 2026 budget: 483.237.000$ | 2025 budget: 420.237.000$
+Ministry of National Defense| 2026 budget: 7.063.272.000$ | 2025 budget: 6.130.000.000$
+Ministry of Health| 2026 budget: 7.841.945.000$ | 2025 budget: 7.177.424.000$
+Ministry of Justice| 2026 budget: 679.577.000$ | 2025 budget: 650.803.000$
+Ministry of Education, Religious Affairs, and Sports| 2026 budget: 6.763.933.000$ | 2025 budget: 6.606.000.000$
+Ministry of Culture| 2026 budget: 653.109.000$ | 2025 budget: 575.419.000$
+Ministry of National Economy and Finance| 2026 budget: 1.717.408.920.000$ | 2025 budget: 1.246.518.464.000$
+Ministry of Rural Development and Food| 2026 budget: 1.503.877.000$ | 2025 budget: 1.281.403.000$
+Ministry of Environment and Energy| 2026 budget: 3.133.452.000$ | 2025 budget: 2.341.227.000$
+Ministry of Labor and Social Security| 2026 budget: 19.101.078.000$ | 2025 budget: 18.678.084.000$
+Ministry of Social Cohesion and Family| 2026 budget: 3.803.316.000$ | 2025 budget: 3.989.553.000$
+Ministry of Development| 2026 budget: 798.476.000$ | 2025 budget: 818.045.000$
+Ministry of Infrastructure and Transport| 2026 budget: 3.391.756.000$ | 2025 budget: 2.694.810.000$
+Ministry of Shipping and Island Policy| 2026 budget: 756.593.000$ | 2025 budget: 651.864.000$
+Ministry of Tourism| 2026 budget: 237.992.000$ | 2025 budget: 189.293.000$
+Ministry of Digital Governance| 2026 budget: 1.391.403.000$ | 2025 budget: 1.073.928.000$
+Ministry of Migration and Asylum| 2026 budget: 536.133.000$ | 2025 budget: 475.871.000$
+Ministry of Citizen Protection| 2026 budget: 2.603.285.000$ | 2025 budget: 2.285.820.000$
+Ministry of Climate Crisis and Civil Protection| 2026 budget: 1.438.115.000$ | 2025 budget: 1.221.116.000$
