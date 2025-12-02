@@ -75,7 +75,7 @@
                 <artifactId>javafx-maven-plugin</artifactId>
                 <version>0.0.8</version>
                 <configuration>
-                    <mainClass>BudgetReviewByCC</mainClass>
+                    <mainClass>BudgetReviewGUI</mainClass>
                 </configuration>
             </plugin>   
         </plugins>     
