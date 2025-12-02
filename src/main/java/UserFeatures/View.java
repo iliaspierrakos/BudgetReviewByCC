@@ -34,32 +34,7 @@ public class View {
             fw = new FileWriter("NecessaryFilesAndData/view" + year +".txt", false);
             pw = new PrintWriter(fw);
             Ministry[] selectedMinistries = null;
-            switch (year) {
-            case 2020:
-                selectedMinistries = CreatingMinistries.ministries2020;
-                break;
-            case 2021:
-                selectedMinistries = CreatingMinistries.ministries2021;
-                break;
-            case 2022:
-                selectedMinistries = CreatingMinistries.ministries2022;
-                break;
-            case 2023:
-                selectedMinistries = CreatingMinistries.ministries2023;
-                break;
-            case 2024:
-                selectedMinistries = CreatingMinistries.ministries2024;
-                break;
-            case 2025:
-                selectedMinistries = CreatingMinistries.ministries2025;
-                break;
-            case 2026:
-                selectedMinistries = CreatingMinistries.ministries2026;
-                break;
-            default:
-                System.out.println("Invalid year. Please select a year between 2020 and 2026.");
-                return;
-            }
+            selectedMinistries =  ministryYear(year);
             if (selectedMinistries == null) {
                 System.out.println("No data available for year " + year);
                 return;
@@ -86,6 +61,33 @@ public class View {
             fw.close();
             System.out.println(Files.readString(Paths.get("NecessaryFilesAndData/view" + year + ".txt")));
         } catch(IOException e) {}
+    }
+    public static Ministry[] ministryYear(int year) {
+        Ministry[] selectedMinistries = null;
+        switch (year) {
+        case 2020:
+            selectedMinistries = CreatingMinistries.ministries2020;
+            break;
+        case 2021:
+            selectedMinistries = CreatingMinistries.ministries2021;
+            break;
+        case 2022:
+            selectedMinistries = CreatingMinistries.ministries2022;
+            break;
+        case 2023:
+            selectedMinistries = CreatingMinistries.ministries2023;
+            break;
+        case 2024:
+            selectedMinistries = CreatingMinistries.ministries2024;
+            break;
+        case 2025:
+            selectedMinistries = CreatingMinistries.ministries2025;
+            break;
+        case 2026:
+            selectedMinistries = CreatingMinistries.ministries2026;
+            break;
+        }
+        return selectedMinistries;
     }
 
 }

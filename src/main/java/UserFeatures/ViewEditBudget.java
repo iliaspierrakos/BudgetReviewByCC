@@ -37,28 +37,13 @@ public class ViewEditBudget {
             System.out.println("1.View");
             System.out.println("2.Edit");
             System.out.println("3.Edit History");
-            System.out.println("4.Return");
+            System.out.println("4.Compare");
+            System.out.println("5.Return");
             int number = scanner.nextInt();
             String answer = "no";
             switch (number) {
             case 1:
-                int selectedYear = 0;
-                boolean validYear = false;
-                while (!validYear) {
-                    System.out.println("Please select a year (2020-2026):");
-                    try {
-                        selectedYear = scanner.nextInt();
-                        scanner.nextLine();
-                        if (selectedYear >= 2020 && selectedYear <= 2026) {
-                            validYear = true;
-                        } else {
-                            System.out.println("Invalid year. Please enter a year between 2020 and 2026.");
-                        }
-                    } catch (Exception e) {
-                        System.out.println("Invalid input. Please enter a valid year.");
-                        scanner.nextLine();
-                    }
-                }
+                int selectedYear = Compare.validityYear();
                 View.viewGovBudget(selectedYear);
                 if (selectedYear == 2026) {
                     System.out.println("Available=" + Ministry.getFormattedBudget(Edit.balance));
@@ -84,6 +69,9 @@ public class ViewEditBudget {
                 } catch (IOException e) {}
                 break;
             case 4:
+                Compare.comparingMinistries();
+                break;
+            case 5:
                 return;
             default:
                 System.out.println("Invalid");
