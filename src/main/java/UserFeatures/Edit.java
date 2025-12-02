@@ -19,6 +19,7 @@ public class Edit {
     private double amount;
     private Scanner scanner = new Scanner(System.in);
     public static double balance = 0;
+    public static EditHistoryList history = new EditHistoryList(); //creating static object for storing the edits 
 
     /**
      * Collects user input for a budget transfer.
@@ -59,17 +60,17 @@ public class Edit {
      *
      * @param object The {@code Edit} object containing the ministry name, change type, and amount.
      */
-    public void editingbudget( Edit object) {
+    public void editingbudget( Edit object, boolean undo) {
         for (int i = 0; i < CreatingMinistries.ministries2026.length; i++) {// Loop used for searching the ministry's name
             if (CreatingMinistries.ministries2026[i] != null && CreatingMinistries.ministries2026[i].getMinistryName().equalsIgnoreCase(object.name)) {
                 // found the correct ministry
                 double newBudget;
                 if (object.change.equalsIgnoreCase("Increase")) {// checking the type of change and making the proper move to the ministry's budget
                     newBudget = CreatingMinistries.ministries2026[i].getBudget() + object.amount;
-                    printNewBudget(newBudget,"Increase",i);
+                    printNewBudget(newBudget,"Increase",i , undo);
                 } else {
                     newBudget = CreatingMinistries.ministries2026[i].getBudget() - object.amount ;
-                    printNewBudget(newBudget, "Decrease", i);
+                    printNewBudget(newBudget, "Decrease", i, undo);
 
                 }
                 break; // Exit loop once ministry is found
@@ -84,13 +85,18 @@ public class Edit {
      * @param type The type of change ("Increase" or "Decrease").
      * @param i The index of the ministry in the {@code CreatingMinistries.ministries} array.
      */
-    public void printNewBudget(double finalBudget, String type, int i) {
+    public void printNewBudget(double finalBudget, String type, int i, boolean undo) {
         double previousBudget = CreatingMinistries.ministries2026[i].getBudget();
         String ministryName = CreatingMinistries.ministries2026[i].getMinistryName();
         CreatingMinistries.ministries2026[i].setBudget(finalBudget);
         EditHistory.historyOfEdit(ministryName, previousBudget, finalBudget);
-        System.out.println("Budget updated successfully!");
-        System.out.println("New budget for " + CreatingMinistries.ministries2026[i].getMinistryName() + " " + Ministry.getFormattedBudget(CreatingMinistries.ministries2026[i].getBudget()));// printing the new result
+        if (undo == false) {
+            System.out.println("Budget updated successfully!");
+            System.out.println("New budget for " + CreatingMinistries.ministries2026[i].getMinistryName() + " " + Ministry.getFormattedBudget(CreatingMinistries.ministries2026[i].getBudget()));// printing the new result
+        } else {
+            System.out.println("Undo completed: " + ministryName + " reverted to " + Ministry.getFormattedBudget(finalBudget));
+        }
+
     }
 
 
@@ -138,7 +144,8 @@ public class Edit {
         // Show previous budget and perform the decrease
         System.out.println(fromName + " previous budget: " + Ministry.getFormattedBudget(Ministry.budgetSearchByName(fromName, CreatingMinistries.ministries2026)));
         Edit obj1 = new Edit(fromName, "Decrease", amount);
-        obj1.editingbudget(obj1);
+        history.addEdit(obj1);
+        obj1.editingbudget(obj1, false);        
         System.out.println("Available money for Investment : " + Ministry.getFormattedBudget(balance));
 
         //Ask for a new edit either increase or decrease
@@ -184,7 +191,8 @@ public class Edit {
 
             // Perform the transfer (Decrease from source, Increase to destination)
             Edit obj2 = new Edit(toName, change, changeamount);
-            obj2.editingbudget(obj2);
+            history.addEdit(obj2);
+            obj2.editingbudget(obj2, false);
             System.out.println("Available money for Investment : " + Ministry.getFormattedBudget(balance));
             //Ask for edit either increase or decrease
             System.out.println("Would you like to edit the budget of another ministry? ");
@@ -295,5 +303,18 @@ public class Edit {
      */
     public String formatNumber(double number) {
         return df.format(number);
+    }
+    public String getName() {
+        return name;
+    }
+    public double getAmount() {
+        return amount;
+    }
+    public String getChange() {
+        return change;
+    }
+    @Override
+    public String toString() {
+        return name + " " + change + " " + amount;
     }
 }

@@ -1,7 +1,7 @@
 package UserFeatures;
 import java.io.FileWriter;
-import java.io.PrintWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 
 public class EditHistory {
 
@@ -17,6 +17,9 @@ public class EditHistory {
             pw.println(ministryName + " new budget: " + Ministry.getFormattedBudget(newBudget));
             pw.close();
             fw.close();
+            System.out.println("Do you want to undo?");
+            var e = new EditHistoryList();
+            e.undo();
         } catch(IOException e) {}
 
     }
