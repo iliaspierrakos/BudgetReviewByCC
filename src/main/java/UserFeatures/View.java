@@ -1,9 +1,11 @@
 package UserFeatures;
+
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+
 /**
  * The {@code View} class handles the "View" option of the application's menu.
  * It provides methods for displaying data related to the budgets of the selected Ministries.
@@ -64,28 +66,69 @@ public class View {
                 System.out.println("No data available for year " + year);
                 return;
             }
+            
+            // Calculate total budget
             for (Ministry m : selectedMinistries) {
-                mbudg=m.getBudget();
+                mbudg = m.getBudget();
                 inUseBudget += mbudg;
             }
+            
             if (inUseBudget == 0) {
-                System.out.println("Total budget is 0 — cannot calculate percentages.");
-            return;
+                System.out.println("Total budget is 0 – cannot calculate percentages.");
+                return;
             }
+            
+            // Print header with decorative line
+            pw.println("=".repeat(105));
+            // Centered title with the year
+            pw.println(String.format("%63s", "GOVERNMENT BUDGET " + year));
+            pw.println("=".repeat(105));
+            // Column headers with proper alignment
+            pw.printf("%-60s %20s %20s%n", "MINISTRY", "BUDGET", "PERCENTAGE");
+            pw.println("-".repeat(105));
+            
+            // Print data for each ministry
             for (Ministry m : selectedMinistries) {
-                mbudg=m.getBudget();
-                readable = Ministry.getFormattedBudget(mbudg); //Caution readble variable is String it is used only for readable print in View
+                mbudg = m.getBudget();
+                readable = Ministry.getFormattedBudget(mbudg);
+                
+                // Calculate percentage of total budget
                 double percent = (mbudg / inUseBudget) * 100;
-                readablePercent =  Ministry.getFormattedBudget(percent);
-                //System.out.println("test");
-                pw.println(m.getMinistryName() + " : " + readable + "$" + " , " + readablePercent + " % of total budget" ) ;
-
-
+                
+                // Format percentage with European style (comma for decimals)
+                // Use String.format with replace to change . to ,
+                readablePercent = String.format("%.2f%%", percent).replace(".", ",");
+                
+                // Print row with proper alignment
+                // %-60s: left-aligned string of 60 characters (for ministry name)
+                // %20s: right-aligned string of 20 characters (for budget)
+                // %20s: right-aligned string of 20 characters (for percentage)
+                pw.printf("%-60s %20s %20s%n",
+                          m.getMinistryName(),
+                          readable,
+                          readablePercent);
             }
+            
+            // Print footer with total
+            pw.println("-".repeat(105));
+            // Total row with right-aligned 100,00%
+            pw.printf("%-60s %20s %20s%n",
+                      "TOTAL",
+                      Ministry.getFormattedBudget(inUseBudget),
+                      "100,00%");
+            pw.println("=".repeat(105));
+            
             pw.close();
             fw.close();
+            
+            // Display file contents to screen
             System.out.println(Files.readString(Paths.get("NecessaryFilesAndData/view" + year + ".txt")));
-        } catch(IOException e) {}
+            
+        } catch(IOException e) {
+            // Print error message if file write/read fails
+            System.err.println("Error writing or reading view file: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
 }

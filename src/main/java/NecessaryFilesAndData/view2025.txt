@@ -1,0 +1,28 @@
+=========================================================================================================
+                                         GOVERNMENT BUDGET 2025
+=========================================================================================================
+MINISTRY                                                                   BUDGET           PERCENTAGE
+---------------------------------------------------------------------------------------------------------
+Ministry of Interior                                                3.830.276.000                0,29%
+Ministry of Foreign Affairs                                           420.237.000                0,03%
+Ministry of National Defense                                        6.130.000.000                0,47%
+Ministry of Health                                                  7.177.424.000                0,55%
+Ministry of Justice                                                   650.803.000                0,05%
+Ministry of Education, Religious Affairs, and Sports                6.606.000.000                0,51%
+Ministry of Culture                                                   575.419.000                0,04%
+Ministry of National Economy and Finance                        1.246.518.464.000               95,33%
+Ministry of Rural Development and Food                              1.281.403.000                0,10%
+Ministry of Environment and Energy                                  2.341.227.000                0,18%
+Ministry of Labor and Social Security                              18.678.084.000                1,43%
+Ministry of Social Cohesion and Family                              3.989.553.000                0,31%
+Ministry of Development                                               818.045.000                0,06%
+Ministry of Infrastructure and Transport                            2.694.810.000                0,21%
+Ministry of Shipping and Island Policy                                651.864.000                0,05%
+Ministry of Tourism                                                   189.293.000                0,01%
+Ministry of Digital Governance                                      1.073.928.000                0,08%
+Ministry of Migration and Asylum                                      475.871.000                0,04%
+Ministry of Citizen Protection                                      2.285.820.000                0,17%
+Ministry of Climate Crisis and Civil Protection                     1.221.116.000                0,09%
+---------------------------------------------------------------------------------------------------------
+TOTAL                                                           1.307.609.637.000              100,00%
+=========================================================================================================
