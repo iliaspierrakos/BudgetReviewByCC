@@ -1,0 +1,20 @@
+Ministry of Interior| 2024 budget: 3.705.487.000$ | 2025 budget: 3.830.276.000$
+Ministry of Foreign Affairs| 2024 budget: 407.892.000$ | 2025 budget: 420.237.000$
+Ministry of National Defense| 2024 budget: 6.123.388.000$ | 2025 budget: 6.130.000.000$
+Ministry of Health| 2024 budget: 6.027.031.000$ | 2025 budget: 7.177.424.000$
+Ministry of Justice| 2024 budget: 625.464.000$ | 2025 budget: 650.803.000$
+Ministry of Education, Religious Affairs, and Sports| 2024 budget: 6.547.630.000$ | 2025 budget: 6.606.000.000$
+Ministry of Culture| 2024 budget: 400.113.000$ | 2025 budget: 575.419.000$
+Ministry of National Economy and Finance| 2024 budget: 1.049.897.798.000$ | 2025 budget: 1.246.518.464.000$
+Ministry of Rural Development and Food| 2024 budget: 1.184.694.000$ | 2025 budget: 1.281.403.000$
+Ministry of Environment and Energy| 2024 budget: 1.823.158.000$ | 2025 budget: 2.341.227.000$
+Ministry of Labor and Social Security| 2024 budget: 18.629.492.000$ | 2025 budget: 18.678.084.000$
+Ministry of Social Cohesion and Family| 2024 budget: 3.992.039.000$ | 2025 budget: 3.989.553.000$
+Ministry of Development| 2024 budget: 924.661.000$ | 2025 budget: 818.045.000$
+Ministry of Infrastructure and Transport| 2024 budget: 2.350.117.000$ | 2025 budget: 2.694.810.000$
+Ministry of Shipping and Island Policy| 2024 budget: 576.280.000$ | 2025 budget: 651.864.000$
+Ministry of Tourism| 2024 budget: 167.787.000$ | 2025 budget: 189.293.000$
+Ministry of Digital Governance| 2024 budget: 843.765.000$ | 2025 budget: 1.073.928.000$
+Ministry of Migration and Asylum| 2024 budget: 473.304.000$ | 2025 budget: 475.871.000$
+Ministry of Citizen Protection| 2024 budget: 2.262.973.000$ | 2025 budget: 2.285.820.000$
+Ministry of Climate Crisis and Civil Protection| 2024 budget: 936.610.000$ | 2025 budget: 1.221.116.000$
