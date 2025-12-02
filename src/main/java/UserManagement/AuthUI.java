@@ -35,22 +35,10 @@ public class AuthUI {
                     on = false;
                     System.out.println("Goodbye!");
                     ClearHistory.clearFile(Path.of("NecessaryFilesAndData/edithistory.txt"));
-                    ClearHistory.clearFile(Path.of("NecessaryFilesAndData/MinistriesBudgets2025.csv"));
-                    ClearHistory.clearFile(Path.of("NecessaryFilesAndData/MinistriesBudgets2026.csv"));
-                    ClearHistory.clearFile(Path.of("NecessaryFilesAndData/MinistriesBudgets2024.csv"));
-                    ClearHistory.clearFile(Path.of("NecessaryFilesAndData/MinistriesBudgets2023.csv"));
-                    ClearHistory.clearFile(Path.of("NecessaryFilesAndData/MinistriesBudgets2022.csv"));
-                    ClearHistory.clearFile(Path.of("NecessaryFilesAndData/MinistriesBudgets2021.csv"));
-                    ClearHistory.clearFile(Path.of("NecessaryFilesAndData/MinistriesBudgets2020.csv"));
-                    ClearHistory.clearFile(Path.of("NecessaryFilesAndData/view2020.txt"));
-                    ClearHistory.clearFile(Path.of("NecessaryFilesAndData/view2021.txt"));
-                    ClearHistory.clearFile(Path.of("NecessaryFilesAndData/view2022.txt"));
-                    ClearHistory.clearFile(Path.of("NecessaryFilesAndData/view2023.txt"));
-                    ClearHistory.clearFile(Path.of("NecessaryFilesAndData/view2024.txt"));
-                    ClearHistory.clearFile(Path.of("NecessaryFilesAndData/view2025.txt"));
-                    ClearHistory.clearFile(Path.of("NecessaryFilesAndData/view2026.txt"));
-
-
+                    for (int i = 2020; i <= 2026; i++) {
+                        ClearHistory.clearFile(Path.of("NecessaryFilesAndData/MinistriesBudgets" + i + ".csv"));
+                        ClearHistory.clearFile(Path.of("NecessaryFilesAndData/view" + i + ".txt"));
+                    }
                     break;
                 default:
                     System.out.println("Invalid choice. Try again.");
