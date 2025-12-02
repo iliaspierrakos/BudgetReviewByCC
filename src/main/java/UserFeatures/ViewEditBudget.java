@@ -37,8 +37,9 @@ public class ViewEditBudget {
             System.out.println("Do you want to :");
             System.out.println("1.View");
             System.out.println("2.Edit");
-            System.out.println("3.Edit History");
-            System.out.println("4.Return");
+            System.out.println("3.Bulk Edit");  // <- ΤΣΕΚΑΡΕΤΕ ΤΟ
+            System.out.println("4.Edit History");
+            System.out.println("5.Return");
             int number = scanner.nextInt();
             String answer = "no";
             switch (number) {
@@ -71,12 +72,16 @@ public class ViewEditBudget {
                     answer = scanner.nextLine();
                 }while (answer.equalsIgnoreCase("yes"));
                 break;
-            case 3:
+            case 3:  // ← ΠΡΟΣΘΗΚΗ
+                BulkEdit bulkEdit = new BulkEdit();
+                bulkEdit.bulkEditMenu();
+                break;
+            case 4:
                 try {
                     System.out.println(Files.readString(Paths.get("NecessaryFilesAndData/edithistory.txt")));
                 } catch (IOException e) {}
                 break;
-            case 4:
+            case 5:
                 return;
             default:
                 System.out.println("Invalid");
