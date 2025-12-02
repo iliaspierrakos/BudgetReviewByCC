@@ -6,7 +6,7 @@ import java.io.PrintWriter;
 import java.io.IOException;
 
 public class Propose {
-    public static void editProposal(User user) {
+    public static void editProposal(User user,String ministryName, double previousBudget, double newBudget) {
         if (user.getRole() == User.Role.GOVERNOR || user.getRole() == User.Role.CITIZEN) {
             return;
         }
@@ -16,6 +16,8 @@ public class Propose {
         try {
             fw = new FileWriter("NecessaryFilesAndData/" + user.getUsername() + " .txt", true);
             pw = new PrintWriter(fw);
+            pw.println(ministryName + " previous budget: " + Ministry.getFormattedBudget(previousBudget));
+            pw.println(ministryName + " new budget: " + Ministry.getFormattedBudget(newBudget));
 
             pw.close();
             fw.close();
