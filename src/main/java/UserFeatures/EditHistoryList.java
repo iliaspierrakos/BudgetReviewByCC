@@ -1,3 +1,9 @@
+/**
+ * This is a class for creating a list for storing the edits made from the user
+ * it has the addEdit, undo and reverseEdit methods which are used for 
+ * adding an edit to the list, adding the undo feature to the app and being 
+ * able to reverse edit the changes made by the user. 
+ */
 package UserFeatures;
 
 import java.util.LinkedList;
