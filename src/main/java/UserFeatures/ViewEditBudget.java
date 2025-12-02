@@ -38,7 +38,8 @@ public class ViewEditBudget {
             System.out.println("1.View");
             System.out.println("2.Edit");
             System.out.println("3.Edit History");
-            System.out.println("4.Return");
+            System.out.println("4.Compare");
+            System.out.println("5.Return");
             int number = scanner.nextInt();
             String answer = "no";
             switch (number) {
@@ -48,7 +49,6 @@ public class ViewEditBudget {
                 if (selectedYear == 2026) {
                     System.out.println("Available=" + Ministry.getFormattedBudget(Edit.balance));
                 }
-                Compare.comparingMinistries();
                 break;
             case 2:
                 do {
@@ -63,6 +63,9 @@ public class ViewEditBudget {
                 } catch (IOException e) {}
                 break;
             case 4:
+                Compare.comparingMinistries();
+                break;
+            case 5:
                 return;
             default:
                 System.out.println("Invalid");

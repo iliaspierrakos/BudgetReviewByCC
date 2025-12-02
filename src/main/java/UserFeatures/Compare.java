@@ -8,8 +8,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 public class Compare {
-
-
     public static void comparingMinistries() {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Please type the first of the two years that you want to compare:");
@@ -39,7 +37,7 @@ public class Compare {
             for (Ministry m : secondYearMinistry) {
                 mbudg=m.getBudget();
                 readable = Ministry.getFormattedBudget(mbudg); //Caution readble variable is String it is used only for readable print in View
-                pw.println(m.getMinistryName() + "|" + firstYear + " budget: " + budget1[counter] + "$ | " + secondYear  + " budget: " + readable + "$"  );
+                pw.println(m.getMinistryName() + "| " + firstYear + " budget: " + budget1[counter] + "$ | " + secondYear  + " budget: " + readable + "$"  );
                 counter++;
             }
 
