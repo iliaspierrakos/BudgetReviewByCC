@@ -38,7 +38,8 @@ public class ViewEditBudget {
             System.out.println("2.Edit");
             System.out.println("3.Edit History");
             System.out.println("4.Compare");
-            System.out.println("5.Return");
+            System.out.println("5.Bulk Edit");
+            System.out.println("6.Return");
             int number = scanner.nextInt();
             String answer = "no";
             switch (number) {
@@ -72,6 +73,10 @@ public class ViewEditBudget {
                 Compare.comparingMinistries();
                 break;
             case 5:
+                BulkEdit bulkEdit = new BulkEdit();
+                bulkEdit.bulkEditMenu();
+                break;
+            case 6:
                 return;
             default:
                 System.out.println("Invalid");

@@ -74,7 +74,6 @@ public class Ministry {    //Ministry class
      */
     public void setBudget(double budget) {
         this.budget = budget;
-        System.out.println("yes");
     }
 
     /**

@@ -47,13 +47,17 @@ public class CreatingMinistries {
                         }
                     }
                     double budget = 0.0;
-                    lastNumber = lastNumber.replaceAll("\\.", "");
                     try {
-                        //String cleanNumber = lastNumber.replace(".", "");
-                        //cleanNumber = cleanNumber.replace(",", ".");
-                        budget = Double.parseDouble(lastNumber);
-                    } catch (Exception e) {
+                        // Remove . (thousands separator)
+                        String cleanNumber = lastNumber.replace(".", "");
+                        
+                        // Replace , with . for decimals
+                        cleanNumber = cleanNumber.replace(",", ".");
+                        
+                        budget = Double.parseDouble(cleanNumber);
+                    } catch (NumberFormatException e) {
                         System.err.println("Error parsing budget for " + ministryName + ": " + lastNumber);
+                        System.err.println("Exception: " + e.getMessage());
                         budget = 0.0;
                     }
                     if (year.equalsIgnoreCase("2020")) {
@@ -74,9 +78,6 @@ public class CreatingMinistries {
 
                     writer.write(ministryName + " " + lastNumber);
                     writer.newLine();
-                    //System.out.println(ministryName + " " + lastNumber);
-
-
                 }
 
 
