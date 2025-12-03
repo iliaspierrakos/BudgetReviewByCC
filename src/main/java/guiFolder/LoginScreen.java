@@ -1,9 +1,6 @@
 package guiFolder;
 
 import UserManagement.UserManager;
-
-import java.lang.classfile.Label;
-
 import UserManagement.User;
 
 import javafx.geometry.Insets;
@@ -21,10 +18,12 @@ public class LoginScreen {
     public void show(Stage stage) {
         Label title = new Label("Login");
         title.setStyle("-fx-font-size: 22px; -fx-font-weight: bold;");
+
         TextField usernameField = new TextField();
-        usernameField.setPromtText("Username");
-        PassowrField passwordField = new PasswordField();
-        passwordField.setPromtText("Password");
+        usernameField.setPromptText("Username");
+
+        PasswordField passwordField = new PasswordField();
+        passwordField.setPromptText("Password");
         Label errorLabel = new Label();
         errorLabel.setStyle("-fx-text-fill: red;");
         Button loginButton = new Button("Login");
@@ -52,10 +51,10 @@ public class LoginScreen {
             new StartMenuScreen(userManager).show(stage);
         });
         VBox layout = new VBox(
-            15, tittle, usernameField, passwordField, loginButton, backButton, errorLabel);
+            15, title, usernameField, passwordField, loginButton, backButton, errorLabel);
         layout.setAlignment(Pos.CENTER);
         layout.setPadding(new Insets(20));
-        Scene = new Scene(layout, 350, 260);
+        Scene scene = new Scene(layout, 350, 260);
         stage.setScene(scene);
         stage.setTitle("Login");
         stage.show();    
