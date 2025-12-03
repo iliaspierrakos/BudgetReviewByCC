@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.util.Scanner;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.io.IOException;
 
 public class AuthUI {
     private UserManager userManager;
@@ -41,7 +42,11 @@ public class AuthUI {
                         ClearHistory.clearFile(Path.of("NecessaryFilesAndData/MinistriesBudgets" + i + ".csv"));
                         ClearHistory.clearFile(Path.of("NecessaryFilesAndData/view" + i + ".txt"));
                         for (int j = 2020; j <= 2026; j++) {
-                            Files.deleteIfExists(Paths.get("NecessaryFilesAndData/compare" + i "with" + j +));
+                            try {
+                                Files.deleteIfExists(Paths.get("NecessaryFilesAndData/compare" + i + "with" + j + ".txt"));
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
                         }
 
                     }
