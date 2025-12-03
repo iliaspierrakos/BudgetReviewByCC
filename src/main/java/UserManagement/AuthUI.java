@@ -4,6 +4,8 @@ import UserFeatures.ClearHistory;
 import UserFeatures.ViewEditBudget;
 import java.nio.file.Path;
 import java.util.Scanner;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 public class AuthUI {
     private UserManager userManager;
@@ -38,6 +40,10 @@ public class AuthUI {
                     for (int i = 2020; i <= 2026; i++) {
                         ClearHistory.clearFile(Path.of("NecessaryFilesAndData/MinistriesBudgets" + i + ".csv"));
                         ClearHistory.clearFile(Path.of("NecessaryFilesAndData/view" + i + ".txt"));
+                        for (int j = 2020; j <= 2026; j++) {
+                            Files.deleteIfExists(Paths.get("NecessaryFilesAndData/compare" + i "with" + j +));
+                        }
+
                     }
                     break;
                 default:
@@ -102,7 +108,7 @@ public class AuthUI {
         if (user != null) {
             System.out.println("Welcome, " + user.getUsername());
             showRoleMenu(user);
-            ViewEditBudget.budgetMenu(user); // passes the user object as a parameter 
+            ViewEditBudget.budgetMenu(user); // passes the user object as a parameter
         }
     }
     private void showRoleMenu(User user) {
