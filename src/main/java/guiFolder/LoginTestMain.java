@@ -1,4 +1,4 @@
-package gui;
+package guiFolder;
 
 import UserManagement.UserManager;
 import javafx.application.Application;
