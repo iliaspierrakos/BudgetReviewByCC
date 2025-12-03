@@ -1,0 +1,20 @@
+Ministry of Interior 3.238.568.000
+Ministry of Foreign Affairs 268.622.000
+Ministry of National Defense 6.465.600.000
+Ministry of Health 4.657.271.000
+Ministry of Justice 578.368.000
+Ministry of Education, Religious Affairs, and Sports 5.841.100.000
+Ministry of Culture 417.553.000
+Ministry of National Economy and Finance 751.576.826.000
+Ministry of Rural Development and Food 1.041.436.000
+Ministry of Environment and Energy 1.415.581.000
+Ministry of Labor and Social Security 21.612.496.000
+Ministry of Social Cohesion and Family 0
+Ministry of Development 2.926.720.000
+Ministry of Infrastructure and Transport 2.046.210.000
+Ministry of Shipping and Island Policy 451.427.000
+Ministry of Tourism 84.485.000
+Ministry of Digital Governance 954.578.000
+Ministry of Migration and Asylum 243.642.000
+Ministry of Citizen Protection 1.975.413.000
+Ministry of Climate Crisis and Civil Protection 595.021.000
