@@ -34,7 +34,7 @@ public class StartMenuScreen {
         exitButton.setOnAction(e -> {
             stage.close();
         });
-        VBox layout = new VBox(20, title, loginButton, registerButton, exitButton);
+        VBox layout = new VBox(20, title, registerButton,  loginButton, exitButton);
 
         layout.setAlignment(Pos.CENTER);
         layout.setPadding(new Insets(20));
