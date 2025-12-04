@@ -53,35 +53,75 @@ public class BulkEdit {
             System.out.println("Cannot decrease by 100% or more!");
             return;
         }
-        
-        // Show preview with before/after comparison
-        showBeforeAfterPreview(percentage, null);
-        
-        System.out.println("\nConfirm changes? (yes/no):");
-        String confirm = scanner.nextLine();
-        
-        if (confirm.equalsIgnoreCase("yes")) {
-            applyPercentageChange(percentage, null);
-            
-            // Update Edit.balance based on total change
-            double totalChange = calculateTotalChange(percentage, null);
-            if (totalChange < 0) { // If decrease occurred
-                Edit.balance += Math.abs(totalChange);
-                System.out.println("Available money for Investment updated: " + Ministry.getFormattedBudget(Edit.balance));
-            } else { // If increase occurred
-                if (Edit.balance >= totalChange) {
-                    Edit.balance -= totalChange;
-                    System.out.println("Available money for Investment updated: " + Ministry.getFormattedBudget(Edit.balance));
+        double totalChange = calculateTotalChange(percentage, null);
+        if (totalChange >= Edit.balance) {
+            System.out.println("The increase you want to do will lead to a negative balance. "
+            + "This means that you will have to decrease the budget of one or more ministries, " 
+            + "until the balance is 0 or more. Do you want to countinue with this change?");
+            String reassurance = scanner.nextLine();
+            reassurance = yesOrNo(reassurance);
+            if (reassurance.equalsIgnoreCase("No")) {
+                return;
+            } else {
+                // Show preview with before/after comparison
+                showBeforeAfterPreview(percentage, null);
+                
+                System.out.println("\nConfirm changes? (yes/no):");
+                String confirm = scanner.nextLine();
+                confirm = yesOrNo(confirm);
+                
+                if (confirm.equalsIgnoreCase("yes")) {
+                    applyPercentageChange(percentage, null);
+                    
+                    // Update Edit.balance based on total change
+                    
+                    if (totalChange < 0) { // If decrease occurred
+                        Edit.balance += Math.abs(totalChange);
+                        System.out.println("Available money for Investment updated: " + Ministry.getFormattedBudget(Edit.balance));
+                    } else { // If increase occurred
+                        if (Edit.balance >= totalChange) {
+                            Edit.balance -= totalChange;
+                            System.out.println("Available money for Investment updated: " + Ministry.getFormattedBudget(Edit.balance));
+                        }
+                    }
+                    
+                    System.out.println("All budgets updated successfully!");
                 } else {
-                    System.out.println("Warning: Increase exceeds available balance!");
+                    System.out.println("Operation cancelled.");
                 }
             }
-            
-            System.out.println("✓ All budgets updated successfully!");
+
         } else {
-            System.out.println("Operation cancelled.");
+            // Show preview with before/after comparison
+            showBeforeAfterPreview(percentage, null);
+                
+            System.out.println("\nConfirm changes? (yes/no):");
+            String confirm = scanner.nextLine();
+            confirm = yesOrNo(confirm);
+                
+            if (confirm.equalsIgnoreCase("yes")) {
+                applyPercentageChange(percentage, null);
+                    
+                // Update Edit.balance based on total change
+                    
+                if (totalChange < 0) { // If decrease occurred
+                    Edit.balance += Math.abs(totalChange);
+                    System.out.println("Available money for Investment updated: " + Ministry.getFormattedBudget(Edit.balance));
+                } else { // If increase occurred
+                    if (Edit.balance >= totalChange) {
+                        Edit.balance -= totalChange;
+                        System.out.println("Available money for Investment updated: " + Ministry.getFormattedBudget(Edit.balance));
+                    }
+                }
+                    
+                    System.out.println("All budgets updated successfully!");
+                }   else {
+                    System.out.println("Operation cancelled.");
+                }
         }
-    }
+                    
+    } 
+            
     
     /**
      * Applies a fixed amount change to ALL ministries with preview.
@@ -109,41 +149,78 @@ public class BulkEdit {
         if (wouldCauseNegative) {
             return;
         }
-        
-        // Show preview with before/after comparison
-        showFixedAmountPreview(amount, null);
-        
-        System.out.println("\nConfirm changes? (yes/no):");
-        String confirm = scanner.nextLine();
-        
-        if (confirm.equalsIgnoreCase("yes")) {
-            applyFixedAmountChange(amount, null);
+        int ministryCount = 0;
+        for (Ministry m : CreatingMinistries.ministries2026) {
+            if (m != null) ministryCount++;
+        }
+        double totalChange = amount * ministryCount;
+        if (totalChange >= Edit.balance) {
+            System.out.println("The increase you want to do will lead to a negative balance. "
+            + "This means that you will have to decrease the budget of one or more ministries, " 
+            + "until the balance is 0 or more. Do you want to countinue with this change?");
+            String reassurance = scanner.nextLine();
+            reassurance = yesOrNo(reassurance);
+            if (reassurance.equalsIgnoreCase("No")) {
+                return;
+            } else {
+                // Show preview with before/after comparison
+                showFixedAmountPreview(amount, null);
+                
+                System.out.println("\nConfirm changes? (yes/no):");
+                String confirm = scanner.nextLine();
+                confirm = yesOrNo(confirm);
+                
+                if (confirm.equalsIgnoreCase("yes")) {
+                    applyFixedAmountChange(amount, null);
 
-            // Update Edit.balance based on total change
-            int ministryCount = 0;
-            for (Ministry m : CreatingMinistries.ministries2026) {
-                if (m != null) ministryCount++;
-            }
-            double totalChange = amount * ministryCount;
-            
-            if (amount < 0) { // Decrease
-                Edit.balance += Math.abs(totalChange);
-            } else { // Increase
-                if (Edit.balance >= totalChange) {
-                    Edit.balance -= totalChange;
+                    // Update Edit.balance based on total change
+                    if (amount < 0) { // Decrease
+                        Edit.balance += Math.abs(totalChange);
+                    } else { // Increase
+                        if (Edit.balance >= totalChange) {
+                            Edit.balance -= totalChange;
+                        } else {
+                            System.out.println("Warning: Increase exceeds available balance!");
+                        }
+                    }
+                    
+                    System.out.println("Available money for Investment: " + 
+                        Ministry.getFormattedBudget(Edit.balance));
+                    System.out.println("All budgets updated successfully!");
                 } else {
-                    System.out.println("Warning: Increase exceeds available balance!");
+                    System.out.println("Operation cancelled.");
                 }
             }
-            
-            System.out.println("Available money for Investment: " + 
-                Ministry.getFormattedBudget(Edit.balance));
-            System.out.println("✓ All budgets updated successfully!");
         } else {
-            System.out.println("Operation cancelled.");
-        }
-    }
-    
+            // Show preview with before/after comparison
+            showFixedAmountPreview(amount, null);
+                
+            System.out.println("\nConfirm changes? (yes/no):");
+            String confirm = scanner.nextLine();
+            confirm = yesOrNo(confirm);
+                
+            if (confirm.equalsIgnoreCase("yes")) {
+                applyFixedAmountChange(amount, null);
+
+                // Update Edit.balance based on total change
+                if (amount < 0) { // Decrease
+                    Edit.balance += Math.abs(totalChange);
+                } else { // Increase
+                    if (Edit.balance >= totalChange) {
+                        Edit.balance -= totalChange;
+                    } else {
+                        System.out.println("Warning: Increase exceeds available balance!");
+                    }
+                }
+                    
+                System.out.println("Available money for Investment: " + 
+                    Ministry.getFormattedBudget(Edit.balance));
+                System.out.println("All budgets updated successfully!");
+            } else {
+                System.out.println("Operation cancelled.");
+            }
+        } 
+    }    
     /**
      * Applies changes to SELECTED ministries.
      * User selects specific ministries by entering their numbers (comma-separated).
@@ -158,9 +235,9 @@ public class BulkEdit {
         for (int i = 0; i < CreatingMinistries.ministries2026.length; i++) {
             if (CreatingMinistries.ministries2026[i] != null) {
                 System.out.printf("%d. %s (Budget: %s)%n", 
-                    i + 1, // Display 1-based numbering for user
-                    CreatingMinistries.ministries2026[i].getMinistryName(),
-                    Ministry.getFormattedBudget(CreatingMinistries.ministries2026[i].getBudget()));
+                i + 1, // Display 1-based numbering for user
+                CreatingMinistries.ministries2026[i].getMinistryName(),
+                Ministry.getFormattedBudget(CreatingMinistries.ministries2026[i].getBudget()));
             }
         }
         
@@ -216,41 +293,77 @@ public class BulkEdit {
                 System.out.println("Cannot decrease by 100% or more!");
                 return;
             }
-            
-            // Show preview
-            showBeforeAfterPreview(percentage, selectedIndices);
-            
-            System.out.println("\nConfirm changes? (yes/no):");
-            String confirm = scanner.nextLine();
-            
-            if (confirm.equalsIgnoreCase("yes")) {
-                applyPercentageChange(percentage, selectedIndices);
-                
-                // Update balance
-                double totalChange = calculateTotalChange(percentage, selectedIndices);
-                if (totalChange < 0) {
-                    Edit.balance += Math.abs(totalChange);
+            double totalChange = calculateTotalChange(percentage, selectedIndices);
+            if (totalChange >= Edit.balance) {
+                System.out.println("The increase you want to do will lead to a negative balance. "
+                + "This means that you will have to decrease the budget of one or more ministries, " 
+                + "until the balance is 0 or more. Do you want to countinue with this change?");
+                String reassurance = scanner.nextLine();
+                reassurance = yesOrNo(reassurance);
+                if (reassurance.equalsIgnoreCase("No")) {
+                    return;
                 } else {
-                    if (Edit.balance >= totalChange) {
-                        Edit.balance -= totalChange;
+                    // Show preview
+                    showBeforeAfterPreview(percentage, selectedIndices);
+                    
+                    System.out.println("\nConfirm changes? (yes/no):");
+                    String confirm = scanner.nextLine();
+                    confirm = yesOrNo(confirm);
+                    
+                    if (confirm.equalsIgnoreCase("yes")) {
+                        applyPercentageChange(percentage, selectedIndices);
+                        // Update balance
+                        if (totalChange < 0) {
+                            Edit.balance += Math.abs(totalChange);
+                        } else {
+                            if (Edit.balance >= totalChange) {
+                                Edit.balance -= totalChange;
+                            } else {
+                                System.out.println("Warning: Increase exceeds available balance!");
+                            }
+                        }
+                        
+                        System.out.println("Available money for Investment: " + 
+                            Ministry.getFormattedBudget(Edit.balance));
+                        System.out.println("Selected ministries updated!");
                     } else {
-                        System.out.println("Warning: Increase exceeds available balance!");
+                        System.out.println("Operation cancelled.");
                     }
                 }
-                
-                System.out.println("Available money for Investment: " + 
-                    Ministry.getFormattedBudget(Edit.balance));
-                System.out.println("✓ Selected ministries updated!");
             } else {
-                System.out.println("Operation cancelled.");
-            }
-            
+                // Show preview
+                showBeforeAfterPreview(percentage, selectedIndices);
+                    
+                System.out.println("\nConfirm changes? (yes/no):");
+                String confirm = scanner.nextLine();
+                confirm = yesOrNo(confirm);
+                    
+                if (confirm.equalsIgnoreCase("yes")) {
+                    applyPercentageChange(percentage, selectedIndices);
+                    // Update balance
+                    if (totalChange < 0) {
+                        Edit.balance += Math.abs(totalChange);
+                    } else {
+                        if (Edit.balance >= totalChange) {
+                            Edit.balance -= totalChange;
+                        } else {
+                            System.out.println("Warning: Increase exceeds available balance!");
+                        }
+                    }
+                        
+                    System.out.println("Available money for Investment: " + 
+                        Ministry.getFormattedBudget(Edit.balance));
+                    System.out.println("Selected ministries updated!");
+                } else {
+                    System.out.println("Operation cancelled.");
+                }
+            }  
         } else if (opChoice == 2) {
             // fixed amount change for selected ministries
             System.out.println("Enter fixed amount change per ministry:");
             double amount = scanner.nextDouble();
             scanner.nextLine();
-            
+            double totalChange = amount * selectedIndices.size();
             // Validation: Check for negative budgets
             boolean wouldCauseNegative = false;
             for (int idx : selectedIndices) {
@@ -264,33 +377,75 @@ public class BulkEdit {
             if (wouldCauseNegative) {
                 return;
             }
-            
-            // Show preview
-            showFixedAmountPreview(amount, selectedIndices);
-            
-            System.out.println("\nConfirm changes? (yes/no):");
-            String confirm = scanner.nextLine();
-            
-            if (confirm.equalsIgnoreCase("yes")) {
-                applyFixedAmountChange(amount, selectedIndices);
-                
-                // Update balance
-                double totalChange = amount * selectedIndices.size();
-                if (amount < 0) {
-                    Edit.balance += Math.abs(totalChange);
+            if (totalChange >= Edit.balance) {
+                System.out.println("The increase you want to do will lead to a negative balance. "
+                + "This means that you will have to decrease the budget of one or more ministries, " 
+                + "until the balance is 0 or more. Do you want to countinue with this change?");
+                String reassurance = scanner.nextLine();
+                reassurance = yesOrNo(reassurance);
+                if (reassurance.equalsIgnoreCase("No")) {
+                    return;
                 } else {
-                    if (Edit.balance >= totalChange) {
-                        Edit.balance -= totalChange;
+            
+                    // Show preview
+                    showFixedAmountPreview(amount, selectedIndices);
+                    
+                    System.out.println("\nConfirm changes? (yes/no):");
+                    String confirm = scanner.nextLine();
+                    confirm = yesOrNo(confirm);
+                    
+                    if (confirm.equalsIgnoreCase("yes")) {
+                        applyFixedAmountChange(amount, selectedIndices);
+                        
+                        // Update balance
+                        
+                        if (amount < 0) {
+                            Edit.balance += Math.abs(totalChange);
+                        } else {
+                            if (Edit.balance >= totalChange) {
+                                Edit.balance -= totalChange;
+                            } else {
+                                System.out.println("Warning: Increase exceeds available balance!");
+                            }
+                        }
+                        
+                        System.out.println("Available money for Investment: " + 
+                            Ministry.getFormattedBudget(Edit.balance));
+                        System.out.println("Selected ministries updated!");
                     } else {
-                        System.out.println("Warning: Increase exceeds available balance!");
+                        System.out.println("Operation cancelled.");
                     }
-                }
-                
-                System.out.println("Available money for Investment: " + 
-                    Ministry.getFormattedBudget(Edit.balance));
-                System.out.println("✓ Selected ministries updated!");
+                } 
+        
             } else {
-                System.out.println("Operation cancelled.");
+                // Show preview
+                showFixedAmountPreview(amount, selectedIndices);
+                    
+                System.out.println("\nConfirm changes? (yes/no):");
+                String confirm = scanner.nextLine();
+                confirm = yesOrNo(confirm);
+                    
+                if (confirm.equalsIgnoreCase("yes")) {
+                    applyFixedAmountChange(amount, selectedIndices);
+                        
+                    // Update balance
+                        
+                    if (amount < 0) {
+                        Edit.balance += Math.abs(totalChange);
+                    } else {
+                        if (Edit.balance >= totalChange) {
+                            Edit.balance -= totalChange;
+                        } else {
+                            System.out.println("Warning: Increase exceeds available balance!");
+                        }
+                    }
+                        
+                    System.out.println("Available money for Investment: " + 
+                        Ministry.getFormattedBudget(Edit.balance));
+                    System.out.println("Selected ministries updated!");
+                } else {
+                    System.out.println("Operation cancelled.");
+                }
             }
         } else {
             System.out.println("Invalid operation choice.");
@@ -466,7 +621,6 @@ public class BulkEdit {
      */
     private double calculateTotalChange(double percentage, ArrayList<Integer> selectedIndices) {
         double totalChange = 0;
-        
         for (int i = 0; i < CreatingMinistries.ministries2026.length; i++) {
             Ministry m = CreatingMinistries.ministries2026[i];
             
@@ -480,5 +634,12 @@ public class BulkEdit {
         }
         
         return totalChange;
+    }
+    private String yesOrNo(String response) {
+        while (!response.equalsIgnoreCase("yes") && !response.equalsIgnoreCase("no"))  {
+            System.out.println("Invalid input!Please respond with yes or no.");
+            response = scanner.nextLine();
+        }
+        return response;
     }
 }

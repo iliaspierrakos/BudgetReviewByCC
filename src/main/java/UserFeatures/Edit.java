@@ -282,29 +282,6 @@ public class Edit {
         return validAmount;
     }
 
-    /**
-     * NumberFormat object for formatting numbers, configured for US locale
-     * and used by {@code formatNumber}.
-     */
-    NumberFormat df = NumberFormat.getNumberInstance(Locale.US);//make number readable
-
-
-    /**
-     * Default constructor. Configures the {@code NumberFormat} object for readable output.
-     */
-    public Edit() {
-        df.setMaximumFractionDigits(2);
-    }
-
-    /**
-     * Formats a double number into a readable string using the configured {@code NumberFormat}.
-     *
-     * @param number The double value to format.
-     * @return The formatted string representation of the number.
-     */
-    public String formatNumber(double number) {
-        return df.format(number);
-    }
     public String getName() {
         return name;
     }
@@ -318,4 +295,5 @@ public class Edit {
     public String toString() {
         return name + " " + change + " " + amount;
     }
+    public Edit(){} // default constructor
 }

@@ -40,7 +40,7 @@ public class View {
         
         // Validation: Cannot calculate percentages if total is zero
         if (inUseBudget == 0) {
-            System.out.println("Total budget is 0 – cannot calculate percentages.");
+            System.out.println("Total budget is 0. cannot calculate percentages.");
             return;
         }
         
@@ -92,7 +92,7 @@ public class View {
                 StandardCharsets.UTF_8
             );
             
-            // For year 2026, also show available balance for investments
+            //For year 2026, also show available balance for investments
             if (year == 2026) {
                 System.out.println("Available=" + Ministry.getFormattedBudget(Edit.balance));
             }
