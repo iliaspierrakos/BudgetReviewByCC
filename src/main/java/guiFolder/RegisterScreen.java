@@ -79,12 +79,8 @@ public class RegisterScreen {
             }
 
             if (success) {
-                errorLabel.setText("Registration successful!");
-                usernameField.clear();
-                passwordField.clear();
-                ministryField.clear();
-                roleBox.setValue(null);
-            } else {
+                new LoginScreen(userManager).show(stage);
+             } else {
                 errorLabel.setText("Registration failed. Username exists or role limit reached.");
             }
         });
