@@ -12,7 +12,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import main.java.guiFolder.MenuScreen;
+import guiFolder.MenuScreen;
+import guiFolder.StartMenuScreen;
 
 public class LoginScreen {
     private final UserManager userManager;
