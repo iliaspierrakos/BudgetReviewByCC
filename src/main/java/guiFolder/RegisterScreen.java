@@ -1,6 +1,9 @@
 package guiFolder;
 
 import UserManagement.UserManager;
+
+import javafx.scene.control.Label;
+
 import UserManagement.User;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -25,6 +28,7 @@ public class RegisterScreen {
 
         PasswordField passwordField = new PasswordField();
         passwordField.setPromptText("Password");
+        passwordField.setStyle("-fx-font-size: 10px;");
 
         ComboBox<User.Role> roleBox = new ComboBox<>();
         roleBox.getItems().addAll(
@@ -79,12 +83,8 @@ public class RegisterScreen {
             }
 
             if (success) {
-                errorLabel.setText("Registration successful!");
-                usernameField.clear();
-                passwordField.clear();
-                ministryField.clear();
-                roleBox.setValue(null);
-            } else {
+                new LoginScreen(userManager).show(stage);
+             } else {
                 errorLabel.setText("Registration failed. Username exists or role limit reached.");
             }
         });

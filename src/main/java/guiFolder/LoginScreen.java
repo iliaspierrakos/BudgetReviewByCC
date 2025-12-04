@@ -1,6 +1,9 @@
 package guiFolder;
 
 import UserManagement.UserManager;
+
+import javafx.scene.control.Label;
+
 import UserManagement.User;
 
 import javafx.geometry.Insets;
@@ -9,6 +12,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import guiFolder.MenuScreen;
+import guiFolder.StartMenuScreen;
 
 public class LoginScreen {
     private final UserManager userManager;
@@ -24,6 +29,7 @@ public class LoginScreen {
 
         PasswordField passwordField = new PasswordField();
         passwordField.setPromptText("Password");
+        passwordField.setStyle("-fx-font-size: 10px;");
         Label errorLabel = new Label();
         errorLabel.setStyle("-fx-text-fill: red;");
         Button loginButton = new Button("Login");

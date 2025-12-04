@@ -17,10 +17,10 @@ public class StartMenuScreen {
     public void show(Stage stage) {
         Label title = new Label("PRIME MINISTER FOR A DAY");
         title.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
-        Button loginButton = new Button("Login");
-        loginButton.setMinWidth(150);
         Button registerButton = new Button("Register");
         registerButton.setMinWidth(150);
+        Button loginButton = new Button("Login");
+        loginButton.setMinWidth(150);
         Button exitButton = new Button("Exit");
         exitButton.setMinWidth(150);
 
@@ -34,7 +34,7 @@ public class StartMenuScreen {
         exitButton.setOnAction(e -> {
             stage.close();
         });
-        VBox layout = new VBox(20, title, loginButton, registerButton, exitButton);
+        VBox layout = new VBox(20, title, registerButton,  loginButton, exitButton);
 
         layout.setAlignment(Pos.CENTER);
         layout.setPadding(new Insets(20));
