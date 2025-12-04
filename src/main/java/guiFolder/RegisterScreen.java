@@ -1,6 +1,9 @@
 package guiFolder;
 
 import UserManagement.UserManager;
+
+import java.lang.classfile.Label;
+
 import UserManagement.User;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -25,6 +28,7 @@ public class RegisterScreen {
 
         PasswordField passwordField = new PasswordField();
         passwordField.setPromptText("Password");
+        passwordField.setStyle("-fx-font-size: 10px;");
 
         ComboBox<User.Role> roleBox = new ComboBox<>();
         roleBox.getItems().addAll(
