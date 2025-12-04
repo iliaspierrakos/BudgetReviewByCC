@@ -94,7 +94,7 @@ public class View {
 
             // For year 2026, also show available balance for investments
             if (year == 2026) {
-                System.out.println("Available=" + Ministry.getFormattedBudget(Edit.balance));
+                System.out.println("Available = " + Ministry.getFormattedBudget(Edit.balance));
             }
         } catch (IOException e) {
             System.err.println("Error writing view file: " + e.getMessage());

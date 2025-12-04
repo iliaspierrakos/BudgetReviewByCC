@@ -3,6 +3,7 @@ package UserFeatures;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
+import java.util.Scanner;
 
 /**
  * The {@code Ministry} class represents a government ministry with a name and a general budget.
@@ -98,5 +99,24 @@ public class Ministry {    //Ministry class
         symbols.setDecimalSeparator(',');
         DecimalFormat df = new DecimalFormat("#,###.##", symbols);
         return df.format(budget);
+    }
+    // Display all ministries with numbers
+    public static void displayListOfMinistries(){
+        for (int i = 0; i < CreatingMinistries.ministries2026.length; i++) {
+            if (CreatingMinistries.ministries2026[i] != null) {
+                System.out.printf("%d. %s (Budget: %s)%n", 
+                    i + 1, // Display 1-based numbering for user
+                    CreatingMinistries.ministries2026[i].getMinistryName(),
+                    Ministry.getFormattedBudget(CreatingMinistries.ministries2026[i].getBudget()));
+            }
+        }
+    }
+    public static String yesOrNo(String response) {
+        Scanner scanner = new Scanner(System.in);
+        while (!response.equalsIgnoreCase("yes") && !response.equalsIgnoreCase("no"))  {
+            System.out.println("Invalid input!Please respond with yes or no.");
+            response = scanner.nextLine();
+        }
+        return response;
     }
 }
