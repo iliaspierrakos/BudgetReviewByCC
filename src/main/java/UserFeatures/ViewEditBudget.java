@@ -27,7 +27,13 @@ public class ViewEditBudget {
         do {
             System.out.println("Do you want to :");
             System.out.println("1.View");
-            System.out.println("2.Edit/Propose");
+            if (u.getRole() == User.Role.MINISTRYMEMBER) {
+                System.out.println("2.Propose Edit");
+            } else if (u.getRole() == User.Role.CITIZEN) {
+                System.out.println("2.Virtual Edit");
+            } else if (u.getRole() == User.Role.GOVERNOR) {
+                System.out.println("2.Edit");
+            }
             System.out.println("3.Edit History");
             System.out.println("4.Compare");
             System.out.println("5.Bulk Edit");
