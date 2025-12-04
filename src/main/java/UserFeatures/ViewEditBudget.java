@@ -6,36 +6,28 @@
 * ministry budgets.
 */
 package UserFeatures;
-
+import UserManagement.User;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Scanner;
 public class ViewEditBudget {
-    public static void budgetMenu() {
+    public static void budgetMenu(User u) {
         Scanner scanner = new Scanner(System.in);
         Ministries min = new Ministries();
-        MinistriesBudgets budg = new MinistriesBudgets();        
-        budg.budget(Path.of("NecessaryFilesAndData/BudgetReview2026.txt"));
-        budg.budget(Path.of("NecessaryFilesAndData/BudgetReview2025.txt"));
-        budg.budget(Path.of("NecessaryFilesAndData/BudgetReview2024.txt"));
-        budg.budget(Path.of("NecessaryFilesAndData/BudgetReview2023.txt"));
-        budg.budget(Path.of("NecessaryFilesAndData/BudgetReview2022.txt"));
-        budg.budget(Path.of("NecessaryFilesAndData/BudgetReview2021.txt"));
-        budg.budget(Path.of("NecessaryFilesAndData/BudgetReview2020.txt"));
+        MinistriesBudgets budg = new MinistriesBudgets();
+        for (int i = 2020; i <= 2026; i++) {
+            budg.budget(Path.of("NecessaryFilesAndData/BudgetReview" + i + ".txt"));
+        }
         min.minlist();
-        CreatingMinistries.ministryCreation(Path.of("NecessaryFilesAndData/MinistriesBudgets2026.csv")); // Initializing Ministry objects
-        CreatingMinistries.ministryCreation(Path.of("NecessaryFilesAndData/MinistriesBudgets2025.csv"));
-        CreatingMinistries.ministryCreation(Path.of("NecessaryFilesAndData/MinistriesBudgets2024.csv"));
-        CreatingMinistries.ministryCreation(Path.of("NecessaryFilesAndData/MinistriesBudgets2023.csv"));
-        CreatingMinistries.ministryCreation(Path.of("NecessaryFilesAndData/MinistriesBudgets2022.csv"));
-        CreatingMinistries.ministryCreation(Path.of("NecessaryFilesAndData/MinistriesBudgets2021.csv"));
-        CreatingMinistries.ministryCreation(Path.of("NecessaryFilesAndData/MinistriesBudgets2020.csv"));
+        for (int i = 2020; i <= 2026; i++) {
+            CreatingMinistries.ministryCreation(Path.of("NecessaryFilesAndData/MinistriesBudgets" + i + ".csv"));
+        }
         do {
             System.out.println("Do you want to :");
             System.out.println("1.View");
-            System.out.println("2.Edit");
+            System.out.println("2.Edit/Propose");
             System.out.println("3.Edit History");
             System.out.println("4.Compare");
             System.out.println("5.Bulk Edit");
@@ -48,16 +40,19 @@ public class ViewEditBudget {
                 View.viewGovBudget(selectedYear);
                 break;
             case 2:
-                do {
+                if (u.getRole() == User.Role.MINISTRYMEMBER) {
+                    System.out.println("Starting proposal...");
+                    Propose p = new Propose();
+                    p.editProposal(u.getUsername());
+                } else {
                     Edit obj = new Edit();
                     obj.collectData();
-                    answer = scanner.nextLine();
-                }while (answer.equalsIgnoreCase("yes"));
+                }
                 break;
             case 3:
                 try {
                     System.out.println(Files.readString(Paths.get("NecessaryFilesAndData/edithistory.txt")));
-                    System.out.println("Changes made:" + EditHistoryList.editList.size());
+                    System.out.println("Changes made:" + Edit.history.editList.size());
                     System.out.println("Do you want to undo?");
                     scanner.nextLine();
                     answer = scanner.nextLine();

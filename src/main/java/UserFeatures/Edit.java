@@ -20,7 +20,7 @@ public class Edit {
     private double amount;
     private Scanner scanner = new Scanner(System.in);
     public static double balance = 0;
-    public static EditHistoryList history = new EditHistoryList(); //creating static object for storing the edits 
+    public static EditHistoryList history = new EditHistoryList(); //creating static object for storing the edits
 
     /**
      * Collects user input for a budget transfer.
@@ -146,7 +146,7 @@ public class Edit {
         System.out.println(fromName + " previous budget: " + Ministry.getFormattedBudget(Ministry.budgetSearchByName(fromName, CreatingMinistries.ministries2026)));
         Edit obj1 = new Edit(fromName, "Decrease", amount);
         history.addEdit(obj1);
-        obj1.editingbudget(obj1, false);        
+        obj1.editingbudget(obj1, false);
         System.out.println("Available money for Investment : " + Ministry.getFormattedBudget(balance));
 
         //Ask for a new edit either increase or decrease
@@ -280,7 +280,9 @@ public class Edit {
 
         }
         return validAmount;
+
     }
+    public Edit() {} //default constructor
 
     public String getName() {
         return name;
@@ -293,7 +295,6 @@ public class Edit {
     }
     @Override
     public String toString() {
-        return name + " " + change + " " + amount;
+        return name + " " + change + "d by" + " " + Ministry.getFormattedBudget(amount);
     }
-    public Edit(){} // default constructor
 }
