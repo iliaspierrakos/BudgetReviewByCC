@@ -153,7 +153,6 @@ public class Edit {
         System.out.println("Would you like to edit the budget of another ministry? ");
         String answer=scanner.nextLine();
         answer=validityAnswer(answer);  //Validation for answer
-
         if (answer.equalsIgnoreCase("no")) {
             return; //exit
         }

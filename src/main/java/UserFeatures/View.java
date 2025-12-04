@@ -111,6 +111,7 @@ public class View {
      */
     public static Ministry[] ministryYear(int year) {
         Ministry[] selectedMinistries = null;
+
         switch (year) {
             case 2020:
                 selectedMinistries = CreatingMinistries.ministries2020;
