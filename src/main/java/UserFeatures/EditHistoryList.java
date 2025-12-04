@@ -9,7 +9,7 @@ package UserFeatures;
 import java.util.LinkedList;
 
 public class EditHistoryList { 
-    public static LinkedList<Edit> editList = new LinkedList<>();
+    public LinkedList<Edit> editList = new LinkedList<>();
     private int index=-1;
     public void addEdit(Edit edit) {
         editList.add(edit);

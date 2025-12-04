@@ -1,9 +1,9 @@
 package UserManagement;
 
 import UserFeatures.ClearHistory;
-import java.util.Scanner;
 import UserFeatures.ViewEditBudget;
 import java.nio.file.Path;
+import java.util.Scanner;
 
 public class AuthUI {
     private UserManager userManager;
@@ -102,7 +102,7 @@ public class AuthUI {
         if (user != null) {
             System.out.println("Welcome, " + user.getUsername());
             showRoleMenu(user);
-            ViewEditBudget.budgetMenu();
+            ViewEditBudget.budgetMenu(user); // passes the user object as a parameter 
         }
     }
     private void showRoleMenu(User user) {

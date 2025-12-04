@@ -316,6 +316,6 @@ public class Edit {
     }
     @Override
     public String toString() {
-        return name + " " + change + " " + amount;
+        return name + " " + change + "d by" + " " + formatNumber(amount);
     }
 }

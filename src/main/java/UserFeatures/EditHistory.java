@@ -12,14 +12,13 @@ public class EditHistory {
         try {
             fw = new FileWriter("NecessaryFilesAndData/edithistory.txt", true);
             pw = new PrintWriter(fw);
-
             pw.println(ministryName + " previous budget: " + Ministry.getFormattedBudget(previousBudget));
             pw.println(ministryName + " new budget: " + Ministry.getFormattedBudget(newBudget));
             pw.close();
             fw.close();
-            System.out.println("Do you want to undo?");
-            var e = new EditHistoryList();
-            e.undo();
+            //System.out.println("Do you want to undo?");
+            //var e = new EditHistoryList();
+            //e.undo();
         } catch(IOException e) {}
 
     }

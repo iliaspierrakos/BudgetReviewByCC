@@ -1,0 +1,26 @@
+========================================================================================================================
+                                            BUDGET COMPARISON: 2025 vs 2022
+========================================================================================================================
+MINISTRY                                                              2025 BUDGET          2022 BUDGET
+------------------------------------------------------------------------------------------------------------------------
+Ministry of Interior                                                3.830.276.000        3.238.568.000
+Ministry of Foreign Affairs                                           420.237.000          268.622.000
+Ministry of National Defense                                        6.130.000.000        6.465.600.000
+Ministry of Health                                                  7.177.424.000        4.657.271.000
+Ministry of Justice                                                   650.803.000          578.368.000
+Ministry of Education, Religious Affairs, and Sports                6.606.000.000        5.841.100.000
+Ministry of Culture                                                   575.419.000          417.553.000
+Ministry of National Economy and Finance                        1.246.518.464.000      751.576.826.000
+Ministry of Rural Development and Food                              1.281.403.000        1.041.436.000
+Ministry of Environment and Energy                                  2.341.227.000        1.415.581.000
+Ministry of Labor and Social Security                              18.678.084.000       21.612.496.000
+Ministry of Social Cohesion and Family                              3.989.553.000                    0
+Ministry of Development                                               818.045.000        2.926.720.000
+Ministry of Infrastructure and Transport                            2.694.810.000        2.046.210.000
+Ministry of Shipping and Island Policy                                651.864.000          451.427.000
+Ministry of Tourism                                                   189.293.000           84.485.000
+Ministry of Digital Governance                                      1.073.928.000          954.578.000
+Ministry of Migration and Asylum                                      475.871.000          243.642.000
+Ministry of Citizen Protection                                      2.285.820.000        1.975.413.000
+Ministry of Climate Crisis and Civil Protection                     1.221.116.000          595.021.000
+========================================================================================================================

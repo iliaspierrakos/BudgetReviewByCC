@@ -6,28 +6,19 @@ import java.util.ArrayList;
 /**
  * The BulkEdit class handles bulk operations on ministry budgets.
  * It allows applying changes to all ministries or selected ones,
- * with preview functionality before confirming changes.
  */
 public class BulkEdit {
     private Scanner scanner = new Scanner(System.in);
     
-    /**
-     * Main menu for bulk edit operations.
-     * Provides options for:
-     * 1. Percentage change to all ministries
-     * 2. Fixed amount change to all ministries
-     * 3. Changes to selected ministries
-     * 4. Return to previous menu
-     */
     public void bulkEditMenu() {
-        System.out.println("\n*** Bulk Budget Operations ***");
+        System.out.println("\nWhat do you want to do? ");
         System.out.println("1. Apply percentage change to ALL ministries");
         System.out.println("2. Apply fixed amount change to ALL ministries");
         System.out.println("3. Apply change to SELECTED ministries");
         System.out.println("4. Return");
         
         int choice = scanner.nextInt();
-        scanner.nextLine(); // Clear buffer
+        scanner.nextLine();
         
         switch(choice) {
             case 1:
@@ -53,11 +44,11 @@ public class BulkEdit {
      * Updates the Edit.balance accordingly.
      */
     private void percentageChangeAll() {
-        System.out.println("Enter percentage change (e.g., -10 for 10% decrease, 5 for 5% increase):");
+        System.out.println("Enter percentage change (positive to increase, negative to decrease):");
         double percentage = scanner.nextDouble();
         scanner.nextLine();
         
-        // Validation: Cannot decrease by 100% or more
+        // Restriction: Cannot decrease by 100% or more
         if (percentage <= -100) {
             System.out.println("Cannot decrease by 100% or more!");
             return;
@@ -76,13 +67,11 @@ public class BulkEdit {
             double totalChange = calculateTotalChange(percentage, null);
             if (totalChange < 0) { // If decrease occurred
                 Edit.balance += Math.abs(totalChange);
-                System.out.println("Available money for Investment updated: " + 
-                    Ministry.getFormattedBudget(Edit.balance));
+                System.out.println("Available money for Investment updated: " + Ministry.getFormattedBudget(Edit.balance));
             } else { // If increase occurred
                 if (Edit.balance >= totalChange) {
                     Edit.balance -= totalChange;
-                    System.out.println("Available money for Investment updated: " + 
-                        Ministry.getFormattedBudget(Edit.balance));
+                    System.out.println("Available money for Investment updated: " + Ministry.getFormattedBudget(Edit.balance));
                 } else {
                     System.out.println("Warning: Increase exceeds available balance!");
                 }
@@ -102,7 +91,7 @@ public class BulkEdit {
      */
     private void fixedAmountChangeAll() {
         System.out.println("Enter fixed amount to add/subtract from each ministry:");
-        System.out.println("(Use negative number for decrease, e.g., -100000)");
+        System.out.println("(Use negative number for decrease)");
         double amount = scanner.nextDouble();
         scanner.nextLine();
         
@@ -129,7 +118,7 @@ public class BulkEdit {
         
         if (confirm.equalsIgnoreCase("yes")) {
             applyFixedAmountChange(amount, null);
-            
+
             // Update Edit.balance based on total change
             int ministryCount = 0;
             for (Ministry m : CreatingMinistries.ministries2026) {
@@ -257,7 +246,7 @@ public class BulkEdit {
             }
             
         } else if (opChoice == 2) {
-            // FIXED AMOUNT CHANGE for selected ministries
+            // fixed amount change for selected ministries
             System.out.println("Enter fixed amount change per ministry:");
             double amount = scanner.nextDouble();
             scanner.nextLine();
@@ -310,22 +299,25 @@ public class BulkEdit {
     
     /**
      * Displays a before/after preview for percentage changes.
-     * Shows current budget, new budget, and the change amount for each ministry.
-     * 
      * @param percentage The percentage change to apply
      * @param selectedIndices List of selected ministry indices (null = all ministries)
      */
     private void showBeforeAfterPreview(double percentage, ArrayList<Integer> selectedIndices) {
-        System.out.println("\n" + "=".repeat(140));
-        System.out.println(String.format("%80s", "PREVIEW - BUDGET CHANGES (Percentage: " + percentage + "%)"));
-        System.out.println("=".repeat(140));
-        System.out.printf("%-55s %25s %25s %25s%n", 
-            "MINISTRY", "CURRENT BUDGET", "NEW BUDGET", "CHANGE");
-        System.out.println("-".repeat(140));
+        StringBuilder sb = new StringBuilder();
+        
+        //  HEADER 
+        TableUtils.appendSeparator(sb, 140, '=');
+        TableUtils.appendTitle(sb, "PREVIEW - BUDGET CHANGES (Percentage: " + percentage + "%)", 140);
+        TableUtils.appendSeparator(sb, 140, '=');
+        
+        //  COLUMN HEADERS 
+        TableUtils.appendTableRowCustom(sb, 55, 25, "MINISTRY", "CURRENT BUDGET", "NEW BUDGET", "CHANGE");
+        TableUtils.appendSeparator(sb, 140, '-');
         
         double totalCurrentBudget = 0;
         double totalNewBudget = 0;
         
+        //  DATA ROWS 
         for (int i = 0; i < CreatingMinistries.ministries2026.length; i++) {
             Ministry m = CreatingMinistries.ministries2026[i];
             
@@ -340,7 +332,7 @@ public class BulkEdit {
                     totalCurrentBudget += oldBudget;
                     totalNewBudget += newBudget;
                     
-                    System.out.printf("%-55s %25s %25s %25s%n",
+                    TableUtils.appendTableRowCustom(sb, 55, 25,
                         m.getMinistryName(),
                         Ministry.getFormattedBudget(oldBudget),
                         Ministry.getFormattedBudget(newBudget),
@@ -349,36 +341,43 @@ public class BulkEdit {
             }
         }
         
-        // Display totals
-        System.out.println("-".repeat(140));
-        System.out.printf("%-55s %25s %25s %25s%n",
+        //  FOOTER
+        TableUtils.appendSeparator(sb, 140, '-');
+        TableUtils.appendTableRowCustom(sb, 55, 25,
             "TOTAL",
             Ministry.getFormattedBudget(totalCurrentBudget),
             Ministry.getFormattedBudget(totalNewBudget),
             Ministry.getFormattedBudget(totalNewBudget - totalCurrentBudget));
-        System.out.println("=".repeat(140));
+        TableUtils.appendSeparator(sb, 140, '=');
+        
+        // Display the preview
+        System.out.println(sb.toString());
     }
     
     /**
      * Displays a before/after preview for fixed amount changes.
      * Shows current budget, new budget, and the fixed change amount for each ministry.
-     * 
+     
      * @param amount The fixed amount to add/subtract
      * @param selectedIndices List of selected ministry indices (null = all ministries)
      */
     private void showFixedAmountPreview(double amount, ArrayList<Integer> selectedIndices) {
-        System.out.println("\n" + "=".repeat(140));
-        System.out.println(String.format("%80s", "PREVIEW - BUDGET CHANGES (Fixed Amount: " + 
-            Ministry.getFormattedBudget(amount) + ")"));
-        System.out.println("=".repeat(140));
-        System.out.printf("%-55s %25s %25s %25s%n", 
-            "MINISTRY", "CURRENT BUDGET", "NEW BUDGET", "CHANGE");
-        System.out.println("-".repeat(140));
+        StringBuilder sb = new StringBuilder();
+        
+        //  HEADER 
+        TableUtils.appendSeparator(sb, 140, '=');
+        TableUtils.appendTitle(sb, "PREVIEW - BUDGET CHANGES (Fixed Amount: " + Ministry.getFormattedBudget(amount) + ")", 140);
+        TableUtils.appendSeparator(sb, 140, '=');
+        
+        //  COLUMN HEADERS 
+        TableUtils.appendTableRowCustom(sb, 55, 25, "MINISTRY", "CURRENT BUDGET", "NEW BUDGET", "CHANGE");
+        TableUtils.appendSeparator(sb, 140, '-');
         
         double totalCurrentBudget = 0;
         double totalNewBudget = 0;
         int affectedCount = 0;
         
+        //  DATA ROWS 
         for (int i = 0; i < CreatingMinistries.ministries2026.length; i++) {
             Ministry m = CreatingMinistries.ministries2026[i];
             
@@ -391,7 +390,7 @@ public class BulkEdit {
                     totalNewBudget += newBudget;
                     affectedCount++;
                     
-                    System.out.printf("%-55s %25s %25s %25s%n",
+                    TableUtils.appendTableRowCustom(sb, 55, 25,
                         m.getMinistryName(),
                         Ministry.getFormattedBudget(oldBudget),
                         Ministry.getFormattedBudget(newBudget),
@@ -400,14 +399,17 @@ public class BulkEdit {
             }
         }
         
-        // Display totals
-        System.out.println("-".repeat(140));
-        System.out.printf("%-55s %25s %25s %25s%n",
+        //  FOOTER 
+        TableUtils.appendSeparator(sb, 140, '-');
+        TableUtils.appendTableRowCustom(sb, 55, 25,
             "TOTAL (" + affectedCount + " ministries)",
             Ministry.getFormattedBudget(totalCurrentBudget),
             Ministry.getFormattedBudget(totalNewBudget),
             Ministry.getFormattedBudget(amount * affectedCount));
-        System.out.println("=".repeat(140));
+        TableUtils.appendSeparator(sb, 140, '=');
+        
+        // Display the preview
+        System.out.println(sb.toString());
     }
     
     /**
@@ -424,8 +426,6 @@ public class BulkEdit {
                 if (selectedIndices == null || selectedIndices.contains(i)) {
                     double oldBudget = m.getBudget();
                     double newBudget = oldBudget * (1 + percentage / 100.0);
-                    
-                    // Record the change in history
                     EditHistory.historyOfEdit(m.getMinistryName(), oldBudget, newBudget);
                     m.setBudget(newBudget);
                 }
