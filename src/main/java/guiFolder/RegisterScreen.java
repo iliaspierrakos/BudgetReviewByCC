@@ -1,5 +1,7 @@
-package UserManagement;
+package guiFolder;
 
+import UserManagement.UserManager;
+import UserManagement.User;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -8,10 +10,10 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 public class RegisterScreen {
-    private final UserManager usermanager;
+    private final UserManager userManager;
 
-    public RegisterScreen(UserManager usermanager) {
-        this.usermanager = usermanager;
+    public RegisterScreen(UserManager userManager) {
+        this.userManager = userManager;
     }
     public void show(Stage stage) {
 
@@ -34,7 +36,6 @@ public class RegisterScreen {
 
         TextField ministryField = new TextField();
         ministryField.setPromptText("Ministry Name");
-        
         ministryField.setVisible(false);
         ministryField.setManaged(false);
      
@@ -47,6 +48,11 @@ public class RegisterScreen {
             ministryField.setVisible(show);
             ministryField.setManaged(show);
         });
+        Button registerButton = new Button("Register");
+        registerButton.setMinWidth(120);
+
+        Button backButton = new Button("Back");
+        backButton.setMinWidth(120);    
 
         registerButton.setOnAction(e -> {
 
@@ -55,7 +61,7 @@ public class RegisterScreen {
             User.Role role = roleBox.getValue();
             String ministry = ministryField.getText().trim();
 
-            if (username.isEmpty() || password.isEmpty() || confirmPassword.isEmpty() || role == null) {
+            if (username.isEmpty() || password.isEmpty() || role == null) {
                 errorLabel.setText("Please fill all fields and select a role.");
                 return;
             }
@@ -76,7 +82,6 @@ public class RegisterScreen {
                 errorLabel.setText("Registration successful!");
                 usernameField.clear();
                 passwordField.clear();
-                confirmPasswordField.clear();
                 ministryField.clear();
                 roleBox.setValue(null);
             } else {
@@ -93,7 +98,6 @@ public class RegisterScreen {
                 title,
                 usernameField,
                 passwordField,
-                confirmPasswordField,
                 roleBox,
                 ministryField,
                 registerButton,
@@ -106,12 +110,6 @@ public class RegisterScreen {
         Scene scene = new Scene(layout, 400, 420);
         stage.setScene(scene);
         stage.setTitle("Register");
-        stage.show();
-        
-        Button registerButton = new Button("Register");
-        registerButton.setMinWidth(120);
-
-        Button backButton = new Button("Back");
-        backButton.setMinWidth(120);    
+        stage.show();    
     }
 }
