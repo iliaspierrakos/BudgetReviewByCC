@@ -26,6 +26,9 @@ public class UserManager {
     /** Stores users in memory (key = username) */
     private Map<String, User> users = new HashMap<>();
 
+    /** Currently logged in user (null if none) */
+    private User currentUser;
+
     /**
      * Constructor — loads users from file on initialization.
      */
@@ -114,12 +117,32 @@ public class UserManager {
 
         if (user != null && user.getPassword().equals(password)) {
             System.out.println("Login successful! ");
+            currentUser = user;
             return user;
         }
 
         System.out.println("Invalid username or password!");
         return null;
     }
+
+    /**
+     * Returns the currently logged in user, or null if none.
+     */
+    public User getCurrentUser() {
+        return currentUser;
+    }
+
+    /**
+     * Returns the ministry name of the current user if they are a MinistryMember, else null.
+     */
+    public String getCurrentMinistryName() {
+        if (currentUser instanceof MinistryMember) {
+            MinistryMember mm = (MinistryMember) currentUser;
+            return mm.getMinistryName();
+        }
+        return null;
+    }
+
 
     /**
      * Checks if a Governor already exists.
