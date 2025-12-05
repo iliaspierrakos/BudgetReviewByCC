@@ -1,6 +1,6 @@
 # Prime Minister for a day
 ## Overview
-This project is a Java-based application that allows users to **view, analyze, and modify the state budget** as if they were the Prime Minister for a day.
+This project is a Java-based application that allows authorized users to **view, analyze, and modify the state budget**.
 It is designed as a command-line interface (CLI) program with optional graphical extensions. 
 The goal is to give users control over public budget data, simulate fiscal decisions, and observe their effects.
 ## Core Features
@@ -21,7 +21,7 @@ The goal is to give users control over public budget data, simulate fiscal decis
 ## Technologies
 - **Language:** Java SE (Standard Edition)
 - **Build Tool:** Apache Maven
-- **Libraries:** JFreeChart
+- **Libraries:** JFreeChart, JavaFx
 - **Version Control:** Git / GitHub
 - **IDE:** Visual Studio Code (VS Code)
 ## System Architecture
@@ -48,7 +48,7 @@ README.md
 +------------------------------------------------------+
 |                    CORE LOGIC                        |
 |------------------------------------------------------|
-| UserManager, Ministry, Governor, Edit, CreatingMinistries |
+|UserManager, Ministry,Governor,Edit,CreatingMinistries|
 | - Validation & Authentication                        |
 | - Budget editing & restrictions                      |
 | - Role-based access control                          |
