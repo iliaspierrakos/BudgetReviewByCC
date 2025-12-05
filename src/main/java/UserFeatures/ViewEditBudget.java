@@ -1,3 +1,4 @@
+package UserFeatures;
 /**
 * The ViewEditBudget class creates the necessary files for the application.
 * It also creates the ministry objects and saves them in a static array,
@@ -5,7 +6,6 @@
 * It also prints the menu that allows users to view, edit and manage
 * ministry budgets.
 */
-package UserFeatures;
 import UserManagement.MinistryMember;
 import UserManagement.User;
 import java.io.IOException;
@@ -38,6 +38,9 @@ public class ViewEditBudget {
             System.out.println("3.Edit History");
             System.out.println("4.Compare");
             System.out.println("5.Return");
+            if (u.getRole() == User.Role.GOVERNOR) {
+            System.out.println("6.View proposals");
+            }
             int number = scanner.nextInt();
             String answer = "no";
             switch (number) {
@@ -86,6 +89,14 @@ public class ViewEditBudget {
                 break;
             case 5:
                 return;
+            case 6:
+                if (u.getRole() == User.Role.GOVERNOR) {
+                    GovernorCheck g = new GovernorCheck();
+                    g.viewProposalsNames();
+                    break;
+                } else {
+                    break;
+                }
             default:
                 System.out.println("Invalid");
                 break;

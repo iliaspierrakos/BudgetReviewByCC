@@ -31,12 +31,22 @@ public class EditHistoryList {
             var e = new Edit(lastEdit.getName(), "Decrease", lastEdit.getAmount());
             //System.out.println(lastEdit);
             Edit.balance += lastEdit.getAmount();
-            e.editingbudget(e,  true);
+            e.editingbudget(e,  true, false);
         } else {
             var e = new Edit(lastEdit.getName(), "Increase", lastEdit.getAmount());
             //System.out.println(lastEdit);
             Edit.balance += lastEdit.getAmount();
-            e.editingbudget(e, true);
+            e.editingbudget(e, true, false);
+        }
+    }
+    public void applyingEdits() {
+        if (index >= 0) {
+            for (Edit e : editList) {
+            e.editingbudget(e, false, false);
+            index = -1;
+            }
+        } else {
+            System.out.println("No edits to apply.");
         }
     }
 }

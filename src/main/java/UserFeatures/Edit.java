@@ -1,7 +1,5 @@
 package UserFeatures;
 
-import java.text.NumberFormat;
-import java.util.Locale;
 import java.util.Scanner;
 
 
@@ -27,12 +25,15 @@ public class Edit {
      * The flow depends on the current value of the static {@code balance}.
      */
     public void collectData() {
+        collectData(false);
+    }
+    public void collectData(boolean isProposal) {
         System.out.println("*** Ministry Budget Transfer ***");
 
         if (balance==0) {
-            zerobalance(); // No money available, must decrease first
+            zerobalance(isProposal); // No money available, must decrease first
         } else {
-            nonzerobalance(); // Money available, can increase or decrease
+            nonzerobalance(isProposal); // Money available, can increase or decrease
         }
     }
 
@@ -61,21 +62,24 @@ public class Edit {
      *
      * @param object The {@code Edit} object containing the ministry name, change type, and amount.
      */
-    public void editingbudget( Edit object, boolean undo) {
+    public void editingbudget( Edit object, boolean undo, boolean isProposal) {
         for (int i = 0; i < CreatingMinistries.ministries2026.length; i++) {// Loop used for searching the ministry's name
-            if (CreatingMinistries.ministries2026[i] != null && CreatingMinistries.ministries2026[i].getMinistryName().equalsIgnoreCase(object.name)) {
+            if (!(isProposal)) {
+                if (CreatingMinistries.ministries2026[i] != null && CreatingMinistries.ministries2026[i].getMinistryName().equalsIgnoreCase(object.name)) {
                 // found the correct ministry
-                double newBudget;
-                if (object.change.equalsIgnoreCase("Increase")) {// checking the type of change and making the proper move to the ministry's budget
-                    newBudget = CreatingMinistries.ministries2026[i].getBudget() + object.amount;
-                    printNewBudget(newBudget,"Increase",i , undo);
-                } else {
-                    newBudget = CreatingMinistries.ministries2026[i].getBudget() - object.amount ;
-                    printNewBudget(newBudget, "Decrease", i, undo);
+                    double newBudget;
+                    if (object.change.equalsIgnoreCase("Increase")) {// checking the type of change and making the proper move to the ministry's budget
+                        newBudget = CreatingMinistries.ministries2026[i].getBudget() + object.amount;
+                        printNewBudget(newBudget,"Increase",i , undo);
+                    } else {
+                        newBudget = CreatingMinistries.ministries2026[i].getBudget() - object.amount ;
+                        printNewBudget(newBudget, "Decrease", i, undo);
 
+                    }
+                    break; // Exit loop once ministry is found
                 }
-                break; // Exit loop once ministry is found
             }
+        
         }
     }
 
@@ -93,7 +97,8 @@ public class Edit {
         EditHistory.historyOfEdit(ministryName, previousBudget, finalBudget);
         if (undo == false) {
             System.out.println("Budget updated successfully!");
-            System.out.println("New budget for " + CreatingMinistries.ministries2026[i].getMinistryName() + " " + Ministry.getFormattedBudget(CreatingMinistries.ministries2026[i].getBudget()));// printing the new result
+            System.out.println("New budget for " + CreatingMinistries.ministries2026[i].getMinistryName() +
+            " " + Ministry.getFormattedBudget(CreatingMinistries.ministries2026[i].getBudget()));// printing the new result
         } else {
             System.out.println("Undo completed: " + ministryName + " reverted to " + Ministry.getFormattedBudget(finalBudget));
         }
@@ -131,7 +136,7 @@ public class Edit {
      * The user must first choose a ministry to **Decrease** its budget to create
      * available balance before any other edits can be made.
      */
-    public void zerobalance(){
+    public void zerobalance(boolean isProposal){
         // Ask for source ministry
         System.out.println("You have to decrease first a ministry's budget because you do not have available money ");
         System.out.println("Which ministry's budgets do you want to decrease?");
@@ -146,7 +151,7 @@ public class Edit {
         System.out.println(fromName + " previous budget: " + Ministry.getFormattedBudget(Ministry.budgetSearchByName(fromName, CreatingMinistries.ministries2026)));
         Edit obj1 = new Edit(fromName, "Decrease", amount);
         history.addEdit(obj1);
-        obj1.editingbudget(obj1, false);
+        obj1.editingbudget(obj1, false, isProposal);
         System.out.println("Available money for Investment : " + Ministry.getFormattedBudget(balance));
 
         //Ask for a new edit either increase or decrease
@@ -156,7 +161,7 @@ public class Edit {
         if (answer.equalsIgnoreCase("no")) {
             return; //exit
         }
-        nonzerobalance();
+        nonzerobalance(isProposal);
     }
 
 
@@ -165,7 +170,7 @@ public class Edit {
      * The user can choose to Increase or Decrease a ministry's budget.
      * Increase operations consume the available balance; Decrease operations add to it.
      */
-    public void nonzerobalance () {
+    public void nonzerobalance (boolean isProposal) {
         String newanswer;
         do {
             // Ask for destination ministry
@@ -192,7 +197,7 @@ public class Edit {
             // Perform the transfer (Decrease from source, Increase to destination)
             Edit obj2 = new Edit(toName, change, changeamount);
             history.addEdit(obj2);
-            obj2.editingbudget(obj2, false);
+            obj2.editingbudget(obj2, false, isProposal);
             System.out.println("Available money for Investment : " + Ministry.getFormattedBudget(balance));
             //Ask for edit either increase or decrease
             System.out.println("Would you like to edit the budget of another ministry? ");
@@ -200,7 +205,7 @@ public class Edit {
             newanswer=validityAnswer(newanswer);
             // If balance is 0 and user wants a new edit , go to zerobalance
             if (balance==0 && newanswer.equalsIgnoreCase("yes")){
-                zerobalance();
+                zerobalance(isProposal);
             }
         } while (newanswer.equalsIgnoreCase("yes"));
     }
