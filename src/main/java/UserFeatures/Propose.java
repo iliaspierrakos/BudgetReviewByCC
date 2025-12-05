@@ -9,11 +9,11 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 public class Propose {
-    public void editProposal(String username) {// taking the user's username as a parameter to create the unique file 
+    public void editProposal(String ministryname ) {// taking the user's username as a parameter to create the unique file 
             FileWriter fw = null;
             PrintWriter pw = null;
             try {
-                fw = new FileWriter("NecessaryFilesAndData/ProposalsFromMinisters/" + username + ".txt", true);
+                fw = new FileWriter("NecessaryFilesAndData/ProposalsFromMinisters/" +  ministryname+ ".txt", true);
                 pw = new PrintWriter(fw);
                 System.out.println("Editing budget...");
                 Edit proposeEdit = new Edit();

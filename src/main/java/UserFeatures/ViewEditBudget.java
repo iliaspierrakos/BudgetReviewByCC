@@ -6,6 +6,7 @@
 * ministry budgets.
 */
 package UserFeatures;
+import UserManagement.MinistryMember;
 import UserManagement.User;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -48,7 +49,9 @@ public class ViewEditBudget {
                 if (u.getRole() == User.Role.MINISTRYMEMBER) {
                     System.out.println("Starting proposal...");
                     Propose p = new Propose();
-                    p.editProposal(u.getUsername());
+                    MinistryMember mm = (MinistryMember) u;
+                    String ministryName = mm.getMinistryName();
+                    p.editProposal(ministryName);
                 } else {
                     System.out.println("Which type of Edit do you want to make:");
                     System.out.println("1.Simple Edit");
