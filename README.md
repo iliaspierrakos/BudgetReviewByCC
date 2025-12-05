@@ -1,6 +1,6 @@
 # Prime Minister for a day
 ## Overview
-This project is a Java-based application that allows users if they are authorized to **view, analyze, and modify the state budget**.
+This project is a Java-based application that allows authorized users to **view, analyze, and modify the state budget**.
 It is designed as a command-line interface (CLI) program with optional graphical extensions. 
 The goal is to give users control over public budget data, simulate fiscal decisions, and observe their effects.
 ## Core Features
