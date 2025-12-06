@@ -16,6 +16,7 @@ import javafx.stage.Stage;
 public class FeaturesScreen {
     private final User loggedInUser;
     private final UserManager userManager;
+
     public FeaturesScreen(User loggedInUser, UserManager userManager) {
         this.loggedInUser = loggedInUser;
         this.userManager = userManager;
@@ -32,8 +33,9 @@ public class FeaturesScreen {
         returnButton.setMinWidth(200);
 
         viewButton.setOnAction(e -> {
-            new ViewFeature(loggedInUser).show(stage);
+            System.out.println("VIEW PRESSED — ViewFeature not created yet");
         });
+
         returnButton.setOnAction(e -> {
             new StartMenuScreen(userManager).show(stage);
         });
@@ -47,4 +49,3 @@ public class FeaturesScreen {
         stage.show();
     }
 }
-
