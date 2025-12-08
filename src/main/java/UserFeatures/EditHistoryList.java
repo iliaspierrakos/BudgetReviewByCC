@@ -49,4 +49,7 @@ public class EditHistoryList {
             System.out.println("No edits to apply.");
         }
     }
+    public int getIndex() {
+        return index;
+    }
 }

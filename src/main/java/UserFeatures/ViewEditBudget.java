@@ -8,10 +8,7 @@ package UserFeatures;
 */
 import UserManagement.MinistryMember;
 import UserManagement.User;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Scanner;
 public class ViewEditBudget {
     public static void budgetMenu(User u) {
@@ -25,21 +22,26 @@ public class ViewEditBudget {
         for (int i = 2020; i <= 2026; i++) {
             CreatingMinistries.ministryCreation(Path.of("NecessaryFilesAndData/MinistriesBudgets" + i + ".csv"));
         }
-        do {
-            System.out.println("Do you want to :");
-            System.out.println("1.View");
+        do {            
             if (u.getRole() == User.Role.MINISTRYMEMBER) {
+                System.out.println("Do you want to :");
+                System.out.println("1.View");
                 System.out.println("2.Propose Edit");
+                System.out.println("3.Compare");
+                System.out.println("4.Return");
             } else if (u.getRole() == User.Role.CITIZEN) {
+                System.out.println("Do you want to :");
+                System.out.println("1.View");
                 System.out.println("2.Virtual Edit");
+                System.out.println("3.Compare");
+                System.out.println("4.Return");
             } else if (u.getRole() == User.Role.GOVERNOR) {
+                System.out.println("Do you want to :");
+                System.out.println("1.View");
                 System.out.println("2.Edit");
-            }
-            System.out.println("3.Edit History");
-            System.out.println("4.Compare");
-            System.out.println("5.Return");
-            if (u.getRole() == User.Role.GOVERNOR) {
-            System.out.println("6.View proposals");
+                System.out.println("3.Compare");
+                System.out.println("4.Return");
+                System.out.println("5.View proposals");
             }
             int number = scanner.nextInt();
             String answer = "no";
@@ -55,7 +57,7 @@ public class ViewEditBudget {
                     MinistryMember mm = (MinistryMember) u;
                     String ministryName = mm.getMinistryName();
                     p.editProposal(ministryName);
-                } else {
+                } else if (u.getRole() == User.Role.GOVERNOR) {
                     System.out.println("Which type of Edit do you want to make:");
                     System.out.println("1.Simple Edit");
                     System.out.println("2.Bulk Edit");
@@ -70,33 +72,30 @@ public class ViewEditBudget {
                     } else {
                         System.out.println("Invalid");
                     }
+                } else if (u.getRole() == User.Role.CITIZEN) {
+                    System.out.println("Starting virtual editing...");
+                    Edit obj = new Edit();
+                    obj.collectData();
+                    while (Edit.history.getIndex() >= 0) {
+                        System.out.println("this works");
+                        Edit.history.undo();
+                    }
                 }
                 break;
             case 3:
-                try {
-                    System.out.println(Files.readString(Paths.get("NecessaryFilesAndData/edithistory.txt")));
-                    System.out.println("Changes made:" + Edit.history.editList.size());
-                    System.out.println("Do you want to undo?");
-                    scanner.nextLine();
-                    answer = scanner.nextLine();
-                    if (answer.equalsIgnoreCase("yes")) {
-                    Edit.history.undo();
-                    }
-                } catch (IOException e) {}
-                break;
-            case 4:
                 Compare.comparingMinistries();
                 break;
-            case 5:
+            case 4:
                 return;
-            case 6:
+            case 5:
                 if (u.getRole() == User.Role.GOVERNOR) {
                     GovernorCheck g = new GovernorCheck();
                     g.viewProposalsNames();
                     break;
                 } else {
+                    System.out.println("Invalid");
                     break;
-                }
+                }                
             default:
                 System.out.println("Invalid");
                 break;
@@ -104,3 +103,14 @@ public class ViewEditBudget {
         } while (true);
     }
 }
+//try {
+                    //System.out.println(Files.readString(Paths.get("NecessaryFilesAndData/edithistory.txt")));
+                    //System.out.println("Changes made:" + Edit.history.editList.size());
+                    //System.out.println("Do you want to undo?");
+                    //scanner.nextLine();
+                    //answer = scanner.nextLine();
+                    //if (answer.equalsIgnoreCase("yes")) {
+                    //Edit.history.undo();
+                    //}
+                //} catch (IOException e) {}
+                //break;
