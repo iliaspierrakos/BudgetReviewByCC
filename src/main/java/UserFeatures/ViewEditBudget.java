@@ -8,8 +8,12 @@ package UserFeatures;
 */
 import UserManagement.MinistryMember;
 import UserManagement.User;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Scanner;
+
 public class ViewEditBudget {
     public static void budgetMenu(User u) {
         Scanner scanner = new Scanner(System.in);
@@ -57,6 +61,7 @@ public class ViewEditBudget {
                     MinistryMember mm = (MinistryMember) u;
                     String ministryName = mm.getMinistryName();
                     p.editProposal(ministryName);
+                    Edit.balance = 0; // this is necessary so the balance's of the other roles are correct
                 } else if (u.getRole() == User.Role.GOVERNOR) {
                     System.out.println("Which type of Edit do you want to make:");
                     System.out.println("1.Simple Edit");
@@ -66,6 +71,22 @@ public class ViewEditBudget {
                     if (choice==1) {
                         Edit obj = new Edit();
                         obj.collectData();
+                        System.out.println("Would you like to see the changes you made?");
+                        String ans = scanner.nextLine();
+                        if (ans.equalsIgnoreCase("yes")){
+                        try {
+                            System.out.println(Files.readString(Paths.get("NecessaryFilesAndData/edithistory.txt")));
+                            System.out.println("Changes made:" + Edit.history.editList.size());
+                            System.out.println("Do you want to undo?");
+                            scanner.nextLine();
+                            answer = scanner.nextLine();
+                            if (answer.equalsIgnoreCase("yes")) {
+                                Edit.history.undo();
+                            }
+                            Edit.balance = 0;
+                        } catch (IOException e) {}
+                            break;
+                        }
                     } else if (choice==2) {
                         BulkEdit bulkEdit = new BulkEdit();
                         bulkEdit.bulkEditMenu();
@@ -77,9 +98,10 @@ public class ViewEditBudget {
                     Edit obj = new Edit();
                     obj.collectData();
                     while (Edit.history.getIndex() >= 0) {
-                        System.out.println("this works");
+                        //System.out.println("this works");
                         Edit.history.undo();
                     }
+                    Edit.balance = 0;
                 }
                 break;
             case 3:
@@ -103,14 +125,3 @@ public class ViewEditBudget {
         } while (true);
     }
 }
-//try {
-                    //System.out.println(Files.readString(Paths.get("NecessaryFilesAndData/edithistory.txt")));
-                    //System.out.println("Changes made:" + Edit.history.editList.size());
-                    //System.out.println("Do you want to undo?");
-                    //scanner.nextLine();
-                    //answer = scanner.nextLine();
-                    //if (answer.equalsIgnoreCase("yes")) {
-                    //Edit.history.undo();
-                    //}
-                //} catch (IOException e) {}
-                //break;
