@@ -97,11 +97,27 @@ public class ViewEditBudget {
                     System.out.println("Starting virtual editing...");
                     Edit obj = new Edit();
                     obj.collectData();
+                    System.out.println("Would you like to see the changes you made?");
+                    String ans = scanner.nextLine();
+                    
                     while (Edit.history.getIndex() >= 0) {
                         //System.out.println("this works");
                         Edit.history.undo();
                     }
-                    Edit.balance = 0;
+                    if (ans.equalsIgnoreCase("yes")){
+                        try {
+                            System.out.println(Files.readString(Paths.get("NecessaryFilesAndData/edithistory.txt")));
+                            System.out.println("Changes made:" + Edit.history.editList.size());
+                            System.out.println("Do you want to undo?");
+                            scanner.nextLine();
+                            answer = scanner.nextLine();
+                            if (answer.equalsIgnoreCase("yes")) {
+                                Edit.history.undo();
+                            }
+                            Edit.balance = 0;
+                        } catch (IOException e) {}
+                            break;
+                    }
                 }
                 break;
             case 3:
