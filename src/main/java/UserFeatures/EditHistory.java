@@ -1,4 +1,8 @@
 package UserFeatures;
+/**
+ * This is a class that creates the edithistory.txt file where all the edits made by the GOVERNOR and the CITIZENS
+ * are stored. This file does NOT store the edits made by the ministers.
+ */
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
