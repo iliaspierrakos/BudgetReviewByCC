@@ -4,3 +4,8 @@ Suggestion: gebgeubeba
 Necessity Score: 9/10
 --- New Recommendation ---
 Target: Ministry of healthSuggestion: add more ambulancesNecessity Score: 8/10
+--- New Recommendation ---
+Target: Ministry of Health Suggestion: null--- New Recommendation ---
+Target: Ministry of Health--- New Recommendation ---
+Target: Ministry of Health--- New Recommendation ---
+Target: Ministry of Health
