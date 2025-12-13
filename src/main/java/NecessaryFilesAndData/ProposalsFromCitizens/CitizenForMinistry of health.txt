@@ -1,11 +1,6 @@
---- New Recommendation ---
-Target: Ministry of health
-Suggestion: gebgeubeba
-Necessity Score: 9/10
---- New Recommendation ---
-Target: Ministry of healthSuggestion: add more ambulancesNecessity Score: 8/10
---- New Recommendation ---
-Target: Ministry of Health Suggestion: null--- New Recommendation ---
-Target: Ministry of Health--- New Recommendation ---
-Target: Ministry of Health--- New Recommendation ---
-Target: Ministry of Health
+Total Votes for Ministry of health: 3
+More doctors and nurses, Votes from Citizens: 0, 0%
+More ambulances, Votes from Citizens: 2, 0%
+Hospital upgrades, Votes from Citizens: 1, 0%
+Medical equipment, Votes from Citizens: 0, 0%
+Prevention programs, Votes from Citizens: 0, 0%

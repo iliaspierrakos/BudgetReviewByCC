@@ -33,26 +33,27 @@ public class RecommendationSystem {
     String[] migrationOptions = {"Reception centers", "Faster asylum process", "Language courses", "Healthcare access", "Integration programs"};
     String[] citizenProtectionOptions = {"More police officers", "Police equipment", "Emergency response", "Crime prevention", "Public safety training"};
     String[] climateOptions = {"Firefighting equipment", "Flood protection", "Early warning systems", "Climate adaptation", "Emergency training"};
-    int[] interiorVotes = new int[6];
-    int[] foreignAffairsVotes = new int[6];
-    int[] nationalDefenseVotes = new int[6];
-    int[] healthVotes = new int[6];
-    int[] justiceVotes = new int[6];
-    int[] educationVotes = new int[6];
-    int[] cultureVotes = new int[6];
-    int[] economyVotes = new int[6];
-    int[] ruralVotes = new int[6];
-    int[] environmentVotes = new int[6];
-    int[] laborVotes = new int[6];
-    int[] socialCohesionVotes = new int[6];
-    int[] developmentVotes = new int[6];
-    int[] infrastructureVotes = new int[6];
-    int[] shippingVotes = new int[6];
-    int[] tourismVotes = new int[6];
-    int[] digitalGovVotes = new int[6];
-    int[] migrationVotes = new int[6];
-    int[] citizenProtectionVotes = new int[6];
-    int[] climateVotes = new int[6];
+    static int[] interiorVotes = new int[6];
+    static int[] foreignAffairsVotes = new int[6];
+    static int[] nationalDefenseVotes = new int[6];
+    static int[] healthVotes = new int[6];
+    static int[] justiceVotes = new int[6];
+    static int[] educationVotes = new int[6];
+    static int[] cultureVotes = new int[6];
+    static int[] economyVotes = new int[6];
+    static int[] ruralVotes = new int[6];
+    static int[] environmentVotes = new int[6];
+    static int[] laborVotes = new int[6];
+    static int[] socialCohesionVotes = new int[6];
+    static int[] developmentVotes = new int[6];
+    static int[] infrastructureVotes = new int[6];
+    static int[] shippingVotes = new int[6];
+    static int[] tourismVotes = new int[6];
+    static int[] digitalGovVotes = new int[6];
+    static int[] migrationVotes = new int[6];
+    static int[] citizenProtectionVotes = new int[6];
+    static int[] climateVotes = new int[6];
+
 
     public RecommendationSystem() {}
 
@@ -76,201 +77,89 @@ public class RecommendationSystem {
         String filePath = "NecessaryFilesAndData/ProposalsFromCitizens/CitizenFor" + targetMinistry + ".txt";
         try (FileWriter fw = new FileWriter(filePath, false);
             PrintWriter pw = new PrintWriter(fw)) {
-                String[] options = {};
-                System.out.println("Available categories for Investment:");
-                int i = 1;
-                int choice;
-                if (targetMinistry.equalsIgnoreCase("Ministry of Interior")) {
-                    options = interiorOptions;
-                    for (String opt : options) {
-                        System.out.println(i + ". " + opt);
-                        i++;
-                    }
-                    choice = validChoice();
-                    interiorVotes[0]++;
-                    interiorVotes[choice]++;
-                    i = 1;
-                    pw.println("Total Votes for " + targetMinistry + ":" + interiorVotes[0]);
-                    for (String opt : options) {
-                        double percentage = interiorVotes[i]/interiorVotes[0]*100;
-                        pw.println(opt + ", Votes from Citizens: " + interiorVotes[i] + ", " + Ministry.getFormattedBudget(percentage) + "%");
-                        i++;
-                    }
+            String[] options = {};
+            int[] votes = {};
+            System.out.println("Available categories for Investment:");
+            int i = 1;
+            int choice;
+            if (targetMinistry.equalsIgnoreCase("Ministry of Interior")) {
+                options = interiorOptions;
+                votes = interiorVotes;
+            } else if (targetMinistry.equalsIgnoreCase("Ministry of Foreign Affairs")) {
+                options = foreignAffairsOptions;
+                votes = foreignAffairsVotes;
+            } else if (targetMinistry.equalsIgnoreCase("Ministry of National Defense")) {
+                options = nationalDefenseOptions;
+                votes = nationalDefenseVotes;
+            } else if (targetMinistry.equalsIgnoreCase("Ministry of Health")) {
+                options = healthOptions;
+                votes = healthVotes;
+            } else if (targetMinistry.equalsIgnoreCase("Ministry of Justice")) {
+                options = justiceOptions;
+                votes = justiceVotes;
+            } else if (targetMinistry.equalsIgnoreCase("Ministry of Education, Religious Affairs, and Sports")) {
+                options = educationOptions;
+                votes = educationVotes;
+            } else if (targetMinistry.equalsIgnoreCase("Ministry of Culture")) {
+                options = cultureOptions;
+                votes = cultureVotes;
+            } else if (targetMinistry.equalsIgnoreCase("Ministry of National Economy and Finance")) {
+                options = economyOptions;
+                votes = economyVotes;
+            } else if (targetMinistry.equalsIgnoreCase("Ministry of Rural Development and Food")) {
+                options = ruralOptions;
+                votes = ruralVotes;
+            } else if (targetMinistry.equalsIgnoreCase("Ministry of Environment and Energy")) {
+                options = environmentOptions;
+                votes = environmentVotes;
+            } else if (targetMinistry.equalsIgnoreCase("Ministry of Labor and Social Security")) {
+                options = laborOptions;
+                votes = laborVotes;
+            } else if (targetMinistry.equalsIgnoreCase("Ministry of Social Cohesion and Family")) {
+                options = socialCohesionOptions;
+                votes = socialCohesionVotes;
+            } else if (targetMinistry.equalsIgnoreCase("Ministry of Development")) {
+                options = developmentOptions;
+                votes = developmentVotes;
+            } else if (targetMinistry.equalsIgnoreCase("Ministry of Infrastructure and Transport")) {
+                options = infrastructureOptions;
+                votes = infrastructureVotes;
+            } else if (targetMinistry.equalsIgnoreCase("Ministry of Shipping and Island Policy")) {
+                options = shippingOptions;
+                votes = shippingVotes;
+            } else if (targetMinistry.equalsIgnoreCase("Ministry of Tourism")) {
+                options = tourismOptions;
+                votes = tourismVotes;
+            } else if (targetMinistry.equalsIgnoreCase("Ministry of Digital Governance")) {
+                options = digitalGovOptions;
+                votes = digitalGovVotes;
+            } else if (targetMinistry.equalsIgnoreCase("Ministry of Migration and Asylum")) {
+                options = migrationOptions;
+                votes = migrationVotes;
+            } else if (targetMinistry.equalsIgnoreCase("Ministry of Citizen Protection")) {
+                options = citizenProtectionOptions;
+                votes = citizenProtectionVotes;
+            } else if (targetMinistry.equalsIgnoreCase("Ministry of Climate Crisis and Civil Protection")) {
+                options = climateOptions;
+                votes = climateVotes;
+            }
+            for (String opt : options) {
+                System.out.println(i + ". " + opt);
+                i++;
+            }
+            choice = validChoice();
+            votes[0]++;
+            votes[choice]++;
+            pw.println("Total Votes for " + targetMinistry + ": " + votes[0]);
+            i = 1;
+            double percentage;
+            for (String opt : options) {
+               percentage = votes[i]/votes[0]*100;
+               pw.println(opt + ", Votes from Citizens: " + votes[i] + ", " + Ministry.getFormattedBudget(percentage) + "%");
+               i++;
+            }
 
-
-                } else if (targetMinistry.equalsIgnoreCase("Ministry of Foreign Affairs")) {
-                    options = foreignAffairsOptions;
-                    for (String opt : options) {
-                        System.out.println(i + ". " + opt);
-                        i++;
-                    }
-                    choice = validChoice();
-                    foreignAffairsVotes[0]++;
-                    foreignAffairsVotes[choice]++;
-                } else if (targetMinistry.equalsIgnoreCase("Ministry of National Defense")) {
-                    options = nationalDefenseOptions;
-                    for (String opt : options) {
-                        System.out.println(i + ". " + opt);
-                        i++;
-                    }
-                    choice = validChoice();
-                    nationalDefenseVotes[0]++;
-                    nationalDefenseVotes[choice]++;
-                } else if (targetMinistry.equalsIgnoreCase("Ministry of Health")) {
-                    options = healthOptions;
-                    for (String opt : options) {
-                        System.out.println(i + ". " + opt);
-                        i++;
-                    }
-                    choice = validChoice();
-                    healthVotes[0]++;
-                    healthVotes[choice]++;
-                } else if (targetMinistry.equalsIgnoreCase("Ministry of Justice")) {
-                    options = justiceOptions;
-                    for (String opt : options) {
-                        System.out.println(i + ". " + opt);
-                        i++;
-                    }
-                    choice = validChoice();
-                    justiceVotes[0]++;
-                    justiceVotes[choice]++;
-                } else if (targetMinistry.equalsIgnoreCase("Ministry of Education, Religious Affairs, and Sports")) {
-                    options = educationOptions;
-                    for (String opt : options) {
-                        System.out.println(i + ". " + opt);
-                        i++;
-                    }
-                    choice = validChoice();
-                    educationVotes[0]++;
-                    educationVotes[choice]++;
-                } else if (targetMinistry.equalsIgnoreCase("Ministry of Culture")) {
-                    options = cultureOptions;
-                    for (String opt : options) {
-                        System.out.println(i + ". " + opt);
-                        i++;
-                    }
-                    choice = validChoice();
-                    cultureVotes[0]++;
-                    cultureVotes[choice]++;
-                } else if (targetMinistry.equalsIgnoreCase("Ministry of National Economy and Finance")) {
-                    options = economyOptions;
-                    for (String opt : options) {
-                        System.out.println(i + ". " + opt);
-                        i++;
-                    }
-                    choice = validChoice();
-                    economyVotes[0]++;
-                    economyVotes[choice]++;
-                } else if (targetMinistry.equalsIgnoreCase("Ministry of Rural Development and Food")) {
-                    options = ruralOptions;
-                    for (String opt : options) {
-                        System.out.println(i + ". " + opt);
-                        i++;
-                    }
-                    choice = validChoice();
-                    ruralVotes[0]++;
-                    ruralVotes[choice]++;
-                } else if (targetMinistry.equalsIgnoreCase("Ministry of Environment and Energy")) {
-                    options = environmentOptions;
-                    for (String opt : options) {
-                        System.out.println(i + ". " + opt);
-                        i++;
-                    }
-                    choice = validChoice();
-                    environmentVotes[0]++;
-                    environmentVotes[choice]++;
-                } else if (targetMinistry.equalsIgnoreCase("Ministry of Labor and Social Security")) {
-                    options = laborOptions;
-                    for (String opt : options) {
-                        System.out.println(i + ". " + opt);
-                        i++;
-                    }
-                    choice = validChoice();
-                    laborVotes[0]++;
-                    laborVotes[choice]++;
-                } else if (targetMinistry.equalsIgnoreCase("Ministry of Social Cohesion and Family")) {
-                    options = socialCohesionOptions;
-                    for (String opt : options) {
-                        System.out.println(i + ". " + opt);
-                        i++;
-                    }
-                    choice = validChoice();
-                    socialCohesionVotes[0]++;
-                    socialCohesionVotes[choice]++;
-                } else if (targetMinistry.equalsIgnoreCase("Ministry of Development")) {
-                    options = developmentOptions;
-                    for (String opt : options) {
-                        System.out.println(i + ". " + opt);
-                        i++;
-                    }
-                    choice = validChoice();
-                    developmentVotes[0]++;
-                    developmentVotes[choice]++;
-                } else if (targetMinistry.equalsIgnoreCase("Ministry of Infrastructure and Transport")) {
-                    options = infrastructureOptions;
-                    for (String opt : options) {
-                        System.out.println(i + ". " + opt);
-                        i++;
-                    }
-                    choice = validChoice();
-                    infrastructureVotes[0]++;
-                    infrastructureVotes[choice]++;
-                } else if (targetMinistry.equalsIgnoreCase("Ministry of Shipping and Island Policy")) {
-                    options = shippingOptions;
-                    for (String opt : options) {
-                        System.out.println(i + ". " + opt);
-                        i++;
-                    }
-                    choice = validChoice();
-                    shippingVotes[0]++;
-                    shippingVotes[choice]++;
-                } else if (targetMinistry.equalsIgnoreCase("Ministry of Tourism")) {
-                    options = tourismOptions;
-                    for (String opt : options) {
-                        System.out.println(i + ". " + opt);
-                        i++;
-                    }
-                    choice = validChoice();
-                    tourismVotes[0]++;
-                    tourismVotes[choice]++;
-                } else if (targetMinistry.equalsIgnoreCase("Ministry of Digital Governance")) {
-                    options = digitalGovOptions;
-                    for (String opt : options) {
-                        System.out.println(i + ". " + opt);
-                        i++;
-                    }
-                    choice = validChoice();
-                    digitalGovVotes[0]++;
-                    digitalGovVotes[choice]++;
-                } else if (targetMinistry.equalsIgnoreCase("Ministry of Migration and Asylum")) {
-                    options = migrationOptions;
-                    for (String opt : options) {
-                        System.out.println(i + ". " + opt);
-                        i++;
-                    }
-                    choice = validChoice();
-                    migrationVotes[0]++;
-                    migrationVotes[choice]++;
-                } else if (targetMinistry.equalsIgnoreCase("Ministry of Citizen Protection")) {
-                    options = citizenProtectionOptions;
-                    for (String opt : options) {
-                        System.out.println(i + ". " + opt);
-                        i++;
-                    }
-                    choice = validChoice();
-                    citizenProtectionVotes[0]++;
-                    citizenProtectionVotes[choice]++;
-                } else if (targetMinistry.equalsIgnoreCase("Ministry of Climate Crisis and Civil Protection")) {
-                    options = climateOptions;
-                    for (String opt : options) {
-                        System.out.println(i + ". " + opt);
-                        i++;
-                    }
-                    choice = validChoice();
-                    climateVotes[0]++;
-                    climateVotes[choice]++;
-                }
-                System.out.println("Thank you! Your recommendation has been filed.");
+            System.out.println("Thank you! Your recommendation has been filed.");
 
         } catch (IOException ex) {
             System.out.println("Error saving your recommendation.");
@@ -280,11 +169,16 @@ public class RecommendationSystem {
     }
     public int validChoice() {
         Scanner s = new Scanner(System.in);
-        System.out.println("Select a number (1-5): ");
-        int validchoice = s.nextInt();
-        s.nextLine();
-        return validchoice;
+        int choice;
+
+        do {
+            System.out.print("Select a number (1-5): ");
+            choice = s.nextInt();
+        } while (choice < 1 || choice > 5);
+
+        return choice;
     }
+}
     //private void saveRecommendation() {
         //String filePath = "NecessaryFilesAndData/ProposalsFromCitizens/CitizenFor" + targetMinistry + ".txt";
 
@@ -302,4 +196,3 @@ public class RecommendationSystem {
        //     e.printStackTrace();
        // }
    // }
-}
