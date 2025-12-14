@@ -154,7 +154,7 @@ public class RecommendationSystem {
             i = 1;
             double percentage;
             for (String opt : options) {
-               percentage = votes[i]/votes[0]*100;
+               percentage = (double)votes[i] / votes[0] * 100;
                pw.println(opt + ", Votes from Citizens: " + votes[i] + ", " + Ministry.getFormattedBudget(percentage) + "%");
                i++;
             }
