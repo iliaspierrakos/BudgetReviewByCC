@@ -14,6 +14,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Scanner;
 
+import javax.swing.text.View;
+
 public class ViewEditBudget {
     public static void budgetMenu(User u) {
         Scanner scanner = new Scanner(System.in);
@@ -40,6 +42,7 @@ public class ViewEditBudget {
                 System.out.println("3.Compare");
                 System.out.println("4.Return");
                 System.out.println("5.Submit Recommendation");
+                System.out.println("6.Tax Receipt");
             } else if (u.getRole() == User.Role.GOVERNOR) {
                 System.out.println("Do you want to :");
                 System.out.println("1.View");
@@ -53,7 +56,7 @@ public class ViewEditBudget {
             switch (number) {
             case 1:
                 int selectedYear = Compare.validityYear(0);
-                View.viewGovBudget(selectedYear);
+                UserFeatures.View.viewGovBudget(selectedYear);
                 break;
             case 2:
                 if (u.getRole() == User.Role.MINISTRYMEMBER) {
@@ -139,9 +142,18 @@ public class ViewEditBudget {
                     System.out.println("Invalid");
                     break;
                 }
-            default:
-                System.out.println("Invalid");
-                break;
+            
+            case 6:
+                    if (u.getRole() == User.Role.CITIZEN) {
+                        TaxReceiptVisualizer receipt = new TaxReceiptVisualizer();
+                        receipt.generateReceipt();
+                        break;
+                    } else {
+                        System.out.println("Invalid");
+                        break;
+                }    default:
+                        System.out.println("Invalid");
+                        break;
             }
         } while (true);
     }

@@ -24,7 +24,7 @@ public class TaxReceiptVisualizer {
         System.out.println("------------------------------------------------");
         
         //  Get User Input
-        System.out.println("Please enter your approximate Annual Income (€):");
+        System.out.println("Please enter your approximate Annual Income :");
         double income = -1;
         
         // Simple validation to ensure positive income
@@ -43,8 +43,8 @@ public class TaxReceiptVisualizer {
         //  Calculate Tax
         double estimatedTax = income * 0.20; 
 
-        System.out.println("\nBased on your income of " + Ministry.getFormattedBudget(income) + "€,");
-        System.out.println("your estimated contribution (Taxes) is: " + Ministry.getFormattedBudget(estimatedTax) + "€");
+        System.out.println("\nBased on your income of " + Ministry.getFormattedBudget(income) );
+        System.out.println("your estimated contribution (Taxes) is: " + Ministry.getFormattedBudget(estimatedTax) );
         System.out.println("\nHere is your personal \"Retail Receipt\" from the State:");
         
         //   Calculate Total Government Budget (Reference Year 2026)
@@ -66,7 +66,7 @@ public class TaxReceiptVisualizer {
         System.out.println("\n==================================================");
         System.out.println("             OFFICIAL STATE RECEIPT               ");
         System.out.println("==================================================");
-        System.out.printf("%-40s %10s%n", "MINISTRY", "YOUR SHARE");
+        System.out.printf("%-60s %10s%n", "MINISTRY", "YOUR SHARE");
         System.out.println("--------------------------------------------------");
 
         for (Ministry m : CreatingMinistries.ministries2026) {
@@ -77,13 +77,13 @@ public class TaxReceiptVisualizer {
 
                 // Only show ministries where the contribution is significant (e.g., > 0.01€)
                 if (myContribution > 0.01) {
-                    System.out.printf("%-40s %9.2f€%n", m.getMinistryName(), myContribution);
+                    System.out.printf("%-60s %9.2f%n", m.getMinistryName(), myContribution);
                 }
             }
         }
         
         System.out.println("--------------------------------------------------");
-        System.out.printf("%-40s %9.2f€%n", "TOTAL TAX PAID", estimatedTax);
+        System.out.printf("%-60s %9.2f%n", "TOTAL TAX PAID", estimatedTax);
         System.out.println("==================================================");
         System.out.println("   Thank you for your contribution to society!    ");
         System.out.println("==================================================\n");
