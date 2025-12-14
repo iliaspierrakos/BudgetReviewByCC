@@ -26,7 +26,7 @@ public class ViewEditBudget {
         for (int i = 2020; i <= 2026; i++) {
             CreatingMinistries.ministryCreation(Path.of("NecessaryFilesAndData/MinistriesBudgets" + i + ".csv"));
         }
-        do {            
+        do {
             if (u.getRole() == User.Role.MINISTRYMEMBER) {
                 System.out.println("Do you want to :");
                 System.out.println("1.View");
@@ -39,6 +39,7 @@ public class ViewEditBudget {
                 System.out.println("2.Virtual Edit");
                 System.out.println("3.Compare");
                 System.out.println("4.Return");
+                System.out.println("5.Submit Recommendation");
             } else if (u.getRole() == User.Role.GOVERNOR) {
                 System.out.println("Do you want to :");
                 System.out.println("1.View");
@@ -99,7 +100,7 @@ public class ViewEditBudget {
                     obj.collectData();
                     System.out.println("Would you like to see the changes you made?");
                     String ans = scanner.nextLine();
-                    
+
                     while (Edit.history.getIndex() >= 0) {
                         //System.out.println("this works");
                         Edit.history.undo();
@@ -130,10 +131,14 @@ public class ViewEditBudget {
                     GovernorCheck g = new GovernorCheck();
                     g.viewProposalsNames();
                     break;
+                } else if (u.getRole() == User.Role.CITIZEN) {
+                    RecommendationSystem rs = new RecommendationSystem();
+                    rs.castRecommendation();
+                    break;
                 } else {
                     System.out.println("Invalid");
                     break;
-                }                
+                }
             default:
                 System.out.println("Invalid");
                 break;
