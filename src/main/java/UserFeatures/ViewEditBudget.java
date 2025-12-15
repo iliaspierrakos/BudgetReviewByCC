@@ -148,18 +148,19 @@ public class ViewEditBudget {
                     System.out.println("Invalid");
                     break;
                 }
-            
+
             case 6:
-                    if (u.getRole() == User.Role.CITIZEN) {
-                        TaxReceiptVisualizer receipt = new TaxReceiptVisualizer();
-                        receipt.generateReceipt();
-                        break;
-                    } else {
-                        System.out.println("Invalid");
-                        break;
-                }    default:
-                        System.out.println("Invalid");
-                        break;
+                if (u.getRole() == User.Role.CITIZEN) {
+                    TaxReceiptVisualizer receipt = new TaxReceiptVisualizer();
+                    receipt.generateReceipt();
+                    break;
+                } else {
+                    System.out.println("Invalid");
+                    break;
+                }
+            default:
+                System.out.println("Invalid");
+                break;
             }
         } while (true);
     }
