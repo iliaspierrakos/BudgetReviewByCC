@@ -14,8 +14,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Scanner;
 
-import javax.swing.text.View;
-
 public class ViewEditBudget {
     public static void budgetMenu(User u) {
         Scanner scanner = new Scanner(System.in);
@@ -35,6 +33,7 @@ public class ViewEditBudget {
                 System.out.println("2.Propose Edit");
                 System.out.println("3.Compare");
                 System.out.println("4.Return");
+                System.out.println("See Recommendations");
             } else if (u.getRole() == User.Role.CITIZEN) {
                 System.out.println("Do you want to :");
                 System.out.println("1.View");
@@ -138,22 +137,24 @@ public class ViewEditBudget {
                     RecommendationSystem rs = new RecommendationSystem();
                     rs.castRecommendation();
                     break;
+                } else if (u.getRole() == User.Role.MINISTRYMEMBER){
+
+                    System.out.println("Invalid");
+                    break;
+                }
+
+            case 6:
+                if (u.getRole() == User.Role.CITIZEN) {
+                    TaxReceiptVisualizer receipt = new TaxReceiptVisualizer();
+                    receipt.generateReceipt();
+                    break;
                 } else {
                     System.out.println("Invalid");
                     break;
                 }
-            
-            case 6:
-                    if (u.getRole() == User.Role.CITIZEN) {
-                        TaxReceiptVisualizer receipt = new TaxReceiptVisualizer();
-                        receipt.generateReceipt();
-                        break;
-                    } else {
-                        System.out.println("Invalid");
-                        break;
-                }    default:
-                        System.out.println("Invalid");
-                        break;
+            default:
+                System.out.println("Invalid");
+                break;
             }
         } while (true);
     }
