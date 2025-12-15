@@ -99,6 +99,7 @@ public class Compare {
             System.out.println("Please select a year (2020-2026):");
             try {
                 selectedYear = scanner.nextInt();
+                scanner.nextLine();
                 if (selectedYear >= 2020 && selectedYear <= 2026) {
                     if (selectedYear!=year) {
                         validYear = true;

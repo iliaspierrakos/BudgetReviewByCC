@@ -4,14 +4,17 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Arrays;
 
 /**
- * The {@code View} class handles the "View" option of the application's menu.
+ * The {@code ViewGovernmentBudget} class handles the "View" option of the application's menu.
  * It provides methods for displaying data related to the budgets of the selected Ministries.
  *
  * REFACTORED: Now uses StringBuilder + TableUtils for cleaner, more efficient code.
+ * The class creates a clone array which is used for the sorting feature without actually
+ * changing the original selectedMinistries array. 
  */
-public class View {
+public class ViewGovernmentBudget {
 
     /**
      * Displays the name, budget, and percentage of every Ministry object for the selected year.
@@ -24,7 +27,9 @@ public class View {
     public void viewGovBudget(int year, boolean sort) {
         Ministry[] selectedMinistries = ministryYear(year);
         if (sort) {
-            sortingBudgets(selectedMinistries);
+            Ministry[] selectedMinistriesClone = selectedMinistries.clone();
+            sortingBudgets(selectedMinistriesClone);
+            selectedMinistries = selectedMinistriesClone;
         }
 
         // Validation: Check if data exists for the year
@@ -140,9 +145,16 @@ public class View {
         }
         return selectedMinistries;
     }
-    public void sortingBudgets(Ministry m[]) {
-
-
+    public void sortingBudgets(Ministry[] m) {
+        Arrays.sort(m, (m1, m2) -> { //lamda function for sorting the ministries budgets
+            int budgetCompare = Double.compare(m2.getBudget(), m1.getBudget());
+                
+                if (budgetCompare == 0) { //if budgets are equal the ministries are sorted alphabetically
+                    return m1.getMinistryName().compareToIgnoreCase(m2.getMinistryName());
+                }
+                
+            return budgetCompare;
+        });
     }
-    public View() {}
 }
+    
