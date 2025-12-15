@@ -3,7 +3,12 @@ package UserFeatures;
  * This is a class for Citizens to create recommendations for Ministers.
  * Uses Bash script to load votes line by line from CSV
  */
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.util.Scanner;
 
 public class RecommendationSystem {
@@ -49,12 +54,11 @@ public class RecommendationSystem {
 
     public void collectInfo(Scanner s) {
         initializeCSV();
-        System.out.println("Loading votes from CSV via Bash script...");
+        System.out.println("Waiting...");
         loadVotesFromCSV();
-        System.out.println("Votes loaded successfully!");
         System.out.println("*** Citizen Recommendation Form ***");
 
-        System.out.println("Which Ministry is this recommendation for? (e.g. Health, Education)");
+        System.out.println("Which Ministry is this recommendation for? (e.g. Health)");
         System.out.print("Ministry of: ");
         String temp = "Ministry of " + s.nextLine();
         var e = new Edit();

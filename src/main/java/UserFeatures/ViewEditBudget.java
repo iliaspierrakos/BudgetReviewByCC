@@ -33,7 +33,7 @@ public class ViewEditBudget {
                 System.out.println("2.Propose Edit");
                 System.out.println("3.Compare");
                 System.out.println("4.Return");
-                System.out.println("See Recommendations");
+                System.out.println("5.See Recommendations");
             } else if (u.getRole() == User.Role.CITIZEN) {
                 System.out.println("Do you want to :");
                 System.out.println("1.View");
@@ -138,8 +138,9 @@ public class ViewEditBudget {
                     rs.castRecommendation();
                     break;
                 } else if (u.getRole() == User.Role.MINISTRYMEMBER){
-
-                    System.out.println("Invalid");
+                    try {
+                        System.out.println(Files.readString(Paths.get("NecessaryFilesAndData/ProposalsFromCitizens/CitizenForMinistry of health.txt")));
+                    } catch (IOException e) {}
                     break;
                 }
 
