@@ -14,8 +14,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Scanner;
 
-import javax.swing.text.View;
-
 public class ViewEditBudget {
     public static void budgetMenu(User u) {
         Scanner scanner = new Scanner(System.in);
@@ -52,11 +50,19 @@ public class ViewEditBudget {
                 System.out.println("5.View proposals");
             }
             int number = scanner.nextInt();
+            scanner.nextLine();
             String answer = "no";
             switch (number) {
             case 1:
                 int selectedYear = Compare.validityYear(0);
-                UserFeatures.View.viewGovBudget(selectedYear);
+                ViewGovernmentBudget v = new ViewGovernmentBudget();
+                System.out.println("Would you like to see the budget sorted?");
+                String a = scanner.nextLine();
+                if (a.equalsIgnoreCase("yes")) {
+                    v.viewGovBudget(selectedYear, true);
+                } else {
+                    v.viewGovBudget(selectedYear, false);
+                }                
                 break;
             case 2:
                 if (u.getRole() == User.Role.MINISTRYMEMBER) {

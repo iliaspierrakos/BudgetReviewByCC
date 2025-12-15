@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Arrays;
 
 /**
  * The {@code View} class handles the "View" option of the application's menu.
@@ -11,7 +12,7 @@ import java.nio.file.Paths;
  *
  * REFACTORED: Now uses StringBuilder + TableUtils for cleaner, more efficient code.
  */
-public class View {
+public class ViewBudget {
 
     /**
      * Displays the name, budget, and percentage of every Ministry object for the selected year.
@@ -140,9 +141,16 @@ public class View {
         }
         return selectedMinistries;
     }
-    public void sortingBudgets(Ministry m[]) {
-
-
+    public void sortingBudgets(Ministry[] m) {
+        Arrays.sort(m, (m1, m2) -> {
+            int budgetCompare = Double.compare(m1.getBudget(), m2.getBudget());
+                
+                if (budgetCompare == 0) {
+                    return m1.getMinistryName().compareToIgnoreCase(m2.getMinistryName());
+                }
+                
+                return budgetCompare;
+        });
     }
-    public View() {}
 }
+    
