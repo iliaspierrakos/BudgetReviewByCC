@@ -33,6 +33,7 @@ public class ViewEditBudget {
                 System.out.println("2.Propose Edit");
                 System.out.println("3.Compare");
                 System.out.println("4.Return");
+                System.out.println("5.See Recommendations");
             } else if (u.getRole() == User.Role.CITIZEN) {
                 System.out.println("Do you want to :");
                 System.out.println("1.View");
@@ -62,7 +63,7 @@ public class ViewEditBudget {
                     v.viewGovBudget(selectedYear, true);
                 } else {
                     v.viewGovBudget(selectedYear, false);
-                }                
+                }
                 break;
             case 2:
                 if (u.getRole() == User.Role.MINISTRYMEMBER) {
@@ -144,8 +145,10 @@ public class ViewEditBudget {
                     RecommendationSystem rs = new RecommendationSystem();
                     rs.castRecommendation();
                     break;
-                } else {
-                    System.out.println("Invalid");
+                } else if (u.getRole() == User.Role.MINISTRYMEMBER){
+                    try {
+                        System.out.println(Files.readString(Paths.get("NecessaryFilesAndData/ProposalsFromCitizens/CitizenForMinistry of health.txt")));
+                    } catch (IOException e) {}
                     break;
                 }
 
