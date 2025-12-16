@@ -27,52 +27,82 @@ public class ViewEditBudget {
             CreatingMinistries.ministryCreation(Path.of("NecessaryFilesAndData/MinistriesBudgets" + i + ".csv"));
         }
         do {
+
             if (u.getRole() == User.Role.MINISTRYMEMBER) {
                 System.out.println("Do you want to :");
                 System.out.println("1.View");
                 System.out.println("2.Propose Edit");
                 System.out.println("3.Compare");
-                System.out.println("4.Return");
+                System.out.println("4.See Recommendations");
+                System.out.println("5.Return");
             } else if (u.getRole() == User.Role.CITIZEN) {
                 System.out.println("Do you want to :");
                 System.out.println("1.View");
                 System.out.println("2.Virtual Edit");
                 System.out.println("3.Compare");
-                System.out.println("4.Return");
-                System.out.println("5.Submit Recommendation");
+                System.out.println("4.Submit Recommendation");
+                System.out.println("5.Tax Receipt");
+                System.out.println("6.Return");
             } else if (u.getRole() == User.Role.GOVERNOR) {
                 System.out.println("Do you want to :");
                 System.out.println("1.View");
                 System.out.println("2.Edit");
                 System.out.println("3.Compare");
-                System.out.println("4.Return");
-                System.out.println("5.View proposals");
+                System.out.println("4.View proposals");
+                System.out.println("5.Return");
             }
             int number = scanner.nextInt();
+            scanner.nextLine();
             String answer = "no";
             switch (number) {
             case 1:
                 int selectedYear = Compare.validityYear(0);
-                View.viewGovBudget(selectedYear);
+                ViewGovernmentBudget v = new ViewGovernmentBudget();
+                System.out.println("Would you like to see the budget sorted?");
+                String a = scanner.nextLine();
+                if (a.equalsIgnoreCase("yes")) {
+                    v.viewGovBudget(selectedYear, true);
+                } else {
+                    v.viewGovBudget(selectedYear, false);
+                }
                 break;
             case 2:
                 if (u.getRole() == User.Role.MINISTRYMEMBER) {
                     System.out.println("Starting proposal...");
-                    Propose p = new Propose();
-                    MinistryMember mm = (MinistryMember) u;
-                    String ministryName = mm.getMinistryName();
-                    p.editProposal(ministryName);
+                } else if (u.getRole() == User.Role.CITIZEN) {
+                    System.out.println("Starting virtual editing...");
+                }
+                System.out.println("Which type of Edit do you want to make:");
+                System.out.println("1.Simple Edit");
+                System.out.println("2.Bulk Edit");
+                System.out.println("3.Edit History");
+                int choice = scanner.nextInt();
+                scanner.nextLine();
+                if (choice == 3 ) {
+                    try {
+                        System.out.println(Files.readString(Paths.get("NecessaryFilesAndData/edithistory.txt")));
+                        break;
+                    } catch (IOException e) {}
+                } else if (choice > 3 || choice <1) {
+                    System.out.println("Invalid");
+                    break;
+                }
+                if (u.getRole() == User.Role.MINISTRYMEMBER) {
                     Edit.balance = 0; // this is necessary so the balance's of the other roles are correct
+                    if (choice == 1) {
+                        Propose p = new Propose();
+                        MinistryMember mm = (MinistryMember) u;
+                        String ministryName = mm.getMinistryName();
+                        p.editProposal(ministryName);
+                    } else if (choice == 2) {
+                        return;// to be changed!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                    }
                 } else if (u.getRole() == User.Role.GOVERNOR) {
-                    System.out.println("Which type of Edit do you want to make:");
-                    System.out.println("1.Simple Edit");
-                    System.out.println("2.Bulk Edit");
-                    int choice = scanner.nextInt();
-                    scanner.nextLine();
+
                     if (choice==1) {
                         Edit obj = new Edit();
                         obj.collectData();
-                        System.out.println("Would you like to see the changes you made?");
+                        /*System.out.println("Would you like to see the changes you made?");
                         String ans = scanner.nextLine();
                         if (ans.equalsIgnoreCase("yes")){
                         try {
@@ -87,18 +117,20 @@ public class ViewEditBudget {
                             Edit.balance = 0;
                         } catch (IOException e) {}
                             break;
-                        }
+                        } */
                     } else if (choice==2) {
                         BulkEdit bulkEdit = new BulkEdit();
                         bulkEdit.bulkEditMenu();
-                    } else {
-                        System.out.println("Invalid");
                     }
                 } else if (u.getRole() == User.Role.CITIZEN) {
-                    System.out.println("Starting virtual editing...");
-                    Edit obj = new Edit();
-                    obj.collectData();
-                    System.out.println("Would you like to see the changes you made?");
+                    if (choice == 1) {
+                        Edit obj = new Edit();
+                        obj.collectData();
+                    } else if (choice == 2 ) {
+                        BulkEdit bulkEdit = new BulkEdit();
+                        bulkEdit.bulkEditMenu();
+                    }
+                    /*System.out.println("Would you like to see the changes you made?");
                     String ans = scanner.nextLine();
 
                     while (Edit.history.getIndex() >= 0) {
@@ -117,16 +149,13 @@ public class ViewEditBudget {
                             }
                             Edit.balance = 0;
                         } catch (IOException e) {}
-                            break;
-                    }
+                    } */
                 }
                 break;
             case 3:
                 Compare.comparingMinistries();
                 break;
             case 4:
-                return;
-            case 5:
                 if (u.getRole() == User.Role.GOVERNOR) {
                     GovernorCheck g = new GovernorCheck();
                     g.viewProposalsNames();
@@ -135,10 +164,28 @@ public class ViewEditBudget {
                     RecommendationSystem rs = new RecommendationSystem();
                     rs.castRecommendation();
                     break;
-                } else {
-                    System.out.println("Invalid");
+                } else if (u.getRole() == User.Role.MINISTRYMEMBER){
+                    try {
+                        System.out.println(Files.readString(Paths.get("NecessaryFilesAndData/ProposalsFromCitizens/CitizenForMinistry of health.txt")));//To be changed
+                    } catch (IOException e) {}
                     break;
                 }
+
+            case 5:
+                if (u.getRole() == User.Role.CITIZEN) {
+                    TaxReceiptVisualizer receipt = new TaxReceiptVisualizer();
+                    receipt.generateReceipt();
+                    break;
+                } else {
+                    return;
+                }
+            case 6:
+                if (u.getRole() == User.Role.CITIZEN) {
+                    return;
+                } else {
+                    System.out.println("Invalid");
+                }
+
             default:
                 System.out.println("Invalid");
                 break;

@@ -1,10 +1,10 @@
 package UserFeatures;
 /**
- * This is a class for creating a list for storing the edits made from the user
- * it has the addEdit, undo and reverseEdit methods which are used for 
- * adding an edit to the list, adding the undo feature to the app and being 
- * able to reverse edit the changes made by the user. 
- */
+ 
+This is a class for creating a list for storing the edits made from the user
+it has the addEdit, undo and reverseEdit methods which are used for
+adding an edit to the list, adding the undo feature to the app and being
+able to reverse edit the changes made by the user. */
 import java.util.LinkedList;
 
 public class EditHistoryList { 
@@ -21,7 +21,7 @@ public class EditHistoryList {
             reverseEdit(lastEdit);
             editList.remove(index);
             index--;
-        } else {    
+        } else {
         System.out.println("Nothing to undo");
         }
     }
