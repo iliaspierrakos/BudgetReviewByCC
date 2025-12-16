@@ -1,8 +1,8 @@
 package UserFeatures;
 /** 
-* This is a class that creates the proposals the ministers make.
-* Each minister has a .txt proposal that are saved in a specific
-* folder where the governor will have access and take action.*/
+This is a class that creates the proposals the ministers make.
+Each minister has a .txt proposal that are saved in a specific
+folder where the governor will have access and take action.*/
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -24,13 +24,12 @@ public class Propose {
                     //System.out.println("this works");
                     pw.println(e.toString()); // calling the edit objects toString
                 }
-                System.out.println("Would you like to add a reasoning for the changes you made?");                
+                System.out.println("Would you like to add a reasoning for the changes you made?");
                 String reason = s.nextLine();
                 pw.println("Reasoning for changes made:" + reason);
                 pw.close();
                 fw.close();
-            
-            } catch(IOException e) {}
-    }    
-}
 
+            } catch(IOException e) {}
+    }
+}
