@@ -94,7 +94,7 @@ public class Edit {
         double previousBudget = CreatingMinistries.ministries2026[i].getBudget();
         String ministryName = CreatingMinistries.ministries2026[i].getMinistryName();
         CreatingMinistries.ministries2026[i].setBudget(finalBudget);
-        EditHistory.historyOfEdit(ministryName, previousBudget, finalBudget);
+        EditHistory.historyOfEdit(ministryName, previousBudget, finalBudget, "Edit");
         if (undo == false) {
             System.out.println("Budget updated successfully!");
             System.out.println("New budget for " + CreatingMinistries.ministries2026[i].getMinistryName() +

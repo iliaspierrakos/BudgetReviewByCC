@@ -9,21 +9,41 @@ import java.io.PrintWriter;
 
 public class EditHistory {
 
-    public static void historyOfEdit(String ministryName, double previousBudget, double newBudget) {
+    public static void historyOfEdit(String ministryName, double previousBudget, double newBudget, String type) {
 
         FileWriter fw = null;
         PrintWriter pw = null;
-        try {
-            fw = new FileWriter("NecessaryFilesAndData/edithistory.txt", true);
-            pw = new PrintWriter(fw);
-            pw.println(ministryName + " previous budget: " + Ministry.getFormattedBudget(previousBudget));
-            pw.println(ministryName + " new budget: " + Ministry.getFormattedBudget(newBudget));
-            pw.close();
-            fw.close();
-            //System.out.println("Do you want to undo?");
-            //var e = new EditHistoryList();
-            //e.undo();
-        } catch(IOException e) {}
+        if (type.equals("Edit")){
+            try {
+                fw = new FileWriter("NecessaryFilesAndData/edithistory.txt", true);
+                pw = new PrintWriter(fw);
+                pw.println(ministryName + " previous budget: " + Ministry.getFormattedBudget(previousBudget));
+                pw.println(ministryName + " new budget: " + Ministry.getFormattedBudget(newBudget));
+                pw.close();
+                fw.close();
+                //System.out.println("Do you want to undo?");
+                //var e = new EditHistoryList();
+                //e.undo();
+            } catch(IOException e) {}
+        } else if (type.equals("BulkEditAll")) {
+            try {
+                fw = new FileWriter("NecessaryFilesAndData/edithistory.txt", true);
+                pw = new PrintWriter(fw);
+                for (Ministry m : CreatingMinistries.ministries2026) {
+                    pw.println(ministryName + " previous budget: " + Ministry.getFormattedBudget(previousBudget));
+                    pw.println(ministryName + " new budget: " + Ministry.getFormattedBudget(newBudget));
+                }
+                pw.close();
+                fw.close();
+
+                //System.out.println("Do you want to undo?");
+                //var e = new EditHistoryList();
+                //e.undo();
+            } catch(IOException e) {}
+
+        } else if (type.equals("BulkEditSelected")) {
+
+        }
 
     }
 }
