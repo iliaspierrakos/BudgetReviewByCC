@@ -166,7 +166,9 @@ public class ViewEditBudget {
                     break;
                 } else if (u.getRole() == User.Role.MINISTRYMEMBER){
                     try {
-                        System.out.println(Files.readString(Paths.get("NecessaryFilesAndData/ProposalsFromCitizens/CitizenForMinistry of health.txt")));//To be changed
+                        MinistryMember mm = (MinistryMember) u;
+                        String ministry_Name = mm.getMinistryName();
+                        System.out.println(Files.readString(Paths.get("NecessaryFilesAndData/ProposalsFromCitizens/CitizenForMinistry of " + ministry_Name + ".txt")));//To be changed
                     } catch (IOException e) {}
                     break;
                 }

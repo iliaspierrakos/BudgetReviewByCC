@@ -1,6 +1,6 @@
 #!/bin/bash
 
-CSV_FILE="NecessaryFilesAndData/ProposalsFromCitizens/VotesData.csv"
+CSV_FILE=$2
 POSITION=$1
 
 

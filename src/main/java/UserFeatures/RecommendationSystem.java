@@ -15,6 +15,8 @@ public class RecommendationSystem {
     private String targetMinistry;
     private static final String VOTES_CSV_FILE = "NecessaryFilesAndData/ProposalsFromCitizens/VotesData.csv";
     private static final String BASH_LOAD_SCRIPT = "UserFeatures/LoadVotes.sh";
+    private static final String MINISTRIES_REC = "NecessaryFilesAndData/ProposalsFromCitizens/MinistryVotes.txt";
+
 
     String[] interiorOptions = {"Digital public services", "Training of public employees", "Municipality infrastructure", "Faster citizen services", "Transparency systems"};
     String[] foreignAffairsOptions = {"Embassies modernization", "Support for exports", "International cooperation", "Digital consular services", "Cultural promotion abroad"};
@@ -164,6 +166,21 @@ public class RecommendationSystem {
             System.out.println("Error saving your recommendation.");
             ex.printStackTrace();
         }
+        try (FileWriter fw = new FileWriter(MINISTRIES_REC, false);
+            PrintWriter pw = new PrintWriter(fw)) {
+                int totalVotes = 0;
+                for (int i = 0; i<20 ; i++) {
+                    totalVotes = allVotes[i][0];
+                }
+                pw.println("Total Votes:" + totalVotes);
+                for (int i = 0; i < CreatingMinistries.ministries2026.length; i++) {
+                    pw.println(CreatingMinistries.ministries2026[i].getMinistryName() +"," + allVotes[i][0] + " Votes");
+                }
+            }catch (IOException ex) {
+            System.out.println("Error saving your recommendation.");
+            ex.printStackTrace();
+        }
+
     }
 
     public int validChoice() {
@@ -188,7 +205,7 @@ public class RecommendationSystem {
                     int position = counter % 6;
 
 
-                    ProcessBuilder pb = new ProcessBuilder("bash", BASH_LOAD_SCRIPT, String.valueOf(counter));
+                    ProcessBuilder pb = new ProcessBuilder("bash", BASH_LOAD_SCRIPT, String.valueOf(counter),"NecessaryFilesAndData/ProposalsFromCitizens/VotesData.csv");
                     Process process = pb.start();
 
 

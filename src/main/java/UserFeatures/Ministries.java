@@ -6,8 +6,8 @@ import java.io.IOException;
 
 
 /**
- * This class provides a method that creates the "ministries.txt" text file 
- * with a predefined list of ministries. This text file is then used for extracting 
+ * This class provides a method that creates the "ministries.txt" text file
+ * with a predefined list of ministries. This text file is then used for extracting
  * the ministry names in other classes.
  */
 public class Ministries {
