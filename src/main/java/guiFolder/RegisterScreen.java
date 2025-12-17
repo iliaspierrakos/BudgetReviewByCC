@@ -1,14 +1,15 @@
 package guiFolder;
 
-import UserManagement.UserManager;
-
-import javafx.scene.control.Label;
-
 import UserManagement.User;
+import UserManagement.UserManager;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
@@ -18,8 +19,8 @@ public class RegisterScreen {
     public RegisterScreen(UserManager userManager) {
         this.userManager = userManager;
     }
-    public void show(Stage stage) {
 
+    public void show(Stage stage) {
         Label title = new Label("Register");
         title.setStyle("-fx-font-size: 22px; -fx-font-weight: bold;");
 
@@ -28,7 +29,6 @@ public class RegisterScreen {
 
         PasswordField passwordField = new PasswordField();
         passwordField.setPromptText("Password");
-        passwordField.setStyle("-fx-font-size: 10px;");
 
         ComboBox<User.Role> roleBox = new ComboBox<>();
         roleBox.getItems().addAll(
@@ -42,26 +42,56 @@ public class RegisterScreen {
         ministryField.setPromptText("Ministry Name");
         ministryField.setVisible(false);
         ministryField.setManaged(false);
-     
+
         Label errorLabel = new Label();
         errorLabel.setStyle("-fx-text-fill: red;");
-        
-        roleBox.setOnAction(e -> {
-            User.Role selected = roleBox.getValue();
-            boolean show = selected == User.Role.MINISTRYMEMBER;
-            ministryField.setVisible(show);
-            ministryField.setManaged(show);
-        });
+
         Button registerButton = new Button("Register");
         registerButton.setMinWidth(120);
 
         Button backButton = new Button("Back");
-        backButton.setMinWidth(120);    
+        backButton.setMinWidth(120);
+
+
+        usernameField.setOnAction(e -> passwordField.requestFocus());
+        passwordField.setOnAction(e -> {
+            User.Role r = roleBox.getValue();
+            if (r == User.Role.MINISTRYMEMBER) {
+                ministryField.requestFocus();
+            } else {
+                registerButton.fire();
+            }
+        });
+        ministryField.setOnAction(e -> registerButton.fire());
+
+        roleBox.valueProperty().addListener((obs, oldV, newV) -> {
+            boolean show = newV == User.Role.MINISTRYMEMBER;
+            ministryField.setVisible(show);
+            ministryField.setManaged(show);
+            errorLabel.setText("");
+            updateDisable(registerButton, usernameField, passwordField, roleBox, ministryField);
+        });
+
+        registerButton.setDisable(true);
+
+        usernameField.textProperty().addListener((obs, o, n) -> {
+            errorLabel.setText("");
+            updateDisable(registerButton, usernameField, passwordField, roleBox, ministryField);
+        });
+
+        passwordField.textProperty().addListener((obs, o, n) -> {
+            errorLabel.setText("");
+            updateDisable(registerButton, usernameField, passwordField, roleBox, ministryField);
+        });
+
+        ministryField.textProperty().addListener((obs, o, n) -> {
+            errorLabel.setText("");
+            updateDisable(registerButton, usernameField, passwordField, roleBox, ministryField);
+        });
 
         registerButton.setOnAction(e -> {
-
             String username = usernameField.getText().trim();
-            String password = passwordField.getText().trim();
+            String password = passwordField.getText(); // NO trim
             User.Role role = roleBox.getValue();
             String ministry = ministryField.getText().trim();
 
@@ -75,26 +105,21 @@ public class RegisterScreen {
                 return;
             }
 
-            boolean success;
-            if (role == User.Role.MINISTRYMEMBER) {
-                success = userManager.registerUser(username, password, role, ministry);
-            } else {
-                success = userManager.registerUser(username, password, role);
-            }
+            boolean success = (role == User.Role.MINISTRYMEMBER)
+                    ? userManager.registerUser(username, password, role, ministry)
+                    : userManager.registerUser(username, password, role);
 
             if (success) {
                 new LoginScreen(userManager).show(stage);
-             } else {
+            } else {
                 errorLabel.setText("Registration failed. Username exists or role limit reached.");
             }
         });
 
-        backButton.setOnAction(e -> {
-            new StartMenuScreen(userManager).show(stage);
-        });
-        
+        backButton.setOnAction(e -> new StartMenuScreen(userManager).show(stage));
+
         VBox layout = new VBox(
-                15,
+                12,
                 title,
                 usernameField,
                 passwordField,
@@ -107,9 +132,29 @@ public class RegisterScreen {
         layout.setAlignment(Pos.CENTER);
         layout.setPadding(new Insets(20));
 
-        Scene scene = new Scene(layout, 400, 420);
+        Scene scene = new Scene(layout, 420, 420);
         stage.setScene(scene);
         stage.setTitle("Register");
-        stage.show();    
+        stage.show();
+
+        usernameField.requestFocus();
+        updateDisable(registerButton, usernameField, passwordField, roleBox, ministryField);
+    }
+
+    private static void updateDisable(
+            Button registerButton,
+            TextField usernameField,
+            PasswordField passwordField,
+            ComboBox<User.Role> roleBox,
+            TextField ministryField
+    ) {
+        String u = usernameField.getText().trim();
+        String p = passwordField.getText();
+        User.Role r = roleBox.getValue();
+        boolean needsMinistry = r == User.Role.MINISTRYMEMBER;
+        String m = ministryField.getText().trim();
+
+        boolean ok = !u.isEmpty() && !p.isEmpty() && r != null && (!needsMinistry || !m.isEmpty());
+        registerButton.setDisable(!ok);
     }
 }
