@@ -16,6 +16,7 @@ public class Edit {
     private String name;
     private String change;
     private double amount;
+    private String changeType;
     private Scanner scanner = new Scanner(System.in);
     public static double balance = 0;
     public static EditHistoryList history = new EditHistoryList(); //creating static object for storing the edits
@@ -49,6 +50,12 @@ public class Edit {
         this.name = name;
         this.amount = amount;
         this.change = change;
+    }
+    public Edit(String name, String change, double amount, String changeType) {
+        this.name = name;
+        this.amount = amount;
+        this.change = change;
+        this.changeType = changeType;
     }
 
 
@@ -149,7 +156,7 @@ public class Edit {
         balance = balance + amount;
         // Show previous budget and perform the decrease
         System.out.println(fromName + " previous budget: " + Ministry.getFormattedBudget(Ministry.budgetSearchByName(fromName, CreatingMinistries.ministries2026)));
-        Edit obj1 = new Edit(fromName, "Decrease", amount);
+        Edit obj1 = new Edit(fromName, "Decrease", amount, "fixed");
         history.addEdit(obj1);
         obj1.editingbudget(obj1, false, isProposal);
         System.out.println("Available money for Investment : " + Ministry.getFormattedBudget(balance));
@@ -195,7 +202,7 @@ public class Edit {
             System.out.println(toName + " previous budget: " + Ministry.getFormattedBudget(Ministry.budgetSearchByName(toName, CreatingMinistries.ministries2026)));
 
             // Perform the transfer (Decrease from source, Increase to destination)
-            Edit obj2 = new Edit(toName, change, changeamount);
+            Edit obj2 = new Edit(toName, change, changeamount, "fixed");
             history.addEdit(obj2);
             obj2.editingbudget(obj2, false, isProposal);
             System.out.println("Available money for Investment : " + Ministry.getFormattedBudget(balance));
@@ -288,6 +295,10 @@ public class Edit {
     }
     public Edit() {} //default constructor
 
+    public String getChangeType() {
+        return changeType;
+    }
+
     public String getName() {
         return name;
     }
@@ -299,6 +310,6 @@ public class Edit {
     }
     @Override
     public String toString() {
-        return name + " " + change + "d by" + " " + Ministry.getFormattedBudget(amount);
+        return name + " " + change + "d by" + " " + Ministry.getFormattedBudget(amount) + " " + changeType;
     }
 }

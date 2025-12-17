@@ -381,9 +381,9 @@ public class BulkEdit {
                     double newBudget = oldBudget * (1 + percentage / 100.0);
                     Edit obj1 = new Edit();
                     if (percentage >= 0){
-                        obj1 = new Edit(m.getMinistryName(), "Increase", Math.abs(percentage));
+                        obj1 = new Edit(m.getMinistryName(), "Increase", Math.abs(percentage), "percentage");
                     }else {
-                        obj1 = new Edit(m.getMinistryName(), "Decrease", Math.abs(percentage));
+                        obj1 = new Edit(m.getMinistryName(), "Decrease", Math.abs(percentage), "percentage");
                     }
                     Edit.history.addEdit(obj1);
                     EditHistory.historyOfEdit(m.getMinistryName(), oldBudget, newBudget, i);
@@ -411,9 +411,9 @@ public class BulkEdit {
                     // Record the change in history
                     Edit obj1 = new Edit();
                     if (amount >= 0){
-                        obj1 = new Edit(m.getMinistryName(), "Increase", Math.abs(amount));
+                        obj1 = new Edit(m.getMinistryName(), "Increase", Math.abs(amount), "fixed");
                     }else {
-                        obj1 = new Edit(m.getMinistryName(), "Decrease", Math.abs(amount));
+                        obj1 = new Edit(m.getMinistryName(), "Decrease", Math.abs(amount), "fixed");
                     }
                     Edit.history.addEdit(obj1);
                     EditHistory.historyOfEdit(m.getMinistryName(), oldBudget, newBudget, i);
