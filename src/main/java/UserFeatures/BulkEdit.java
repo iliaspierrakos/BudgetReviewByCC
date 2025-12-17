@@ -89,7 +89,6 @@ public class BulkEdit {
             } else {
                 System.out.println("Operation cancelled.");
             }
-            System.out.println(Edit.balance);
         }
     }
     
@@ -387,7 +386,7 @@ public class BulkEdit {
                         obj1 = new Edit(m.getMinistryName(), "Decrease", Math.abs(percentage));
                     }
                     Edit.history.addEdit(obj1);
-                    EditHistory.historyOfEdit(m.getMinistryName(), oldBudget, newBudget, "BulkEditSelected");
+                    EditHistory.historyOfEdit(m.getMinistryName(), oldBudget, newBudget, i);
                     m.setBudget(newBudget);
                 }
             }
@@ -417,7 +416,7 @@ public class BulkEdit {
                         obj1 = new Edit(m.getMinistryName(), "Decrease", Math.abs(amount));
                     }
                     Edit.history.addEdit(obj1);
-                    EditHistory.historyOfEdit(m.getMinistryName(), oldBudget, newBudget, "BulkEditSelected");
+                    EditHistory.historyOfEdit(m.getMinistryName(), oldBudget, newBudget, i);
                     m.setBudget(newBudget);
                 }
             }
