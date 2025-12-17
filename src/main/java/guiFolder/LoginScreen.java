@@ -1,22 +1,22 @@
 package guiFolder;
 
-import UserManagement.UserManager;
-
-import javafx.scene.control.Label;
-
 import UserManagement.User;
-
+import UserManagement.UserManager;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import guiFolder.MenuScreen;
-import guiFolder.StartMenuScreen;
+
+
 
 public class LoginScreen {
     private final UserManager userManager;
+
     public LoginScreen(UserManager userManager) {
         this.userManager = userManager;
     }
@@ -36,34 +36,50 @@ public class LoginScreen {
         loginButton.setMinWidth(120);
         Button backButton = new Button("Back");
         backButton.setMinWidth(120);
-        
+
+        usernameField.setOnAction(e -> passwordField.requestFocus());
+        passwordField.setOnAction(e -> loginButton.fire());
+
+        loginButton.setDisable(true);
+        Runnable updateDisable = () -> loginButton.setDisable(
+                usernameField.getText().trim().isEmpty() || passwordField.getText().isEmpty()
+        );
+
+        usernameField.textProperty().addListener((obs, oldV, newV) -> {
+            errorLabel.setText("");
+            updateDisable.run();
+        });
+        passwordField.textProperty().addListener((obs, oldV, newV) -> {
+            errorLabel.setText("");
+            updateDisable.run();
+        });
+
         loginButton.setOnAction(e -> {
             String username = usernameField.getText().trim();
-            String password = passwordField.getText().trim();
+            String password = passwordField.getText(); // 4) NO trim on password
+
             if (username.isEmpty() || password.isEmpty()) {
                 errorLabel.setText("Fields cannot be empty!");
                 return;
             }
+
             User loggedIn = userManager.loginUser(username, password);
             if (loggedIn == null) {
                 errorLabel.setText("Invalid username or password.");
             } else {
-                errorLabel.setText("");
-                MenuScreen menu = new MenuScreen(loggedIn, userManager);
-                menu.show(stage);
+                new MenuScreen(loggedIn, userManager).show(stage);
             }
         });
-        backButton.setOnAction(e -> {
-            new StartMenuScreen(userManager).show(stage);
-        });
-        VBox layout = new VBox(
-            15, title, usernameField, passwordField, loginButton, backButton, errorLabel);
+
+        backButton.setOnAction(e -> new StartMenuScreen(userManager).show(stage));
+
+        VBox layout = new VBox(12, title, usernameField, passwordField, loginButton, backButton, errorLabel);
         layout.setAlignment(Pos.CENTER);
         layout.setPadding(new Insets(20));
-        Scene scene = new Scene(layout, 350, 260);
-        stage.setScene(scene);
+
+        stage.setScene(new Scene(layout, 360, 280));
         stage.setTitle("Login");
-        stage.show();    
+        stage.show();
+        usernameField.requestFocus();
     }
 }
-

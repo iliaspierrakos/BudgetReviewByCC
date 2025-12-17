@@ -6,3 +6,6 @@ Reasoning for changes made:no
 Ministry of health Decreased by 5.000.000.000
 Ministry of tourism increased by 26.780
 Reasoning for changes made:no
+Ministry of health Decreased by 100
+Ministry of tourism Increased by 100
+Reasoning for changes made:no
