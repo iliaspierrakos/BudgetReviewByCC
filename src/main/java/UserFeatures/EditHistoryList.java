@@ -75,7 +75,7 @@ public class EditHistoryList {
     public void reverseChanges(){
         System.out.println("How many of your last changes do you want to undo?");
         int changes = scanner.nextInt();
-        while (changes < 0 || changes > Edit.history.getIndex()) {
+        while (changes < 0 || changes > (Edit.history.getIndex() + 1)) {
             System.out.println("Invalid. Your response must be <= " + Edit.history.getIndex());
             changes = scanner.nextInt();
         }
