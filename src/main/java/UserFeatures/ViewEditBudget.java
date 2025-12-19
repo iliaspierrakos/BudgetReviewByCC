@@ -81,7 +81,15 @@ public class ViewEditBudget {
                 if (choice == 3 ) {
                     try {
                         System.out.println(Files.readString(Paths.get("NecessaryFilesAndData/edithistory.txt")));
-                        break;
+                        System.out.println("Do you want to undo your last changes?");
+                        String ans = scanner.nextLine();
+                        ans = Ministry.yesOrNo(ans); 
+                        if (ans.equalsIgnoreCase("yes")) {
+                            EditHistoryList undo = new EditHistoryList();
+                            undo.reverseChanges();
+                        } else {
+                            return;
+                        } 
                     } catch (IOException e) {}
                 } else if (choice > 3 || choice <1) {
                     System.out.println("Invalid");

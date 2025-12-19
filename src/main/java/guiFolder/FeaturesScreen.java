@@ -14,6 +14,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 public class FeaturesScreen {
+
     private final User loggedInUser;
     private final UserManager userManager;
 
@@ -32,17 +33,19 @@ public class FeaturesScreen {
         Button returnButton = new Button("RETURN");
         returnButton.setMinWidth(200);
 
-        viewButton.setOnAction(e -> {
-            System.out.println("VIEW PRESSED — ViewFeature not created yet");
-        });
+        viewButton.setOnAction(e ->
+                new ViewBudgetScreen(loggedInUser, userManager).show(stage)
+        );
 
-        returnButton.setOnAction(e -> {
-            new StartMenuScreen(userManager).show(stage);
-        });
+        
+        returnButton.setOnAction(e ->
+                new MenuScreen(loggedInUser, userManager).show(stage)
+        );
 
         VBox layout = new VBox(20, title, viewButton, returnButton);
         layout.setAlignment(Pos.CENTER);
         layout.setPadding(new Insets(20));
+
         Scene scene = new Scene(layout, 400, 260);
         stage.setScene(scene);
         stage.setTitle("FEATURES");

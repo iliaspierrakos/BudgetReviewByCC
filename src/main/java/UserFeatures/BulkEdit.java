@@ -1,5 +1,6 @@
 package UserFeatures;
 
+import java.lang.Math;
 import java.util.Scanner;
 import java.util.ArrayList;
 
@@ -9,7 +10,6 @@ import java.util.ArrayList;
  */
 public class BulkEdit {
     private Scanner scanner = new Scanner(System.in);
-    
     public void bulkEditMenu() {
         System.out.println("\nWhat do you want to do? ");
         System.out.println("1. Apply percentage change to ALL ministries");
@@ -89,7 +89,6 @@ public class BulkEdit {
             } else {
                 System.out.println("Operation cancelled.");
             }
-            System.out.println(Edit.balance);
         }
     }
     
@@ -380,7 +379,14 @@ public class BulkEdit {
                 if (selectedIndices == null || selectedIndices.contains(i)) {
                     double oldBudget = m.getBudget();
                     double newBudget = oldBudget * (1 + percentage / 100.0);
-                    EditHistory.historyOfEdit(m.getMinistryName(), oldBudget, newBudget);
+                    Edit obj1 = new Edit();
+                    if (percentage >= 0){
+                        obj1 = new Edit(m.getMinistryName(), "Increase", Math.abs(percentage), "percentage");
+                    }else {
+                        obj1 = new Edit(m.getMinistryName(), "Decrease", Math.abs(percentage), "percentage");
+                    }
+                    Edit.history.addEdit(obj1);
+                    EditHistory.historyOfEdit(m.getMinistryName(), oldBudget, newBudget, i);
                     m.setBudget(newBudget);
                 }
             }
@@ -403,7 +409,14 @@ public class BulkEdit {
                     double newBudget = oldBudget + amount;
                     
                     // Record the change in history
-                    EditHistory.historyOfEdit(m.getMinistryName(), oldBudget, newBudget);
+                    Edit obj1 = new Edit();
+                    if (amount >= 0){
+                        obj1 = new Edit(m.getMinistryName(), "Increase", Math.abs(amount), "fixed");
+                    }else {
+                        obj1 = new Edit(m.getMinistryName(), "Decrease", Math.abs(amount), "fixed");
+                    }
+                    Edit.history.addEdit(obj1);
+                    EditHistory.historyOfEdit(m.getMinistryName(), oldBudget, newBudget, i);
                     m.setBudget(newBudget);
                 }
             }

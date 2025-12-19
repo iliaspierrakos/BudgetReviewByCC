@@ -18,6 +18,7 @@ public class MenuScreen {
         this.loggedInUser = loggedInUser;
         this.userManager = userManager;
     }
+
     public void show(Stage stage) {
         Label title = new Label("Welcome, " + loggedInUser.getUsername());
         title.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
@@ -25,24 +26,46 @@ public class MenuScreen {
         Label roleLabel = new Label("Role: " + loggedInUser.getRole());
         roleLabel.setStyle("-fx-font-size: 14px;");
 
-        Button viewEditBudgetButton = new Button("View / Edit Budget");
-        viewEditBudgetButton.setMinWidth(200);
+        // Main actions
+        Button featuresButton = new Button("FEATURES");
+        featuresButton.setMinWidth(220);
 
-        Button logoutButton = new Button("Logout");
-        logoutButton.setMinWidth(200);
-        viewEditBudgetButton.setOnAction(e -> {
-            System.out.println("Features coming soon...");
-        });
+        Button logoutButton = new Button("LOGOUT");
+        logoutButton.setMinWidth(220);
 
-        logoutButton.setOnAction(e -> {
-            new StartMenuScreen(userManager).show(stage);
-        });
+        // Optional: dynamic UI ανά ρόλο (example buttons)
+        Button adminButton = new Button("ADMIN PANEL");
+        adminButton.setMinWidth(220);
 
-        VBox layout = new VBox(15, title, roleLabel, viewEditBudgetButton, logoutButton);
+        // Default: κρύβεται
+        adminButton.setVisible(false);
+        adminButton.setManaged(false);
+
+        // Αν ο ρόλος είναι GOVERNOR, δείξε το (example)
+        if (loggedInUser.getRole() == User.Role.GOVERNOR) {
+            adminButton.setVisible(true);
+            adminButton.setManaged(true);
+        }
+
+        // Actions
+        featuresButton.setOnAction(e ->
+                new FeaturesScreen(loggedInUser, userManager).show(stage)
+        );
+
+        adminButton.setOnAction(e ->
+                // placeholder για αργότερα
+                new FeaturesScreen(loggedInUser, userManager).show(stage)
+        );
+
+        logoutButton.setOnAction(e ->
+                new StartMenuScreen(userManager).show(stage)
+        );
+
+        VBox layout = new VBox(15, title, roleLabel, featuresButton, adminButton, logoutButton);
         layout.setAlignment(Pos.CENTER);
         layout.setPadding(new Insets(20));
 
-        Scene scene = new Scene(layout, 400, 300);
+        Scene scene = new Scene(layout, 420, 320);
         stage.setScene(scene);
         stage.setTitle("Main Menu");
         stage.show();
