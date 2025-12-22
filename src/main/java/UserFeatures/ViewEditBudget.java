@@ -49,7 +49,8 @@ public class ViewEditBudget {
                 System.out.println("2.Edit");
                 System.out.println("3.Compare");
                 System.out.println("4.View proposals");
-                System.out.println("5.Return");
+                System.out.println("5.View Statistics");
+                System.out.println("6.Return");
             }
             int number = scanner.nextInt();
             scanner.nextLine();
@@ -83,13 +84,13 @@ public class ViewEditBudget {
                         System.out.println(Files.readString(Paths.get("NecessaryFilesAndData/edithistory.txt")));
                         System.out.println("Do you want to undo your last changes?");
                         String ans = scanner.nextLine();
-                        ans = Ministry.yesOrNo(ans); 
+                        ans = Ministry.yesOrNo(ans);
                         if (ans.equalsIgnoreCase("yes")) {
                             EditHistoryList undo = new EditHistoryList();
                             undo.reverseChanges();
                         } else {
                             return;
-                        } 
+                        }
                     } catch (IOException e) {}
                 } else if (choice > 3 || choice <1) {
                     System.out.println("Invalid");
@@ -186,6 +187,12 @@ public class ViewEditBudget {
                     TaxReceiptVisualizer receipt = new TaxReceiptVisualizer();
                     receipt.generateReceipt();
                     break;
+                } else if (u.getRole() == User.Role.GOVERNOR){
+                    try {
+                       System.out.println(Files.readString(Paths.get("NecessaryFilesAndData/ProposalsFromCitizens/MinistryVotes.txt")));
+                    } catch (Exception e) {
+                    }
+                    break;
                 } else {
                     return;
                 }
@@ -193,7 +200,7 @@ public class ViewEditBudget {
                 if (u.getRole() == User.Role.CITIZEN) {
                     return;
                 } else {
-                    System.out.println("Invalid");
+                    return;
                 }
 
             default:
