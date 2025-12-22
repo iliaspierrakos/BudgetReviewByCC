@@ -21,7 +21,7 @@ public class StartMenuScreen {
 
     public void show(Stage stage) {
 
-        // --- LOGO ---
+        
         ImageView logo = new ImageView();
         var logoStream = getClass().getResourceAsStream("logo.png");
         if (logoStream != null) {
@@ -31,11 +31,11 @@ public class StartMenuScreen {
         logo.setPreserveRatio(true);
         logo.setId("app-logo");
 
-        // --- TITLE ---
+        
         Label title = new Label("PRIME MINISTER FOR A DAY");
         title.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
 
-        // --- BUTTONS ---
+        
         Button registerButton = new Button("Register");
         Button loginButton = new Button("Login");
         Button exitButton = new Button("Exit");
@@ -55,7 +55,7 @@ public class StartMenuScreen {
 
         Scene scene = new Scene(layout, 500, 420);
 
-        // --- CSS (safe load) ---//
+        // --- CSS---//
         var cssUrl = getClass().getResource("screen1.css");
         if (cssUrl != null) {
             scene.getStylesheets().add(cssUrl.toExternalForm());
