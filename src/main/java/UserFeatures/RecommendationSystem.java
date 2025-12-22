@@ -5,9 +5,9 @@ package UserFeatures;
  */
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.Scanner;
 
@@ -196,38 +196,21 @@ public class RecommendationSystem {
     }
 
     private static void loadVotesFromCSV() {
-        try {
-
-            for (int counter = 0; counter < 120; counter++) {
-                try {
-
-                    int ministryIndex = counter / 6;
-                    int position = counter % 6;
-
-
-                    ProcessBuilder pb = new ProcessBuilder("bash", BASH_LOAD_SCRIPT, String.valueOf(counter),"NecessaryFilesAndData/ProposalsFromCitizens/VotesData.csv");
-                    Process process = pb.start();
-
-
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-                    String line = reader.readLine();
-
-                    line = line.replace("\r", "");
-                    int value = Integer.parseInt(line.trim());
-                    allVotes[ministryIndex][position] = value;
-
-                    process.waitFor();
-
-                } catch (Exception e) {
-                    System.err.println("Error at position " + counter + ": " + e.getMessage());
+        try (BufferedReader br = new BufferedReader(new FileReader(VOTES_CSV_FILE))) {
+            String line;
+            int row = 0;
+            while ((line = br.readLine()) != null && row < 20) {
+                String[] values = line.split(",");
+                for (int col = 0; col < 6 && col < values.length; col++) {
+                    allVotes[row][col] = Integer.parseInt(values[col].trim());
                 }
+                row++;
             }
-
         } catch (Exception e) {
-            System.err.println("Error loading votes via Bash script");
-            e.printStackTrace();
+            System.err.println("Error");
         }
     }
+
 
 
     private static void saveVotesToCSV() {
