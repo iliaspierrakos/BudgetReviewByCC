@@ -1,9 +1,7 @@
 package UserFeatures;
 
-import java.lang.Math;
-import java.util.Scanner;
 import java.util.ArrayList;
-
+import java.util.Scanner;
 /**
  * The BulkEdit class handles bulk operations on ministry budgets.
  * It allows applying changes to all ministries or selected ones,
@@ -148,10 +146,10 @@ public class BulkEdit {
                 } else { // Increase
                     if (Edit.balance >= totalChange) {
                         Edit.balance -= totalChange;
-                    } 
+                    }
                 }
                 
-                System.out.println("Available money for Investment: " + 
+                System.out.println("Available money for Investment: " +
                     Ministry.getFormattedBudget(Edit.balance));
                 System.out.println("All budgets updated successfully!");
             } else {
