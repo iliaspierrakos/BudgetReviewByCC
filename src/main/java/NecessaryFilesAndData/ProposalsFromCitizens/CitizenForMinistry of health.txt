@@ -1,6 +1,12 @@
+<<<<<<< HEAD
 Total Votes for Ministry of Health: 1
 More doctors and nurses, Votes from Citizens: 1, 100%
 More ambulances, Votes from Citizens: 0, 0%
+=======
+Total Votes for Ministry of Health: 6
+More doctors and nurses, Votes from Citizens: 5, 83,33%
+More ambulances, Votes from Citizens: 1, 16,67%
+>>>>>>> 43e4e6dc160bfc036bece5c5ea96f97040fd2c3d
 Hospital upgrades, Votes from Citizens: 0, 0%
 Medical equipment, Votes from Citizens: 0, 0%
 Prevention programs, Votes from Citizens: 0, 0%
