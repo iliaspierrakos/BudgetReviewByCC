@@ -1,7 +1,6 @@
 package UserFeatures;
 /**
  * This is a class for Citizens to create recommendations for Ministers.
- * Uses Bash script to load votes line by line from CSV
  */
 import java.io.BufferedReader;
 import java.io.File;
@@ -41,19 +40,31 @@ public class RecommendationSystem {
 
     static int[][] allVotes = new int[20][6];  // 20 ministries x 6 votes
 
-
+    /**
+     * Default constructor for RecommendationSystem.
+     */
 
     public RecommendationSystem() {}
 
+    /**
+     * Constructor that initializes the target ministry.
+     * @param m the ministry name
+     */
     public RecommendationSystem(String m) {
         this.targetMinistry = m;
     }
+    /**
+     * Starts the recommendation process by collecting citizen input.
+     */
 
     public void castRecommendation() {
         Scanner sc = new Scanner(System.in);
         collectInfo(sc);
     }
-
+    /**
+     * Collects recommendation information from the citizen and saves it to files.
+     * @param s the Scanner object for user input
+     */
     public void collectInfo(Scanner s) {
         initializeCSV();
         System.out.println("Waiting...");
@@ -182,7 +193,10 @@ public class RecommendationSystem {
         }
 
     }
-
+    /**
+     * Validates user's choice and ensures it's between 1 and 5.
+     * @return the valid choice selected by the user
+     */
     public int validChoice() {
         Scanner s = new Scanner(System.in);
         int choice;
@@ -194,7 +208,9 @@ public class RecommendationSystem {
 
         return choice;
     }
-
+    /**
+     * Loads existing votes from the CSV file into memory.
+     */
     private static void loadVotesFromCSV() {
         try (BufferedReader br = new BufferedReader(new FileReader(VOTES_CSV_FILE))) {
             String line;
@@ -212,7 +228,9 @@ public class RecommendationSystem {
     }
 
 
-
+    /**
+     * Saves the current votes array to the CSV file.
+     */
     private static void saveVotesToCSV() {
         try (PrintWriter pw = new PrintWriter(new FileWriter(VOTES_CSV_FILE))) {
             for (int i = 0; i < 20; i++) {
@@ -222,6 +240,9 @@ public class RecommendationSystem {
             System.err.println("Error saving votes to CSV");
         }
     }
+    /**
+     * Creates the CSV file with initial zero values if it doesn't exist.
+     */
     private static void initializeCSV() {
         File csvFile = new File(VOTES_CSV_FILE);
 

@@ -50,7 +50,8 @@ public class ViewEditBudget {
                 System.out.println("3.Compare");
                 System.out.println("4.View proposals");
                 System.out.println("5.View Statistics");
-                System.out.println("6.Return");
+                System.out.println("6.Restart all");
+                System.out.println("7.Return");
             }
             int number = scanner.nextInt();
             scanner.nextLine();
@@ -197,12 +198,23 @@ public class ViewEditBudget {
                     return;
                 }
             case 6:
-                if (u.getRole() == User.Role.CITIZEN) {
+                if (u.getRole() == User.Role.CITIZEN ) {
                     return;
+                } else if (u.getRole() == User.Role.GOVERNOR) {
+                    ClearHistory.clearFile(Paths.get("NecessaryFilesAndData/ProposalsFromCitizens/VotesData.csv"));
+                    ClearHistory.clearFile(Paths.get("NecessaryFilesAndData/ProposalsFromMinisters"));
+                    System.out.println("Successful");
                 } else {
-                    return;
+                    System.out.println("Invalid");
+                    break;
                 }
 
+            case 7:
+                if (u.getRole() == User.Role.GOVERNOR) {
+                    return;
+                } else {
+                    System.out.println("Invalid");
+                }
             default:
                 System.out.println("Invalid");
                 break;
