@@ -1,6 +1,10 @@
 package guiFolder;
 
+import java.lang.classfile.Label;
 import java.util.List;
+
+import javax.swing.table.TableColumn;
+import javax.swing.text.TableView;
 
 import UserFeatures.View;
 import UserFeatures.View.GovBudgetRow;
@@ -15,21 +19,21 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import main.java.guiFolder.ViewEditBudgetScreen;
 
-public class ViewBudgetScreen {
+public class ViewScreen {
 
     private final User loggedInUser;
     private final UserManager userManager;
     private final View viewBackend = new View();
 
-    public ViewBudgetScreen(User loggedInUser, UserManager userManager) {
+    public ViewScreen(User loggedInUser, UserManager userManager) {
         this.loggedInUser = loggedInUser;
         this.userManager = userManager;
     }
 
     public void show(Stage stage) {
 
-     
         Label title = new Label("VIEW GOVERNMENT BUDGET");
         title.setStyle("-fx-font-size: 22px; -fx-font-weight: bold;");
 
@@ -50,23 +54,19 @@ public class ViewBudgetScreen {
         table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         table.setPlaceholder(new Label("Select a year to view the budget"));
 
-        TableColumn<GovBudgetRow, String> ministryCol =
-                new TableColumn<>("Ministry");
+        TableColumn<GovBudgetRow, String> ministryCol = new TableColumn<>("Ministry");
         ministryCol.setCellValueFactory(new PropertyValueFactory<>("ministry"));
 
-        TableColumn<GovBudgetRow, String> budgetCol =
-                new TableColumn<>("Budget");
+        TableColumn<GovBudgetRow, String> budgetCol = new TableColumn<>("Budget");
         budgetCol.setCellValueFactory(new PropertyValueFactory<>("budgetText"));
         budgetCol.setStyle("-fx-alignment: CENTER-RIGHT;");
 
-        TableColumn<GovBudgetRow, String> percentCol =
-                new TableColumn<>("Percentage");
+        TableColumn<GovBudgetRow, String> percentCol = new TableColumn<>("Percentage");
         percentCol.setCellValueFactory(new PropertyValueFactory<>("percentText"));
         percentCol.setStyle("-fx-alignment: CENTER-RIGHT;");
 
         table.getColumns().addAll(ministryCol, budgetCol, percentCol);
 
-        // ===== RELOAD LOGIC =====
         Runnable reload = () -> {
             errorLabel.setText("");
             Integer year = yearBox.getValue();
@@ -76,10 +76,9 @@ public class ViewBudgetScreen {
                 return;
             }
 
-            List<GovBudgetRow> rows =
-                    viewBackend.getGovBudgetRowsForGui(year, sortBox.isSelected());
-
+            List<GovBudgetRow> rows = viewBackend.getGovBudgetRowsForGui(year, sortBox.isSelected());
             table.getItems().setAll(rows);
+
             title.setText("VIEW GOVERNMENT BUDGET — " + year);
 
             if (rows.isEmpty()) {
@@ -97,18 +96,18 @@ public class ViewBudgetScreen {
 
         Button backButton = new Button("Back");
         backButton.setOnAction(e ->
-                new FeaturesScreen(loggedInUser, userManager).show(stage)
+        new ViewEditBudgetScreen(loggedInUser, userManager).show(stage)
         );
 
-       
+
         HBox controls = new HBox(10, yearBox, sortBox, loadButton);
         controls.setAlignment(Pos.CENTER);
 
-        VBox layout = new VBox(15, title, controls, table, backButton, errorLabel);
-        layout.setAlignment(Pos.CENTER);
-        layout.setPadding(new Insets(20));
+        VBox layout = new VBox(12, title, controls, table, errorLabel, backButton);
+        layout.setAlignment(Pos.TOP_CENTER);
+        layout.setPadding(new Insets(15));
 
-        stage.setScene(new Scene(layout, 900, 560));
+        stage.setScene(new Scene(layout, 800, 520));
         stage.setTitle("View Budget");
         stage.show();
     }
