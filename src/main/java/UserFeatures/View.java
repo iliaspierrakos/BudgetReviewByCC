@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+
 
 /**
  * The {@code View} class handles the "View" option of the application's menu.
@@ -140,9 +143,85 @@ public class View {
         }
         return selectedMinistries;
     }
-    public void sortingBudgets(Ministry m[]) {
+     /**
+     * A simple data holder (row model) for displaying the government budget in the GUI (JavaFX TableView).
+     *
+     * <p>This class stores already formatted strings so the GUI does not deal with formatting rules.</p>
+     */
+    public static class GovBudgetRow {
+        private final String ministry;
+        private final String budgetText;
+        private final String percentText;
 
+        public GovBudgetRow(String ministry, String budgetText, String percentText) {
+            this.ministry = ministry;
+            this.budgetText = budgetText;
+            this.percentText = percentText;
+        }
 
+        public String getMinistry() {
+            return ministry;
+        }
+
+        public String getBudgetText() {
+            return budgetText;
+        }
+
+        public String getPercentText() {
+            return percentText;
+        }
     }
-    public View() {}
+
+    /**
+     * Builds the rows needed by the GUI to display the government budget for a given year.
+     *
+     * <p>GUI-friendly alternative to {@code viewGovBudget(...)}:
+     * it does not print anything and does not write files. It only returns data.</p>
+     *
+     * @param year the budget year (2020–2026)
+     * @param sort whether ministries should be sorted by budget
+     * @return list of rows ready for a JavaFX TableView. If no data, returns empty list.
+     */
+    public List<GovBudgetRow> getGovBudgetRowsForGui(int year, boolean sort) {
+
+        Ministry[] selectedMinistries = ministryYear(year);
+        if (selectedMinistries == null) return List.of();
+
+        if (sort) sortingBudgets(selectedMinistries);
+
+        double total = 0;
+        for (Ministry m : selectedMinistries) {
+            if (m != null) total += m.getBudget();
+        }
+        if (total == 0) return List.of();
+
+        List<GovBudgetRow> rows = new ArrayList<>();
+        for (Ministry m : selectedMinistries) {
+            if (m == null) continue;
+
+            double budget = m.getBudget();
+            double percent = (budget / total) * 100.0;
+
+            String formattedBudget = Ministry.getFormattedBudget(budget);
+            String formattedPercent = String.format("%.2f%%", percent).replace(".", ",");
+
+            rows.add(new GovBudgetRow(m.getMinistryName(), formattedBudget, formattedPercent));
+        }
+
+        rows.add(new GovBudgetRow("TOTAL", Ministry.getFormattedBudget(total), "100,00%"));
+        return rows;
+    }
+
+    /**
+     * Optional sorting hook. If you want, you can implement sorting by budget here.
+     * For now it does nothing (safe).
+     *
+     * @param ministries the array to be sorted
+     */
+    public void sortingBudgets(Ministry[] ministries) {
+        // TODO: implement sorting if needed
+    }
+
+    public View() {
+    }
 }
