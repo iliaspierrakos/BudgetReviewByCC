@@ -1,203 +1,207 @@
 package UserFeatures;
-/**
-* The ViewEditBudget class creates the necessary files for the application.
-* It also creates the ministry objects and saves them in a static array,
-* which is essential for the operations this application will support.
-* It also prints the menu that allows users to view, edit and manage
-* ministry budgets.
-*/
-import UserManagement.MinistryMember;
+
 import UserManagement.User;
-import java.io.IOException;
-import java.nio.file.Files;
+import UserManagement.User.Role;
+
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Scanner;
 
+/**
+ * Central controller class for budget-related features.
+ *
+ * <p>
+ * This class is the GUI-compatible equivalent of the CLI ViewEditBudget menu.
+ * It is responsible for:
+ * </p>
+ *
+ * <ul>
+ *   <li>Loading all required data files (budgets, ministries)</li>
+ *   <li>Deciding which actions are available based on the user's role</li>
+ *   <li>Exposing methods that GUI screens can safely call</li>
+ * </ul>
+ *
+ * <p>
+ * IMPORTANT:
+ * This class contains NO user interaction code (no Scanner, no prints).
+ * All user interaction is handled by GUI classes.
+ * </p>
+ */
 public class ViewEditBudget {
-    public static void budgetMenu(User u) {
-        Scanner scanner = new Scanner(System.in);
-        Ministries min = new Ministries();
-        MinistriesBudgets budg = new MinistriesBudgets();
-        for (int i = 2020; i <= 2026; i++) {
-            budg.budget(Path.of("NecessaryFilesAndData/BudgetReview" + i + ".txt"));
+
+    /** The currently logged-in user */
+    private final User user;
+
+    /**
+     * Constructs the ViewEditBudget controller and initializes
+     * all required data for budget operations.
+     *
+     * @param user the currently logged-in user
+     */
+    public ViewEditBudget(User user) {
+        this.user = user;
+        initializeData();
+    }
+
+    /**
+     * Loads all required files and initializes ministries and budgets.
+     *
+     * <p>
+     * This method replicates the initialization logic of the CLI version,
+     * ensuring that all budget-related files are available before
+     * any feature is used.
+     * </p>
+     */
+    private void initializeData() {
+        Ministries ministries = new Ministries();
+        MinistriesBudgets budgets = new MinistriesBudgets();
+
+        // Create yearly budget files (2020–2026)
+        for (int year = 2020; year <= 2026; year++) {
+            budgets.budget(Path.of("NecessaryFilesAndData/BudgetReview" + year + ".txt"));
         }
-        min.minlist();
-        for (int i = 2020; i <= 2026; i++) {
-            CreatingMinistries.ministryCreation(Path.of("NecessaryFilesAndData/MinistriesBudgets" + i + ".csv"));
+
+        // Initialize ministry list
+        ministries.minlist();
+
+        // Create ministry CSV files for each year
+        for (int year = 2020; year <= 2026; year++) {
+            CreatingMinistries.ministryCreation(
+                    Path.of("NecessaryFilesAndData/MinistriesBudgets" + year + ".csv")
+            );
         }
-        do {
+    }
 
-            if (u.getRole() == User.Role.MINISTRYMEMBER) {
-                System.out.println("Do you want to :");
-                System.out.println("1.View");
-                System.out.println("2.Propose Edit");
-                System.out.println("3.Compare");
-                System.out.println("4.See Recommendations");
-                System.out.println("5.Return");
-            } else if (u.getRole() == User.Role.CITIZEN) {
-                System.out.println("Do you want to :");
-                System.out.println("1.View");
-                System.out.println("2.Virtual Edit");
-                System.out.println("3.Compare");
-                System.out.println("4.Submit Recommendation");
-                System.out.println("5.Tax Receipt");
-                System.out.println("6.Return");
-            } else if (u.getRole() == User.Role.GOVERNOR) {
-                System.out.println("Do you want to :");
-                System.out.println("1.View");
-                System.out.println("2.Edit");
-                System.out.println("3.Compare");
-                System.out.println("4.View proposals");
-                System.out.println("5.Return");
-            }
-            int number = scanner.nextInt();
-            scanner.nextLine();
-            String answer = "no";
-            switch (number) {
-            case 1:
-                int selectedYear = Compare.validityYear(0);
-                ViewGovernmentBudget v = new ViewGovernmentBudget();
-                System.out.println("Would you like to see the budget sorted?");
-                String a = scanner.nextLine();
-                if (a.equalsIgnoreCase("yes")) {
-                    v.viewGovBudget(selectedYear, true);
-                } else {
-                    v.viewGovBudget(selectedYear, false);
-                }
-                break;
-            case 2:
-                if (u.getRole() == User.Role.MINISTRYMEMBER) {
-                    System.out.println("Starting proposal...");
-                } else if (u.getRole() == User.Role.CITIZEN) {
-                    System.out.println("Starting virtual editing...");
-                }
-                System.out.println("Which type of Edit do you want to make:");
-                System.out.println("1.Simple Edit");
-                System.out.println("2.Bulk Edit");
-                System.out.println("3.Edit History");
-                int choice = scanner.nextInt();
-                scanner.nextLine();
-                if (choice == 3 ) {
-                    try {
-                        System.out.println(Files.readString(Paths.get("NecessaryFilesAndData/edithistory.txt")));
-                        System.out.println("Do you want to undo your last changes?");
-                        String ans = scanner.nextLine();
-                        ans = Ministry.yesOrNo(ans); 
-                        if (ans.equalsIgnoreCase("yes")) {
-                            EditHistoryList undo = new EditHistoryList();
-                            undo.reverseChanges();
-                        } else {
-                            return;
-                        } 
-                    } catch (IOException e) {}
-                } else if (choice > 3 || choice <1) {
-                    System.out.println("Invalid");
-                    break;
-                }
-                if (u.getRole() == User.Role.MINISTRYMEMBER) {
-                    Edit.balance = 0; // this is necessary so the balance's of the other roles are correct
-                    if (choice == 1) {
-                        Propose p = new Propose();
-                        MinistryMember mm = (MinistryMember) u;
-                        String ministryName = mm.getMinistryName();
-                        p.editProposal(ministryName);
-                    } else if (choice == 2) {
-                        return;// to be changed!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                    }
-                } else if (u.getRole() == User.Role.GOVERNOR) {
+    /* =====================================================
+       =============== ROLE-BASED PERMISSIONS ===============
+       ===================================================== */
 
-                    if (choice==1) {
-                        Edit obj = new Edit();
-                        obj.collectData();
-                        /*System.out.println("Would you like to see the changes you made?");
-                        String ans = scanner.nextLine();
-                        if (ans.equalsIgnoreCase("yes")){
-                        try {
-                            System.out.println(Files.readString(Paths.get("NecessaryFilesAndData/edithistory.txt")));
-                            System.out.println("Changes made:" + Edit.history.editList.size());
-                            System.out.println("Do you want to undo?");
-                            scanner.nextLine();
-                            answer = scanner.nextLine();
-                            if (answer.equalsIgnoreCase("yes")) {
-                                Edit.history.undo();
-                            }
-                            Edit.balance = 0;
-                        } catch (IOException e) {}
-                            break;
-                        } */
-                    } else if (choice==2) {
-                        BulkEdit bulkEdit = new BulkEdit();
-                        bulkEdit.bulkEditMenu();
-                    }
-                } else if (u.getRole() == User.Role.CITIZEN) {
-                    if (choice == 1) {
-                        Edit obj = new Edit();
-                        obj.collectData();
-                    } else if (choice == 2 ) {
-                        BulkEdit bulkEdit = new BulkEdit();
-                        bulkEdit.bulkEditMenu();
-                    }
-                    /*System.out.println("Would you like to see the changes you made?");
-                    String ans = scanner.nextLine();
+    /**
+     * Checks if the user is allowed to view government budgets.
+     *
+     * @return true for ALL roles
+     */
+    public boolean canView() {
+        return true;
+    }
 
-                    while (Edit.history.getIndex() >= 0) {
-                        //System.out.println("this works");
-                        Edit.history.undo();
-                    }
-                    if (ans.equalsIgnoreCase("yes")){
-                        try {
-                            System.out.println(Files.readString(Paths.get("NecessaryFilesAndData/edithistory.txt")));
-                            System.out.println("Changes made:" + Edit.history.editList.size());
-                            System.out.println("Do you want to undo?");
-                            scanner.nextLine();
-                            answer = scanner.nextLine();
-                            if (answer.equalsIgnoreCase("yes")) {
-                                Edit.history.undo();
-                            }
-                            Edit.balance = 0;
-                        } catch (IOException e) {}
-                    } */
-                }
-                break;
-            case 3:
-                Compare.comparingMinistries();
-                break;
-            case 4:
-                if (u.getRole() == User.Role.GOVERNOR) {
-                    GovernorCheck g = new GovernorCheck();
-                    g.viewProposalsNames();
-                    break;
-                } else if (u.getRole() == User.Role.CITIZEN) {
-                    RecommendationSystem rs = new RecommendationSystem();
-                    rs.castRecommendation();
-                    break;
-                } else if (u.getRole() == User.Role.MINISTRYMEMBER){
-                    try {
-                        System.out.println(Files.readString(Paths.get("NecessaryFilesAndData/ProposalsFromCitizens/CitizenForMinistry of health.txt")));//To be changed
-                    } catch (IOException e) {}
-                    break;
-                }
+    /**
+     * Checks if the user is allowed to perform direct edits.
+     *
+     * @return true only for GOVERNOR
+     */
+    public boolean canEdit() {
+        return user.getRole() == Role.GOVERNOR;
+    }
 
-            case 5:
-                if (u.getRole() == User.Role.CITIZEN) {
-                    TaxReceiptVisualizer receipt = new TaxReceiptVisualizer();
-                    receipt.generateReceipt();
-                    break;
-                } else {
-                    return;
-                }
-            case 6:
-                if (u.getRole() == User.Role.CITIZEN) {
-                    return;
-                } else {
-                    System.out.println("Invalid");
-                }
+    /**
+     * Checks if the user is allowed to submit edit proposals.
+     *
+     * @return true only for MINISTRYMEMBER
+     */
+    public boolean canProposeEdit() {
+        return user.getRole() == Role.MINISTRYMEMBER;
+    }
 
-            default:
-                System.out.println("Invalid");
-                break;
-            }
-        } while (true);
+    /**
+     * Checks if the user is allowed to perform virtual edits.
+     *
+     * @return true only for CITIZEN
+     */
+    public boolean canVirtualEdit() {
+        return user.getRole() == Role.CITIZEN;
+    }
+
+    /**
+     * Checks if the user can view edit history.
+     *
+     * @return true for GOVERNOR and MINISTRYMEMBER
+     */
+    public boolean canViewEditHistory() {
+        return user.getRole() != Role.CITIZEN;
+    }
+
+    /**
+     * Checks if the user can compare ministries.
+     *
+     * @return true for all roles
+     */
+    public boolean canCompare() {
+        return true;
+    }
+
+    /**
+     * Checks if the user can view tax receipt visualizations.
+     *
+     * @return true only for CITIZEN
+     */
+    public boolean canViewTaxReceipt() {
+        return user.getRole() == Role.CITIZEN;
+    }
+
+    /* =====================================================
+       ================= FEATURE EXECUTION =================
+       ===================================================== */
+
+    /**
+     * Executes the View feature for a selected year.
+     *
+     * @param year the year to view
+     */
+    public void viewBudget(int year) {
+        View.viewGovBudget(year);
+    }
+
+    /**
+     * Executes the Edit feature (Governor only).
+     */
+    public void editBudget() {
+        if (!canEdit()) return;
+
+        Edit edit = new Edit();
+        edit.collectData();
+    }
+
+    /**
+     * Executes the Proposal feature (Ministry Member only).
+     */
+    public void proposeEdit() {
+        if (!canProposeEdit()) return;
+
+        Propose propose = new Propose();
+        propose.editProposal(user.getUsername());
+    }
+
+    /**
+     * Executes the Virtual Edit feature (Citizen only).
+     */
+    public void virtualEdit() {
+        if (!canVirtualEdit()) return;
+
+        Edit edit = new Edit();
+        edit.collectData();
+    }
+
+    /**
+     * Displays the edit history and allows undo if applicable.
+     */
+    public void viewEditHistory() {
+        if (!canViewEditHistory()) return;
+
+        EditHistory.showHistory();
+    }
+
+    /**
+     * Executes the Compare Ministries feature.
+     */
+    public void compareMinistries() {
+        Compare.comparingMinistries();
+    }
+
+    /**
+     * Displays the tax receipt visualization for the citizen.
+     */
+    public void showTaxReceipt() {
+        if (!canViewTaxReceipt()) return;
+
+        TaxReceiptVisualizer.show();
     }
 }
