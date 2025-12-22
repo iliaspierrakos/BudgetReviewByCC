@@ -26,35 +26,34 @@ public class MenuScreen {
         Label roleLabel = new Label("Role: " + loggedInUser.getRole());
         roleLabel.setStyle("-fx-font-size: 14px;");
 
-        // Main actions
+       
         Button featuresButton = new Button("FEATURES");
         featuresButton.setMinWidth(220);
 
         Button logoutButton = new Button("LOGOUT");
         logoutButton.setMinWidth(220);
 
-        // Optional: dynamic UI ανά ρόλο (example buttons)
+       
         Button adminButton = new Button("ADMIN PANEL");
         adminButton.setMinWidth(220);
 
-        // Default: κρύβεται
+      
         adminButton.setVisible(false);
         adminButton.setManaged(false);
 
-        // Αν ο ρόλος είναι GOVERNOR, δείξε το (example)
+       
         if (loggedInUser.getRole() == User.Role.GOVERNOR) {
             adminButton.setVisible(true);
             adminButton.setManaged(true);
         }
 
-        // Actions
+      
         featuresButton.setOnAction(e ->
-                new FeaturesScreen(loggedInUser, userManager).show(stage)
+            new FeaturesScreen(loggedInUser, userManager).show(stage)
         );
 
         adminButton.setOnAction(e ->
-                // placeholder για αργότερα
-                new FeaturesScreen(loggedInUser, userManager).show(stage)
+            new FeaturesScreen(loggedInUser, userManager).show(stage)
         );
 
         logoutButton.setOnAction(e ->
