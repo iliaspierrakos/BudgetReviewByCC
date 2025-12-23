@@ -43,8 +43,8 @@ public class ViewEditBudgetScreen {
         Button viewButton = new Button("View Budget");
         viewButton.setMinWidth(220);
         viewButton.setOnAction(e -> {
-            // προσωρινά alert – στο επόμενο βήμα γίνεται κανονικό screen
-            showInfo("View", "View Budget selected (GUI screen next).");
+        new ViewBudgetScreen(user).show(stage);
+
         });
 
         buttonsBox.getChildren().add(viewButton);
