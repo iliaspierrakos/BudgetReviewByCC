@@ -6,6 +6,7 @@ package UserFeatures;
 * It also prints the menu that allows users to view, edit and manage
 * ministry budgets.
 */
+import UserManagement.CurrentSession;
 import UserManagement.MinistryMember;
 import UserManagement.User;
 import java.io.IOException;
@@ -16,6 +17,8 @@ import java.util.Scanner;
 
 public class ViewEditBudget {
     public static void budgetMenu(User u) {
+        CurrentSession.setUser(u);   
+        Path userBudgetFile = UserBudgetFileUtil.getUserBudgetFile(u, 2026);
         Scanner scanner = new Scanner(System.in);
         Ministries min = new Ministries();
         MinistriesBudgets budg = new MinistriesBudgets();
@@ -26,6 +29,11 @@ public class ViewEditBudget {
         for (int i = 2020; i <= 2026; i++) {
             CreatingMinistries.ministryCreation(Path.of("NecessaryFilesAndData/MinistriesBudgets" + i + ".csv"));
         }
+        if (Files.exists(userBudgetFile)) {
+            CreatingMinistries.loadUserBudgets(userBudgetFile, 2026);
+        } else {
+            UserBudgetPersistence.saveUserBudgets(u,CreatingMinistries.ministries2026,2026);
+        }        
         do {
 
             if (u.getRole() == User.Role.MINISTRYMEMBER) {
@@ -98,7 +106,9 @@ public class ViewEditBudget {
                     break;
                 }
                 if (u.getRole() == User.Role.MINISTRYMEMBER) {
-                    Edit.balance = 0; // this is necessary so the balance's of the other roles are correct
+                    if (u.getRole() == User.Role.GOVERNOR) {
+                        Edit.balance = 0; // this is necessary so the balance's of the other roles are correct
+                    } 
                     if (choice == 1) {
                         Propose p = new Propose();
                         MinistryMember mm = (MinistryMember) u;

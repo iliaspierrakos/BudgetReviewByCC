@@ -1,5 +1,7 @@
 package UserFeatures;
 
+import UserManagement.CurrentSession;
+import UserManagement.User;
 import java.util.Scanner;
 
 
@@ -101,6 +103,15 @@ public class Edit {
         double previousBudget = CreatingMinistries.ministries2026[i].getBudget();
         String ministryName = CreatingMinistries.ministries2026[i].getMinistryName();
         CreatingMinistries.ministries2026[i].setBudget(finalBudget);
+        User user = CurrentSession.getUser();
+        if (user != null) {
+            UserBudgetPersistence.saveUserBudgets(
+                user,
+                CreatingMinistries.ministries2026,
+                2026
+            );
+        }
+        UserBudgetPersistence.saveUserBudgets(user, CreatingMinistries.ministries2026, 2026);
         EditHistory.historyOfEdit(ministryName, previousBudget, finalBudget, 0);
         if (undo == false) {
             System.out.println("Budget updated successfully!");

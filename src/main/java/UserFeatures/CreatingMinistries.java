@@ -90,4 +90,32 @@ public class CreatingMinistries {
 
 
     }
+    public static void loadUserBudgets(Path file, int year) {
+        try {
+            List<String> lines = Files.readAllLines(file);
+
+            for (String line : lines) {
+                if (line.isBlank()) continue;
+
+                String[] parts = line.split(",");
+                if (parts[0].equalsIgnoreCase("BALANCE")) {
+                    Edit.balance = Double.parseDouble(parts[1].trim());
+                    continue;
+                }
+                if (parts.length != 2) continue;
+
+                String ministryName = parts[0].trim();
+                double budget = Double.parseDouble(parts[1].trim());
+                for (Ministry m : ministries2026) {
+                    if (m != null && m.getMinistryName().equalsIgnoreCase(ministryName)) {
+                        m.setBudget(budget);
+                        break;
+                    }
+                }
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }

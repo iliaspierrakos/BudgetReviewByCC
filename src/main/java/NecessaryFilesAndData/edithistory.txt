@@ -1,0 +1,27 @@
+========================================================================================================================
+                                                     RECENT CHANGES
+========================================================================================================================
+MINISTRY                                                          PREVIOUS BUDGET           NEW BUDGET
+------------------------------------------------------------------------------------------------------------------------
+Ministry of Tourism                                                   227.992.000          217.992.000
+                                            ========== New Change ==========
+Ministry of Interior                                                4.163.668.000        3.955.484.600
+Ministry of Foreign Affairs                                           483.237.000          459.075.150
+Ministry of National Defense                                        7.063.272.000        6.710.108.400
+Ministry of Health                                                  7.842.945.000        7.450.797.750
+Ministry of Justice                                                   679.577.000          645.598.150
+Ministry of Education, Religious Affairs, and Sports                6.763.933.000        6.425.736.350
+Ministry of Culture                                                   653.109.000          620.453.550
+Ministry of National Economy and Finance                        1.717.408.920.000    1.631.538.474.000
+Ministry of Rural Development and Food                              1.503.877.000        1.428.683.150
+Ministry of Environment and Energy                                  3.133.452.000        2.976.779.400
+Ministry of Labor and Social Security                              19.101.078.000       18.146.024.100
+Ministry of Social Cohesion and Family                              3.803.316.000        3.613.150.200
+Ministry of Development                                               798.476.000          758.552.200
+Ministry of Infrastructure and Transport                            3.391.756.000        3.222.168.200
+Ministry of Shipping and Island Policy                                756.593.000          718.763.350
+Ministry of Tourism                                                   217.992.000          207.092.400
+Ministry of Digital Governance                                      1.391.403.000        1.321.832.850
+Ministry of Migration and Asylum                                      536.133.000          509.326.350
+Ministry of Citizen Protection                                      2.603.285.000        2.473.120.750
+Ministry of Climate Crisis and Civil Protection                     1.438.115.000        1.366.209.250
