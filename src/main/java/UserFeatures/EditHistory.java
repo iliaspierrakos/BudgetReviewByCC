@@ -1,22 +1,15 @@
 package UserFeatures;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.util.Scanner;
-
 
 public class EditHistory {
-    Scanner scanner = new Scanner(System.in);
     private static final String HISTORY_FILE = "NecessaryFilesAndData/edithistory.txt";
     public static void historyOfEdit(String ministryName, double previousBudget, double newBudget, int type) {
         StringBuilder sb = new StringBuilder();
-        FileWriter fw = null;
-        PrintWriter pw = null;
         try {
             File file = new File(HISTORY_FILE);
             if (!file.exists() || file.length() == 0) {
@@ -42,8 +35,7 @@ public class EditHistory {
                 StandardOpenOption.APPEND         // ΠΡΟΣΘΕΣΕ, μην διαγράψεις!
             );
         } catch (IOException e) {
-            System.err.println("Error writing to edit history: " + e.getMessage());
-            e.printStackTrace();  
+            System.err.println("Error writing to edit history: " + e.getMessage()); 
         } 
     }
 }

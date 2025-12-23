@@ -7,6 +7,7 @@ package UserFeatures;
  * After rejecting the proposal, the file will be deleted from the folder.
  */
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -44,7 +45,7 @@ public class GovernorCheck {
             for (String line : lines) {
                 System.out.println(line);
             }
-        } catch (Exception e) {}
+        } catch (IOException e) {}
         fileManagement(budgetChecking(), fileName);
     }
     public boolean budgetChecking() {
@@ -54,11 +55,7 @@ public class GovernorCheck {
             System.out.println("Please type yes or no:");
             ans = scanner.nextLine();
         }
-        if (ans.equalsIgnoreCase("yes")) {
-            return true;
-        } else {
-            return false;
-        }
+        return ans.equalsIgnoreCase("yes");
     }
     public void fileManagement(boolean accepted, String fileName) {
         if (accepted == true) {
@@ -68,7 +65,7 @@ public class GovernorCheck {
             try {
                 Files.deleteIfExists(filePath);
                 System.out.println("File deleted successfully.");
-            } catch (Exception e) {
+            } catch (IOException e) {
                 System.out.println("Could not delete file.");
             }
         }

@@ -7,7 +7,7 @@ import java.util.Scanner;
  * It allows applying changes to all ministries or selected ones,
  */
 public class BulkEdit {
-    private Scanner scanner = new Scanner(System.in);
+    private final Scanner scanner = new Scanner(System.in);
     public void bulkEditMenu() {
         System.out.println("\nWhat do you want to do? ");
         System.out.println("1. Apply percentage change to ALL ministries");
@@ -17,21 +17,18 @@ public class BulkEdit {
         
         int choice = scanner.nextInt();
         scanner.nextLine();
-        
+        while ( choice != 1 || choice != 4 || choice != 2 || choice != 3) {
+            System.out.println("Invalid option. Please select again:");
+            choice = scanner.nextInt();
+            scanner.nextLine();
+        }
         switch(choice) {
-            case 1:
-                percentageChangeAll(1, choice);
+            case 1 -> percentageChangeAll(1, choice);
+            case 2 -> fixedAmountChangeAll(1, choice);
+            case 3 -> selectedMinistriesEdit(1, choice);
+            case 4 -> { 
                 break;
-            case 2:
-                fixedAmountChangeAll(1, choice);
-                break;
-            case 3:
-                selectedMinistriesEdit(1, choice);
-                break;
-            case 4:
-                return;
-            default:
-                System.out.println("Invalid option");
+            }
         }
     }
     
@@ -176,8 +173,7 @@ public class BulkEdit {
         
         System.out.println("\nEnter ministry numbers separated by commas (e.g., 1,3,5,7):");
         String input = scanner.nextLine();
-        ArrayList<Integer> selectedIndices = new ArrayList<>(); 
-        selectedIndices = fillingListWithIndex(input);
+        ArrayList<Integer> selectedIndices = fillingListWithIndex(input);
         // Check if any valid ministries were selected
         if (selectedIndices.isEmpty()) {
             System.out.println("No valid ministries selected. Operation cancelled.");
@@ -200,51 +196,46 @@ public class BulkEdit {
         
         scanner.nextLine();
         
-        if (opChoice == 1) {
-            // PERCENTAGE CHANGE for selected ministries
-            System.out.println("Enter percentage change:");
-            double percentage = scanner.nextDouble();
-            scanner.nextLine();
-            
-            if (percentage <= -100) {
-                System.out.println("Cannot decrease by 100% or more!");
-                return;
-            }
-            double totalChange = calculateTotalChange(percentage, selectedIndices);
-            if (totalChange > Edit.balance){
-                System.out.println("Decrease necessary.");
-                necessaryDecrease(choice);
-            } else {
-                // Show preview
-                executionSelectedPercentage(percentage, selectedIndices);
-            }
-        } else if (opChoice == 2) {
-            // fixed amount change for selected ministries
-            System.out.println("Enter fixed amount change per ministry:");
-            double amount = scanner.nextDouble();
-            scanner.nextLine();
-            
-            // Validation: Check for negative budgets
-            boolean wouldCauseNegative = false;
-            for (int idx : selectedIndices) {
-                Ministry m = CreatingMinistries.ministries2026[idx];
-                if (m.getBudget() + amount < 0) {
-                    System.out.println("Error: This would make " + m.getMinistryName() + " budget negative!");
-                    wouldCauseNegative = true;
-                }
-            }
-            if (wouldCauseNegative) {
-                amount = smallerNegative(amount, selectedIndices);
-            }
-            double totalChange = counter * amount;
-            if (totalChange > Edit.balance){
-                System.out.println("Decrease necessary.");
-                necessaryDecrease(choice);
-            } else {
-            executionSelectedFixed(amount, selectedIndices);
-            }
-        } else {
-            System.out.println("Invalid operation choice.");
+        switch (opChoice) {
+            case 1 ->                 {
+                    // PERCENTAGE CHANGE for selected ministries
+                    System.out.println("Enter percentage change:");
+                    double percentage = scanner.nextDouble();
+                    scanner.nextLine();
+                    if (percentage <= -100) {
+                        System.out.println("Cannot decrease by 100% or more!");
+                        return;
+                    }       double totalChange = calculateTotalChange(percentage, selectedIndices);
+                    if (totalChange > Edit.balance){
+                        System.out.println("Decrease necessary.");
+                        necessaryDecrease(choice);
+                    } else {
+                        // Show preview
+                        executionSelectedPercentage(percentage, selectedIndices);
+                    }                      }
+            case 2 ->                 {
+                    // fixed amount change for selected ministries
+                    System.out.println("Enter fixed amount change per ministry:");
+                    double amount = scanner.nextDouble();
+                    scanner.nextLine();
+                    // Validation: Check for negative budgets
+                    boolean wouldCauseNegative = false;
+                    for (int idx : selectedIndices) {
+                        Ministry m = CreatingMinistries.ministries2026[idx];
+                        if (m.getBudget() + amount < 0) {
+                            System.out.println("Error: This would make " + m.getMinistryName() + " budget negative!");
+                            wouldCauseNegative = true;
+                        }
+                    }       if (wouldCauseNegative) {
+                        amount = smallerNegative(amount, selectedIndices);
+                    }       double totalChange = counter * amount;
+                    if (totalChange > Edit.balance){
+                        System.out.println("Decrease necessary.");
+                        necessaryDecrease(choice);
+                    } else {
+                        executionSelectedFixed(amount, selectedIndices);
+                    }                      }
+            default -> System.out.println("Invalid operation choice.");
         }
     }
     
@@ -377,7 +368,7 @@ public class BulkEdit {
                 if (selectedIndices == null || selectedIndices.contains(i)) {
                     double oldBudget = m.getBudget();
                     double newBudget = oldBudget * (1 + percentage / 100.0);
-                    Edit obj1 = new Edit();
+                    Edit obj1;
                     if (percentage >= 0){
                         obj1 = new Edit(m.getMinistryName(), "Increase", Math.abs(percentage), "percentage");
                     }else {
@@ -407,7 +398,7 @@ public class BulkEdit {
                     double newBudget = oldBudget + amount;
                     
                     // Record the change in history
-                    Edit obj1 = new Edit();
+                    Edit obj1;
                     if (amount >= 0){
                         obj1 = new Edit(m.getMinistryName(), "Increase", Math.abs(amount), "fixed");
                     }else {
@@ -452,8 +443,7 @@ public class BulkEdit {
         System.out.println("\nEnter ministry numbers separated by commas (e.g., 1,3,5,7):");
         String input = scanner.nextLine();
         fillingListWithIndex(input);
-        ArrayList<Integer> selectedIndices = new ArrayList<>(); 
-        selectedIndices = fillingListWithIndex(input);
+        ArrayList<Integer> selectedIndices = fillingListWithIndex(input);
         // Check if any valid ministries were selected
         if (selectedIndices.isEmpty()) {
             System.out.println("No valid ministries selected. Operation cancelled.");
@@ -474,63 +464,54 @@ public class BulkEdit {
         
         scanner.nextLine();
         
-        if (opChoice == 1) {
-            // PERCENTAGE CHANGE for selected ministries
-            System.out.println("Enter percentage change:");
-            double percentage = scanner.nextDouble();
-            percentage = validateForDecrease(percentage);
-            scanner.nextLine();
-            
-            if (percentage <= -100) {
-                System.out.println("Cannot decrease by 100% or more!");
-                while (percentage <= -100) {
-                percentage = scanner.nextDouble();
+        switch (opChoice) {
+            case 1 -> {
+                // PERCENTAGE CHANGE for selected ministries
+                System.out.println("Enter percentage change:");
+                double percentage = scanner.nextDouble();
                 percentage = validateForDecrease(percentage);
-                }            
+                scanner.nextLine();
+                if (percentage <= -100) {
+                    System.out.println("Cannot decrease by 100% or more!");
+                    while (percentage <= -100) {
+                        percentage = scanner.nextDouble();
+                        percentage = validateForDecrease(percentage);
+                    }
+                }   executionSelectedPercentage(percentage, selectedIndices);
             }
-            executionSelectedPercentage(percentage, selectedIndices);
-        } else if (opChoice == 2) {
-            // fixed amount change for selected ministries
-            System.out.println("Enter fixed amount change per ministry:");
-            double amount = scanner.nextDouble();
-            amount = validateForDecrease(amount); 
-            scanner.nextLine();
-            
-            // Validation: Check for negative budgets
-            boolean wouldCauseNegative = false;
-            for (int idx : selectedIndices) {
-                Ministry m = CreatingMinistries.ministries2026[idx];
-                if (m.getBudget() + amount < 0) {
-                    System.out.println("Error: This would make " + m.getMinistryName() + " budget negative!");
-                    wouldCauseNegative = true;
+            case 2 -> {
+                // fixed amount change for selected ministries
+                System.out.println("Enter fixed amount change per ministry:");
+                double amount = scanner.nextDouble();
+                amount = validateForDecrease(amount);
+                scanner.nextLine();
+                // Validation: Check for negative budgets
+                boolean wouldCauseNegative = false;
+                for (int idx : selectedIndices) {
+                    Ministry m = CreatingMinistries.ministries2026[idx];
+                    if (m.getBudget() + amount < 0) {
+                        System.out.println("Error: This would make " + m.getMinistryName() + " budget negative!");
+                        wouldCauseNegative = true;
+                    }
+                }   if (wouldCauseNegative) {
+                    amount = smallerNegative(amount, selectedIndices);
+                }   executionSelectedFixed(amount, selectedIndices);
+            }
+            default -> {
+                while (opChoice != 1 && opChoice != 2) {
+                    System.out.println("Invalid operation choice.");
+                    opChoice = scanner.nextInt();
                 }
-            }
-            
-            if (wouldCauseNegative) {
-                amount = smallerNegative(amount, selectedIndices);
-            } 
-            executionSelectedFixed(amount, selectedIndices);
-
-        } else {
-            while (opChoice != 1 && opChoice != 2) {
-                System.out.println("Invalid operation choice.");
-                opChoice = scanner.nextInt();
             }
         }
         switch(choice) {
-            case 1:
-                percentageChangeAll(2, choice);
+            case 1 -> percentageChangeAll(2, choice);
+            case 2 -> fixedAmountChangeAll(2, choice);
+            case 3 -> selectedMinistriesEdit(2, choice);
+            case 4 -> {
                 break;
-            case 2:
-                fixedAmountChangeAll(2, choice);
-                break;
-            case 3:
-                selectedMinistriesEdit(2, choice);
-                break;
-            case 4:
-                return;
-            default:
-                System.out.println("Invalid option");
+            }
+            default -> System.out.println("Invalid option");
         }
     }
 

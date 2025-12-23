@@ -106,7 +106,6 @@ public class ViewGovernmentBudget {
             }
         } catch (IOException e) {
             System.err.println("Error writing view file: " + e.getMessage());
-            e.printStackTrace();
         }
     }
 
@@ -121,27 +120,13 @@ public class ViewGovernmentBudget {
         Ministry[] selectedMinistries = null;
 
         switch (year) {
-            case 2020:
-                selectedMinistries = CreatingMinistries.ministries2020;
-                break;
-            case 2021:
-                selectedMinistries = CreatingMinistries.ministries2021;
-                break;
-            case 2022:
-                selectedMinistries = CreatingMinistries.ministries2022;
-                break;
-            case 2023:
-                selectedMinistries = CreatingMinistries.ministries2023;
-                break;
-            case 2024:
-                selectedMinistries = CreatingMinistries.ministries2024;
-                break;
-            case 2025:
-                selectedMinistries = CreatingMinistries.ministries2025;
-                break;
-            case 2026:
-                selectedMinistries = CreatingMinistries.ministries2026;
-                break;
+            case 2020 -> selectedMinistries = CreatingMinistries.ministries2020;
+            case 2021 -> selectedMinistries = CreatingMinistries.ministries2021;
+            case 2022 -> selectedMinistries = CreatingMinistries.ministries2022;
+            case 2023 -> selectedMinistries = CreatingMinistries.ministries2023;
+            case 2024 -> selectedMinistries = CreatingMinistries.ministries2024;
+            case 2025 -> selectedMinistries = CreatingMinistries.ministries2025;
+            case 2026 -> selectedMinistries = CreatingMinistries.ministries2026;
         }
         return selectedMinistries;
     }

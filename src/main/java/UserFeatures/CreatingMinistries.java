@@ -46,7 +46,7 @@ public class CreatingMinistries {
                             break;
                         }
                     }
-                    double budget = 0.0;
+                    double budget;
                     try {
                         // Remove . (thousands separator)
                         String cleanNumber = lastNumber.replace(".", "");
