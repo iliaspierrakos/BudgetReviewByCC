@@ -13,21 +13,32 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
-
+/**
+ * JavaFX screen for viewing the government budget.
+ *
+ * <p>This class is part of the GUI layer and is responsible only
+ * for displaying data and handling user interaction.</p>
+ *
+ * <p>All budget data are retrieved from the {@link View}
+ * logic class.
+ * </p>
+ */
 public class ViewBudgetScreen {
 
     private final User user;
     private final View viewLogic = new View();
-
+     /**
+     * Constructs the View Budget screen.
+     *
+     * @param user the currently logged-in user
+     */
     public ViewBudgetScreen(User user) {
         this.user = user;
     }
 
     public void show(Stage stage) {
 
-        /* =========================
-           TOP CONTROLS
-           ========================= */
+       
         ComboBox<Integer> yearBox = new ComboBox<>();
         yearBox.getItems().addAll(2020, 2021, 2022, 2023, 2024, 2025, 2026);
         yearBox.setValue(2026);

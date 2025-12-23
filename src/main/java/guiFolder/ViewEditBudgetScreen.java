@@ -13,9 +13,15 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 /**
- * GUI Menu after login.
- * Replaces the CLI menu of ViewEditBudget.
+ * Main application menu displayed after successful login.
+ *
+ * <p>This JavaFX screen replaces the old CLI-based menu and provides
+ * access to all available features of the application.</p>
+ *
+ * <p>The available options are displayed dynamically based on the
+ * role of the logged-in user.</p>
  */
+
 public class ViewEditBudgetScreen {
 
     private final User user;
@@ -37,9 +43,6 @@ public class ViewEditBudgetScreen {
         VBox buttonsBox = new VBox(12);
         buttonsBox.setAlignment(Pos.CENTER);
 
-        /* =======================
-           VIEW
-           ======================= */
         Button viewButton = new Button("View Budget");
         viewButton.setMinWidth(220);
         viewButton.setOnAction(e -> {
@@ -49,9 +52,6 @@ public class ViewEditBudgetScreen {
 
         buttonsBox.getChildren().add(viewButton);
 
-        /* =======================
-           EDIT / PROPOSE
-           ======================= */
         if (user.getRole() != User.Role.CITIZEN) {
             Button editButton = new Button(
                 user.getRole() == User.Role.MINISTRYMEMBER
@@ -65,9 +65,6 @@ public class ViewEditBudgetScreen {
             buttonsBox.getChildren().add(editButton);
         }
 
-        /* =======================
-           VIRTUAL EDIT (Citizen)
-           ======================= */
         if (user.getRole() == User.Role.CITIZEN) {
             Button virtualEditButton = new Button("Virtual Edit");
             virtualEditButton.setMinWidth(220);
@@ -77,9 +74,6 @@ public class ViewEditBudgetScreen {
             buttonsBox.getChildren().add(virtualEditButton);
         }
 
-        /* =======================
-           COMPARE
-           ======================= */
         Button compareButton = new Button("Compare Budgets");
         compareButton.setMinWidth(220);
         compareButton.setOnAction(e -> {
@@ -88,9 +82,6 @@ public class ViewEditBudgetScreen {
         });
         buttonsBox.getChildren().add(compareButton);
 
-        /* =======================
-           RECOMMENDATIONS / PROPOSALS
-           ======================= */
         Button recButton = new Button();
         recButton.setMinWidth(220);
 
@@ -107,9 +98,6 @@ public class ViewEditBudgetScreen {
 
         buttonsBox.getChildren().add(recButton);
 
-        /* =======================
-           TAX RECEIPT (Citizen)
-           ======================= */
         if (user.getRole() == User.Role.CITIZEN) {
             Button taxButton = new Button("Tax Receipt");
             taxButton.setMinWidth(220);
@@ -120,9 +108,6 @@ public class ViewEditBudgetScreen {
             buttonsBox.getChildren().add(taxButton);
         }
 
-        /* =======================
-           LOGOUT
-           ======================= */
         Button logoutButton = new Button("Logout");
         logoutButton.setMinWidth(220);
         logoutButton.setOnAction(e -> {
@@ -140,9 +125,6 @@ public class ViewEditBudgetScreen {
         stage.show();
     }
 
-    /* =======================
-       Helper
-       ======================= */
     private void showInfo(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle(title);
