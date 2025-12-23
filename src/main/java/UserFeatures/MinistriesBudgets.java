@@ -1,46 +1,46 @@
 package UserFeatures;
 
-import java.io.*;
-import java.nio.file.*;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.regex.*;
+import java.util.*;
+import java.util.regex.Pattern;
 
-/**
- * The MinistriesBudgets class processes budget data from an external text file and
- * proceeds into extracting relevant lines into a CSV format.
- * The procedure is based on regular expressions
- * to filter the records and pick out the ones that belong to specific ministries
- * and have certain expense codes.
- */
 public class MinistriesBudgets {
-    public void budget(Path inputFile) {
-        String fileName = inputFile.getFileName().toString();
-        String year = fileName.replaceAll("\\D+", "");
-        Path outputFile = Path.of("NecessaryFilesAndData/MinistriesBudgets" + year +".csv");
 
-        // Regular expressions for filtering
+    private static final Map<Integer, List<String>> budgetsByYear = new HashMap<>();
+
+    public static void loadFromResources(int year) {
+        if (budgetsByYear.containsKey(year)) return;
+
+        String resourcePath = "/NecessaryFilesAndData/BudgetReview" + year + ".txt";
+
         Pattern startsWith10 = Pattern.compile("^10");
         Pattern containsMinistry = Pattern.compile("Υπουργείο");
 
-        try (BufferedReader reader = Files.newBufferedReader(inputFile, StandardCharsets.UTF_8);
-             BufferedWriter writer = Files.newBufferedWriter(
-                     outputFile,
-                     StandardCharsets.UTF_8,
-                     StandardOpenOption.CREATE,
-                     StandardOpenOption.APPEND)) {
+        List<String> result = new ArrayList<>();
 
+        try (
+            InputStream is = MinistriesBudgets.class.getResourceAsStream(resourcePath);
+            BufferedReader reader = new BufferedReader(
+                    new InputStreamReader(is, StandardCharsets.UTF_8))
+        ) {
             String line;
-            int count = 0;
-
-            while ((line = reader.readLine()) != null && count < 20) {
-                if (startsWith10.matcher(line).find() && containsMinistry.matcher(line).find()) {
-                    writer.write(line);
-                    writer.newLine();
-                    count++;
+            while ((line = reader.readLine()) != null && result.size() < 20) {
+                if (startsWith10.matcher(line).find() &&
+                    containsMinistry.matcher(line).find()) {
+                    result.add(line);
                 }
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to load budgets for year " + year, e);
         }
+
+        budgetsByYear.put(year, result);
+    }
+
+    public static List<String> getBudgets(int year) {
+        return budgetsByYear.getOrDefault(year, List.of());
     }
 }

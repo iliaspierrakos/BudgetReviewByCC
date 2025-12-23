@@ -67,7 +67,7 @@ public class LoginScreen {
             if (loggedIn == null) {
                 errorLabel.setText("Invalid username or password.");
             } else {
-                new MenuScreen(loggedIn, userManager).show(stage);
+                new ViewEditBudgetScreen(loggedIn, userManager).show(stage);
             }
         });
 
