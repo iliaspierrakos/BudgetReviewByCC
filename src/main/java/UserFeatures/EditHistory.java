@@ -1,20 +1,13 @@
 package UserFeatures;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-/**
- * This is a class that creates the edithistory.txt file where all the edits made by the GOVERNOR and the CITIZENS
- * are stored. This file does NOT store the edits made by the ministers.
- */
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Scanner;
-import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.util.Scanner;
 
 
 public class EditHistory {
@@ -26,8 +19,6 @@ public class EditHistory {
         PrintWriter pw = null;
         try {
             File file = new File(HISTORY_FILE);
-            /*fw = new FileWriter("NecessaryFilesAndData/edithistory.txt", true);
-            pw = new PrintWriter(fw);*/
             if (!file.exists() || file.length() == 0) {
                 TableUtils.appendSeparator(sb, 120, '=');
                 TableUtils.appendTitle(sb, "RECENT CHANGES", 120);
@@ -52,14 +43,7 @@ public class EditHistory {
             );
         } catch (IOException e) {
             System.err.println("Error writing to edit history: " + e.getMessage());
-            e.printStackTrace();  // Για debugging
-            /* pw.println(ministryName + " previous budget: " + Ministry.getFormattedBudget(previousBudget));
-            pw.println(ministryName + " new budget: " + Ministry.getFormattedBudget(newBudget));
-            pw.close();
-            fw.close(); */
-                //System.out.println("Do you want to undo?");
-                //var e = new EditHistoryList();
-                //e.undo();
+            e.printStackTrace();  
         } 
     }
 }

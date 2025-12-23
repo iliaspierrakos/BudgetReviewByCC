@@ -83,5 +83,4 @@ public class EditHistoryList {
             Edit.history.undo();
         }
     }
-    
 }

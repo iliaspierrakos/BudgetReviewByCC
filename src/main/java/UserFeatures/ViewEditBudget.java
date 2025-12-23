@@ -6,14 +6,13 @@ package UserFeatures;
 * It also prints the menu that allows users to view, edit and manage
 * ministry budgets.
 */
+import UserManagement.MinistryMember;
+import UserManagement.User;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Scanner;
-
-import UserManagement.MinistryMember;
-import UserManagement.User;
 
 public class ViewEditBudget {
     public static void budgetMenu(User u) {
@@ -83,15 +82,19 @@ public class ViewEditBudget {
                 scanner.nextLine();
                 if (choice == 3 ) {
                     try {
-                        System.out.println(Files.readString(Paths.get("NecessaryFilesAndData/edithistory.txt")));
-                        System.out.println("Do you want to undo your last changes?");
-                        String ans = scanner.nextLine();
-                        ans = Ministry.yesOrNo(ans);
-                        if (ans.equalsIgnoreCase("yes")) {
-                            EditHistoryList undo = new EditHistoryList();
-                            undo.reverseChanges();
+                        if (Edit.history.editList.isEmpty()) {
+                            System.out.println("No changes have been made!");
                         } else {
-                            return;
+                            System.out.println(Files.readString(Paths.get("NecessaryFilesAndData/edithistory.txt")));
+                            System.out.println("Do you want to undo your last changes?");
+                            String ans = scanner.nextLine();
+                            ans = Ministry.yesOrNo(ans);
+                            if (ans.equalsIgnoreCase("yes")) {
+                                EditHistoryList undo = new EditHistoryList();
+                                undo.reverseChanges();
+                            } else {
+                                return;
+                            }
                         }
                     } catch (IOException e) {}
                 } else if (choice > 3 || choice <1) {
