@@ -113,7 +113,7 @@ public class AuthUI {
         if (user != null) {
             System.out.println("Welcome, " + user.getUsername());
             showRoleMenu(user);
-            ViewEditBudget.budgetMenu(user); // passes the user object as a parameter
+            //ViewEditBudget.budgetMenu(user); // passes the user object as a parameter
         }
     }
     private void showRoleMenu(User user) {
