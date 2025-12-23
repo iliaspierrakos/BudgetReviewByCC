@@ -35,6 +35,12 @@
             <artifactId>javafx-controls</artifactId>
             <version>22.0.1</version>
         </dependency>    
+        <!-- jfreechart -->
+        <dependency>
+        <groupId>org.jfree</groupId>
+        <artifactId>jfreechart</artifactId>
+        <version>1.5.4</version>
+        </dependency>
     </dependencies>
 
     <build>
