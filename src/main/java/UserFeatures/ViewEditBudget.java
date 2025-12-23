@@ -6,13 +6,14 @@ package UserFeatures;
 * It also prints the menu that allows users to view, edit and manage
 * ministry budgets.
 */
-import UserManagement.MinistryMember;
-import UserManagement.User;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Scanner;
+
+import UserManagement.MinistryMember;
+import UserManagement.User;
 
 public class ViewEditBudget {
     public static void budgetMenu(User u) {
@@ -112,22 +113,6 @@ public class ViewEditBudget {
                     if (choice==1) {
                         Edit obj = new Edit();
                         obj.collectData();
-                        /*System.out.println("Would you like to see the changes you made?");
-                        String ans = scanner.nextLine();
-                        if (ans.equalsIgnoreCase("yes")){
-                        try {
-                            System.out.println(Files.readString(Paths.get("NecessaryFilesAndData/edithistory.txt")));
-                            System.out.println("Changes made:" + Edit.history.editList.size());
-                            System.out.println("Do you want to undo?");
-                            scanner.nextLine();
-                            answer = scanner.nextLine();
-                            if (answer.equalsIgnoreCase("yes")) {
-                                Edit.history.undo();
-                            }
-                            Edit.balance = 0;
-                        } catch (IOException e) {}
-                            break;
-                        } */
                     } else if (choice==2) {
                         BulkEdit bulkEdit = new BulkEdit();
                         bulkEdit.bulkEditMenu();
@@ -140,26 +125,6 @@ public class ViewEditBudget {
                         BulkEdit bulkEdit = new BulkEdit();
                         bulkEdit.bulkEditMenu();
                     }
-                    /*System.out.println("Would you like to see the changes you made?");
-                    String ans = scanner.nextLine();
-
-                    while (Edit.history.getIndex() >= 0) {
-                        //System.out.println("this works");
-                        Edit.history.undo();
-                    }
-                    if (ans.equalsIgnoreCase("yes")){
-                        try {
-                            System.out.println(Files.readString(Paths.get("NecessaryFilesAndData/edithistory.txt")));
-                            System.out.println("Changes made:" + Edit.history.editList.size());
-                            System.out.println("Do you want to undo?");
-                            scanner.nextLine();
-                            answer = scanner.nextLine();
-                            if (answer.equalsIgnoreCase("yes")) {
-                                Edit.history.undo();
-                            }
-                            Edit.balance = 0;
-                        } catch (IOException e) {}
-                    } */
                 }
                 break;
             case 3:
