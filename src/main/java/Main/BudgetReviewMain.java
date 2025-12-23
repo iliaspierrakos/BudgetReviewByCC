@@ -1,7 +1,7 @@
 package Main;
 
-import java.util.Scanner;
-import UserManagement.*;
+import UserManagement.AuthUI;
+import UserManagement.UserManager;
 
 public class BudgetReviewMain {
     public static void main(String[] args) {

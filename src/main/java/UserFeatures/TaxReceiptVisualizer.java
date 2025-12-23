@@ -63,17 +63,13 @@ public class TaxReceiptVisualizer {
         if (income > 10000) {
             double rate2;
 
-            if (kids == 0) {
-                rate2 = 0.20;
-            } else if (kids == 1) {
-                rate2 = 0.18;
-            } else if (kids == 2) {
-                rate2 = 0.16;
-            } else if (kids == 3) {
-                rate2 = 0.09;
-            } else {
-                rate2 = 0;
-            }
+            rate2 = switch (kids) {
+                case 0 -> 0.20;
+                case 1 -> 0.18;
+                case 2 -> 0.16;
+                case 3 -> 0.09;
+                default -> 0;
+            };
             if (age<=25 || (age<=30 && kids>=4)) {
                 rate2 = 0;
             } else if (age<=30) {
@@ -88,19 +84,13 @@ public class TaxReceiptVisualizer {
         }
 
         if (income > 20000) {
-            double rate3;
-
-            if (kids == 0) {
-                rate3 = 0.26;
-            } else if (kids == 1) {
-                rate3 = 0.24;
-            } else if (kids == 2) {
-                rate3 = 0.22;
-            } else if (kids == 3) {
-                rate3 = 0.20;
-            } else {
-                rate3 = 0.18;
-            }
+            double rate3 = switch (kids) {
+                case 0 -> 0.26;
+                case 1 -> 0.24;
+                case 2 -> 0.22;
+                case 3 -> 0.20;
+                default -> 0.18;
+            };
 
             if (income <= 30000) {
                 tax += (income - 20000) * rate3;
