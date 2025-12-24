@@ -1,20 +1,20 @@
 package UserFeatures;
 /**
  * This is a class for Citizens to create recommendations for Ministers.
- * Uses Bash script to load votes line by line from CSV
  */
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.Scanner;
 
 public class RecommendationSystem {
     private String targetMinistry;
     private static final String VOTES_CSV_FILE = "NecessaryFilesAndData/ProposalsFromCitizens/VotesData.csv";
-    private static final String BASH_LOAD_SCRIPT = "UserFeatures/LoadVotes.sh";
+    private static final String MINISTRIES_REC = "NecessaryFilesAndData/ProposalsFromCitizens/MinistryVotes.txt";
+
 
     String[] interiorOptions = {"Digital public services", "Training of public employees", "Municipality infrastructure", "Faster citizen services", "Transparency systems"};
     String[] foreignAffairsOptions = {"Embassies modernization", "Support for exports", "International cooperation", "Digital consular services", "Cultural promotion abroad"};
@@ -39,19 +39,31 @@ public class RecommendationSystem {
 
     static int[][] allVotes = new int[20][6];  // 20 ministries x 6 votes
 
-
+    /**
+     * Default constructor for RecommendationSystem.
+     */
 
     public RecommendationSystem() {}
 
+    /**
+     * Constructor that initializes the target ministry.
+     * @param m the ministry name
+     */
     public RecommendationSystem(String m) {
         this.targetMinistry = m;
     }
+    /**
+     * Starts the recommendation process by collecting citizen input.
+     */
 
     public void castRecommendation() {
         Scanner sc = new Scanner(System.in);
         collectInfo(sc);
     }
-
+    /**
+     * Collects recommendation information from the citizen and saves it to files.
+     * @param s the Scanner object for user input
+     */
     public void collectInfo(Scanner s) {
         initializeCSV();
         System.out.println("Waiting...");
@@ -164,8 +176,26 @@ public class RecommendationSystem {
             System.out.println("Error saving your recommendation.");
             ex.printStackTrace();
         }
-    }
+        try (FileWriter fw = new FileWriter(MINISTRIES_REC, false);
+            PrintWriter pw = new PrintWriter(fw)) {
+                int totalVotes = 0;
+                for (int i = 0; i<20 ; i++) {
+                    totalVotes = allVotes[i][0];
+                }
+                pw.println("Total Votes:" + totalVotes);
+                for (int i = 0; i < CreatingMinistries.ministries2026.length; i++) {
+                    pw.println(CreatingMinistries.ministries2026[i].getMinistryName() +"," + allVotes[i][0] + " Votes");
+                }
+            }catch (IOException ex) {
+            System.out.println("Error saving your recommendation.");
+            ex.printStackTrace();
+        }
 
+    }
+    /**
+     * Validates user's choice and ensures it's between 1 and 5.
+     * @return the valid choice selected by the user
+     */
     public int validChoice() {
         Scanner s = new Scanner(System.in);
         int choice;
@@ -177,42 +207,29 @@ public class RecommendationSystem {
 
         return choice;
     }
-
+    /**
+     * Loads existing votes from the CSV file into memory.
+     */
     private static void loadVotesFromCSV() {
-        try {
-
-            for (int counter = 0; counter < 120; counter++) {
-                try {
-
-                    int ministryIndex = counter / 6;
-                    int position = counter % 6;
-
-
-                    ProcessBuilder pb = new ProcessBuilder("bash", BASH_LOAD_SCRIPT, String.valueOf(counter));
-                    Process process = pb.start();
-
-
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-                    String line = reader.readLine();
-
-                    line = line.replace("\r", "");
-                    int value = Integer.parseInt(line.trim());
-                    allVotes[ministryIndex][position] = value;
-
-                    process.waitFor();
-
-                } catch (Exception e) {
-                    System.err.println("Error at position " + counter + ": " + e.getMessage());
+        try (BufferedReader br = new BufferedReader(new FileReader(VOTES_CSV_FILE))) {
+            String line;
+            int row = 0;
+            while ((line = br.readLine()) != null && row < 20) {
+                String[] values = line.split(",");
+                for (int col = 0; col < 6 && col < values.length; col++) {
+                    allVotes[row][col] = Integer.parseInt(values[col].trim());
                 }
+                row++;
             }
-
         } catch (Exception e) {
-            System.err.println("Error loading votes via Bash script");
-            e.printStackTrace();
+            System.err.println("Error");
         }
     }
 
 
+    /**
+     * Saves the current votes array to the CSV file.
+     */
     private static void saveVotesToCSV() {
         try (PrintWriter pw = new PrintWriter(new FileWriter(VOTES_CSV_FILE))) {
             for (int i = 0; i < 20; i++) {
@@ -222,6 +239,9 @@ public class RecommendationSystem {
             System.err.println("Error saving votes to CSV");
         }
     }
+    /**
+     * Creates the CSV file with initial zero values if it doesn't exist.
+     */
     private static void initializeCSV() {
         File csvFile = new File(VOTES_CSV_FILE);
 
