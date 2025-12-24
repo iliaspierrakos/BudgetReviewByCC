@@ -17,25 +17,14 @@ import java.util.Scanner;
 
 public class ViewEditBudget {
     public static void budgetMenu(User u) {
-        CurrentSession.setUser(u);   
+        CurrentSession.setUser(u);
+        Path governorPath = Paths.get("NecessaryFilesAndData/Governor_2026.csv"); 
         Path userBudgetFile = UserBudgetFileUtil.getUserBudgetFile(u, 2026);
+        if (u.getRole() == User.Role.GOVERNOR) {
+            governorPath = userBudgetFile;
+        }
         Scanner scanner = new Scanner(System.in);
-        Ministries min = new Ministries();
-        MinistriesBudgets budg = new MinistriesBudgets();
-        for (int i = 2020; i <= 2026; i++) {
-            budg.budget(Path.of("NecessaryFilesAndData/BudgetReview" + i + ".txt"));
-        }
-        min.minlist();
-        for (int i = 2020; i <= 2026; i++) {
-            CreatingMinistries.ministryCreation(Path.of("NecessaryFilesAndData/MinistriesBudgets" + i + ".csv"));
-        }
-        if (Files.exists(userBudgetFile)) {
-            CreatingMinistries.loadUserBudgets(userBudgetFile, 2026);
-        } else {
-            UserBudgetPersistence.saveUserBudgets(u,CreatingMinistries.ministries2026,2026);
-        }        
         do {
-
             if (u.getRole() == User.Role.MINISTRYMEMBER) {
                 System.out.println("Do you want to :");
                 System.out.println("1.View");
@@ -59,7 +48,8 @@ public class ViewEditBudget {
                 System.out.println("4.View proposals");
                 System.out.println("5.View Statistics");
                 System.out.println("6.Restart all");
-                System.out.println("7.Return");
+                System.out.println("7.Publish draft as official budget");
+                System.out.println("8.Return");
             }
             int number = scanner.nextInt();
             scanner.nextLine();
@@ -68,8 +58,26 @@ public class ViewEditBudget {
             case 1:
                 int selectedYear = Compare.validityYear(0);
                 ViewGovernmentBudget v = new ViewGovernmentBudget();
+                if (u.getRole() == User.Role.CITIZEN) {
+
+                    System.out.println("Which budget would you like to view?");
+                    System.out.println("1. Original government budget");
+                    System.out.println("2. My edited budget");
+
+                    int viewChoice = scanner.nextInt();
+                    scanner.nextLine();
+
+                    if (viewChoice == 2 && Files.exists(userBudgetFile)) {
+                        CreatingMinistries.loadUserBudgets(userBudgetFile, selectedYear);
+                        System.out.println("Showing your edited budget...");
+                    } else {
+                        CreatingMinistries.loadUserBudgets(governorPath, 2026);
+                        System.out.println("Showing original government budget...");
+                    }
+                }
                 System.out.println("Would you like to see the budget sorted?");
                 String a = scanner.nextLine();
+
                 if (a.equalsIgnoreCase("yes")) {
                     v.viewGovBudget(selectedYear, true);
                 } else {
@@ -143,6 +151,23 @@ public class ViewEditBudget {
                         bulkEdit.bulkEditMenu();
                     }
                 } else if (u.getRole() == User.Role.CITIZEN) {
+                    if (Files.exists(userBudgetFile)) {
+                        System.out.println("Do you want to load your saved budget edits?");
+                        System.out.println("Type 'yes' to load or 'no' to use original budgets:");
+                        String loadChoice = scanner.nextLine();
+                        loadChoice = Ministry.yesOrNo(loadChoice);
+                        if (loadChoice.equalsIgnoreCase("yes")) {
+                            CreatingMinistries.loadUserBudgets(userBudgetFile, 2026);
+                            System.out.println("Your saved budget has been loaded.");
+                        } else {
+                            System.out.println("Using original government budgets.");
+                            // Ensure original budgets are restored
+                            CreatingMinistries.loadUserBudgets(governorPath, 2026);
+                        }
+                    } else {
+                        System.out.println("No saved edits found. Using original government budgets.");
+                        CreatingMinistries.loadUserBudgets(governorPath, 2026);
+                    }
                     if (choice == 1) {
                         Edit obj = new Edit();
                         obj.collectData();
@@ -213,21 +238,73 @@ public class ViewEditBudget {
                 } else if (u.getRole() == User.Role.GOVERNOR) {
                     ClearHistory.clearFile(Paths.get("NecessaryFilesAndData/ProposalsFromCitizens/VotesData.csv"));
                     ClearHistory.clearFile(Paths.get("NecessaryFilesAndData/ProposalsFromMinisters"));
-                    System.out.println("Successful");
+                } else {
+                    System.out.println("Invalid");
+                    break;
+                }                
+                if (u.getRole() == User.Role.GOVERNOR) {
+
+                    System.out.println("WARNING:");
+                    System.out.println("This will restore the ORIGINAL 2026 government budget.");
+                    System.out.println("All governor drafts and future edits will start from it.");
+                    System.out.println("Type 'yes' to confirm:");
+
+                    String confirm = scanner.nextLine();
+                    confirm = Ministry.yesOrNo(confirm);
+
+                    if (confirm.equalsIgnoreCase("yes")) {
+
+                        Path original = Path.of("NecessaryFilesAndData/OriginalBudget/MinistriesBudgets2026_original.csv"
+                        );
+
+                        Path official = Path.of("NecessaryFilesAndData/Governor_2026.csv");
+
+                        try {
+                            Files.copy(original, official, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+                            CreatingMinistries.resetToOriginalBudgets(2026);
+                            System.out.println("Original 2026 budget successfully restored.");
+                        } catch (IOException e) {
+                            System.out.println("Failed to restore original budget.");
+                        }
+
+                    } else {
+                        System.out.println("Restart cancelled.");
+                    }
+                    break;
                 } else {
                     System.out.println("Invalid");
                     break;
                 }
 
-            case 7:
-                if (u.getRole() == User.Role.GOVERNOR) {
-                    return;
+
+            case 7:                
+            if (u.getRole() == User.Role.GOVERNOR) {
+
+                System.out.println("Are you sure you want to publish your draft?");
+                System.out.println("This will replace the official government budget.");
+                System.out.println("Type 'yes' to confirm:");
+
+                String confirm = scanner.nextLine();
+                confirm = Ministry.yesOrNo(confirm);
+
+                if (confirm.equalsIgnoreCase("yes")) {
+                    Path officialFile =
+                        Path.of("NecessaryFilesAndData/Governor_2026.csv");
+
+                    CreatingMinistries.saveCurrentBudgetsAsOfficial(officialFile, 2026);
+
+                    System.out.println("Draft successfully published as official budget.");
                 } else {
-                    System.out.println("Invalid");
+                    System.out.println("Operation cancelled.");
                 }
-            default:
+                break;
+            } else {
                 System.out.println("Invalid");
                 break;
+            }
+            default:
+                System.out.println("Invalid");
+                return;
             }
         } while (true);
     }

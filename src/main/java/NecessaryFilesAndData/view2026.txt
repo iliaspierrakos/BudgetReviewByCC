@@ -3,10 +3,10 @@
 =========================================================================================================
 MINISTRY                                                                   BUDGET           PERCENTAGE
 ---------------------------------------------------------------------------------------------------------
-Ministry of National Economy and Finance                        1.717.408.920.000               96,28%
+Ministry of National Economy and Finance                        1.717.408.920.000               96,33%
 Ministry of Labor and Social Security                              19.101.078.000                1,07%
-Ministry of Health                                                  7.842.945.000                0,44%
 Ministry of National Defense                                        7.063.272.000                0,40%
+Ministry of Health                                                  6.841.945.000                0,38%
 Ministry of Education, Religious Affairs, and Sports                6.763.933.000                0,38%
 Ministry of Interior                                                4.163.668.000                0,23%
 Ministry of Social Cohesion and Family                              3.803.316.000                0,21%
@@ -22,7 +22,7 @@ Ministry of Justice                                                   679.577.00
 Ministry of Culture                                                   653.109.000                0,04%
 Ministry of Migration and Asylum                                      536.133.000                0,03%
 Ministry of Foreign Affairs                                           483.237.000                0,03%
-Ministry of Tourism                                                   227.992.000                0,01%
+Ministry of Tourism                                                   237.992.000                0,01%
 ---------------------------------------------------------------------------------------------------------
-TOTAL                                                           1.783.744.137.000              100,00%
+TOTAL                                                           1.782.753.137.000              100,00%
 =========================================================================================================

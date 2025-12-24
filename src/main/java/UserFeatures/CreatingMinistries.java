@@ -118,4 +118,27 @@ public class CreatingMinistries {
             e.printStackTrace();
         }
     }
+    public static void resetToOriginalBudgets(int year) {
+        ministries2026 = new Ministry[20];
+        ministryCreation(Path.of("NecessaryFilesAndData/MinistriesBudgets" + year + ".csv"));
+    }
+    public static void saveCurrentBudgetsAsOfficial(Path file, int year) {
+        try {
+            StringBuilder sb = new StringBuilder();
+
+            for (Ministry m : ministries2026) {
+                sb.append(m.getMinistryName()).append(",");
+                sb.append(m.getBudget()).append("\n");
+            }
+
+            Files.writeString(file, sb.toString());
+
+        } catch (IOException e) {
+            System.out.println("Failed to publish official budget.");
+        }
+    }
+     public static void loadOfficialBudgets(int year) {
+        ministries2026 = new Ministry[20];
+        ministryCreation(Path.of("NecessaryFilesAndData/MinistriesBudgets" + year + ".csv"));
+    }
 }
