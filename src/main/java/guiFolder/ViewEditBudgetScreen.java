@@ -11,6 +11,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import guiFolder.CompareScreen;
+import guiFolder.SubmitRecommendationScreen;
 
 /**
  * Main application menu displayed after successful login.
@@ -91,9 +93,18 @@ public class ViewEditBudgetScreen {
         }
 
         recButton.setOnAction(e -> {
-            ViewEditBudget.recommendations(user);
-            showInfo("Recommendations", "Action executed.");
+            switch (user.getRole()) {
+                case CITIZEN -> 
+                    new SubmitRecommendationScreen(user).show(stage);
+
+                case MINISTRYMEMBER -> 
+                    new ViewRecommendationsScreen(user).show(stage);
+
+                case GOVERNOR -> 
+                    new ViewStatisticsScreen(user).show(stage);
+            }
         });
+
 
         buttonsBox.getChildren().add(recButton);
 
