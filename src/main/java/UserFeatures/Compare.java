@@ -4,21 +4,23 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 /**
- * The Compare class provides functionality to compare ministry budgets between two different years.
- * It displays a side-by-side comparison table showing budget data from both years.
+ * Provides functionality for comparing ministry budgets between two years.
  *
- * REFACTORED: Now uses StringBuilder + TableUtils for cleaner, more efficient code.
+ * <p>This class belongs to the logic layer and is independent of any UI.
+ * It exposes GUI-friendly methods that return comparison data models
+ * suitable for JavaFX TableView usage.</p>
  */
 public class Compare {
 
-    /**
-     * Main method for comparing ministry budgets between two years.
-     * Prompts the user to select two years, validates them, and displays a comparison table.
-     * The comparison is both displayed on screen and saved to a file.
-     */
+    /* =====================================================
+       CLI VERSION (optional – not used by GUI)
+       ===================================================== */
+
     public static void comparingMinistries() {
         System.out.println("Please type the first of the two years that you want to compare:");
         int firstYear = validityYear(0);
@@ -26,94 +28,143 @@ public class Compare {
         System.out.println("Please type the second year that you want to compare:");
         int secondYear = validityYear(firstYear);
 
-        // Retrieve ministry data for both years
         Ministry[] firstYearMinistry = View.ministryYear(firstYear);
         Ministry[] secondYearMinistry = View.ministryYear(secondYear);
 
-        // Validation: Check if data exists for both years
         if (firstYearMinistry == null || secondYearMinistry == null) {
-            System.out.println("Cannot compare - missing data for one or both years.");
+            System.out.println("Cannot compare - missing data.");
             return;
         }
 
-        // Build comparison table using StringBuilder and TableUtils
         StringBuilder sb = new StringBuilder();
 
-        // ========== HEADER ==========
         TableUtils.appendSeparator(sb, 120, '=');
-        TableUtils.appendTitle(sb, "BUDGET COMPARISON: " + firstYear + " vs " + secondYear, 120);
+        TableUtils.appendTitle(
+                sb,
+                "BUDGET COMPARISON: " + firstYear + " vs " + secondYear,
+                120
+        );
         TableUtils.appendSeparator(sb, 120, '=');
 
-        // ========== COLUMN HEADERS ==========
-        TableUtils.appendTableRow(sb, "MINISTRY", firstYear + " BUDGET", secondYear + " BUDGET");
+        TableUtils.appendTableRow(
+                sb,
+                "MINISTRY",
+                firstYear + " BUDGET",
+                secondYear + " BUDGET"
+        );
         TableUtils.appendSeparator(sb, 120, '-');
 
-        // ========== DATA ROWS ==========
-        // Compare only up to the length of the shorter array
-        int maxRows = Math.min(firstYearMinistry.length, secondYearMinistry.length);
-
-        for (int i = 0; i < maxRows; i++) {
+        int max = Math.min(firstYearMinistry.length, secondYearMinistry.length);
+        for (int i = 0; i < max; i++) {
             if (firstYearMinistry[i] != null && secondYearMinistry[i] != null) {
-                String name = firstYearMinistry[i].getMinistryName();
-                String budget1 = Ministry.getFormattedBudget(firstYearMinistry[i].getBudget());
-                String budget2 = Ministry.getFormattedBudget(secondYearMinistry[i].getBudget());
-
-                TableUtils.appendTableRow(sb, name, budget1, budget2);
+                TableUtils.appendTableRow(
+                        sb,
+                        firstYearMinistry[i].getMinistryName(),
+                        Ministry.getFormattedBudget(firstYearMinistry[i].getBudget()),
+                        Ministry.getFormattedBudget(secondYearMinistry[i].getBudget())
+                );
             }
         }
 
-        // ========== FOOTER ==========
         TableUtils.appendSeparator(sb, 120, '=');
 
-        // Convert StringBuilder to String
         String output = sb.toString();
-
-        // Display to screen
         System.out.println(output);
 
-        // Save to file and handle any errors
         try {
             Files.writeString(
-                Paths.get("NecessaryFilesAndData/compare" + firstYear + "with" + secondYear + ".txt"),
-                output,
-                StandardCharsets.UTF_8
+                    Paths.get("NecessaryFilesAndData/compare" + firstYear + "with" + secondYear + ".txt"),
+                    output,
+                    StandardCharsets.UTF_8
             );
         } catch (IOException e) {
-            System.err.println("Error writing comparison file: " + e.getMessage());
             e.printStackTrace();
         }
     }
 
-    /**
-     * Validates and prompts the user to enter a valid year between 2020 and 2026.
-     * Continues prompting until a valid year is entered.
-     *
-     * @return A valid year between 2020 and 2026 (inclusive)
-     */
     public static int validityYear(int year) {
         Scanner scanner = new Scanner(System.in);
         int selectedYear = 0;
-        boolean validYear = false;
 
-        while (!validYear) {
+        while (true) {
             System.out.println("Please select a year (2020-2026):");
             try {
                 selectedYear = scanner.nextInt();
                 scanner.nextLine();
-                if (selectedYear >= 2020 && selectedYear <= 2026) {
-                    if (selectedYear!=year) {
-                        validYear = true;
-                    } else {
-                        System.out.println("Cannot be the same with the first year");
-                    }
-                } else {
-                    System.out.println("Invalid year. Please enter a year between 2020 and 2026.");
+                if (selectedYear >= 2020 && selectedYear <= 2026 && selectedYear != year) {
+                    return selectedYear;
                 }
+                System.out.println("Invalid year.");
             } catch (Exception e) {
-                System.out.println("Invalid input. Please enter a valid year.");
-                scanner.nextLine(); // Clear invalid input
+                scanner.nextLine();
+                System.out.println("Invalid input.");
             }
         }
-        return selectedYear;
+    }
+
+    /* =====================================================
+       GUI VERSION (USED BY JavaFX)
+       ===================================================== */
+
+    /**
+     * Immutable row model used by JavaFX TableView.
+     */
+    public static class CompareRow {
+        private final String ministry;
+        private final String firstYearBudget;
+        private final String secondYearBudget;
+
+        public CompareRow(String ministry, String firstYearBudget, String secondYearBudget) {
+            this.ministry = ministry;
+            this.firstYearBudget = firstYearBudget;
+            this.secondYearBudget = secondYearBudget;
+        }
+
+        public String getMinistry() {
+            return ministry;
+        }
+
+        public String getFirstYearBudget() {
+            return firstYearBudget;
+        }
+
+        public String getSecondYearBudget() {
+            return secondYearBudget;
+        }
+    }
+
+    /**
+     * Builds comparison rows for GUI display.
+     *
+     * @param firstYear first year (2020–2026)
+     * @param secondYear second year (2020–2026)
+     * @return list of rows for JavaFX TableView
+     */
+    public static List<CompareRow> getComparisonRowsForGui(
+            int firstYear,
+            int secondYear
+    ) {
+
+        if (firstYear == secondYear) return List.of();
+
+        Ministry[] first = View.ministryYear(firstYear);
+        Ministry[] second = View.ministryYear(secondYear);
+
+        if (first == null || second == null) return List.of();
+
+        int max = Math.min(first.length, second.length);
+        List<CompareRow> rows = new ArrayList<>();
+
+        for (int i = 0; i < max; i++) {
+            if (first[i] == null || second[i] == null) continue;
+
+            rows.add(new CompareRow(
+                    first[i].getMinistryName(),
+                    Ministry.getFormattedBudget(first[i].getBudget()),
+                    Ministry.getFormattedBudget(second[i].getBudget())
+            ));
+        }
+
+        return rows;
     }
 }

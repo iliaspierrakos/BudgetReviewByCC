@@ -76,10 +76,9 @@ public class ViewEditBudgetScreen {
 
         Button compareButton = new Button("Compare Budgets");
         compareButton.setMinWidth(220);
-        compareButton.setOnAction(e -> {
-            ViewEditBudget.compare();
-            showInfo("Compare", "Comparison completed (CLI logic called).");
-        });
+        compareButton.setOnAction(e -> 
+          new CompareScreen(user).show(stage)
+        );
         buttonsBox.getChildren().add(compareButton);
 
         Button recButton = new Button();
