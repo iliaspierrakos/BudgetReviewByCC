@@ -6,7 +6,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-
+import java.util.Arrays;
+import java.util.Comparator;
 
 /**
  * The {@code View} class handles the "View" option of the application's menu.
@@ -219,7 +220,12 @@ public class View {
      * @param ministries the array to be sorted
      */
     public void sortingBudgets(Ministry[] ministries) {
-        // TODO: implement sorting if needed
+        Arrays.sort(
+            ministries,
+            Comparator.nullsLast(
+                Comparator.comparingDouble(Ministry::getBudget).reversed()
+            )
+        );
     }
 
     public View() {
