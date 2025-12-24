@@ -117,12 +117,7 @@ public class ViewEditBudget {
             GovernorCheck g = new GovernorCheck();
             g.viewProposalsNames();
         }
-
-        else if (user.getRole() == User.Role.CITIZEN) {
-            RecommendationSystem rs = new RecommendationSystem();
-            rs.castRecommendation();
-        }
-
+        
         else if (user.getRole() == User.Role.MINISTRYMEMBER) {
             // προσωρινό – θα γίνει GUI screen
             throw new UnsupportedOperationException(

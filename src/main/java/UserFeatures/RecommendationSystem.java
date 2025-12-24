@@ -332,4 +332,9 @@ public class RecommendationSystem {
             throw new RuntimeException("Cannot save summary file", e);
         }
     }
+    public int getTotalVotesForMinistry(String ministry) {
+    int idx = getMinistryIndex(ministry);
+    return idx == -1 ? 0 : votes[idx][0];
+}
+
 }

@@ -33,6 +33,7 @@ public class ViewStatisticsScreen {
 
     public void show(Stage stage) {
 
+        // --- Access control ---
         if (user.getRole() != User.Role.GOVERNOR) {
             Alert alert = new Alert(Alert.AlertType.ERROR,
                     "Access denied. Governor only.");
@@ -63,13 +64,13 @@ public class ViewStatisticsScreen {
         table.getColumns().addAll(ministryCol, votesCol);
 
         /* =========================
-           LOAD DATA
+           LOAD DATA (CLEAN API)
            ========================= */
         ObservableList<StatsRow> data = FXCollections.observableArrayList();
 
         List<String> ministries = recSystem.getAvailableMinistries();
         for (String ministry : ministries) {
-            int totalVotes = extractTotalVotes(ministry);
+            int totalVotes = recSystem.getTotalVotesForMinistry(ministry);
             data.add(new StatsRow(ministry, totalVotes));
         }
 
@@ -95,28 +96,6 @@ public class ViewStatisticsScreen {
         stage.setTitle("View Statistics");
         stage.setScene(scene);
         stage.show();
-    }
-
-    /**
-     * Helper that extracts total votes for a ministry
-     * via RecommendationSystem public API.
-     */
-    private int extractTotalVotes(String ministry) {
-        List<String> results = recSystem.getResultsForMinistry(ministry);
-        int sum = 0;
-
-        for (String line : results) {
-            // example: "More doctors → 3 votes (60.00%)"
-            int idx = line.indexOf("→");
-            int idx2 = line.indexOf("votes");
-            if (idx != -1 && idx2 != -1) {
-                try {
-                    String num = line.substring(idx + 1, idx2).trim();
-                    sum += Integer.parseInt(num);
-                } catch (NumberFormatException ignored) {}
-            }
-        }
-        return sum;
     }
 
     /* =========================
