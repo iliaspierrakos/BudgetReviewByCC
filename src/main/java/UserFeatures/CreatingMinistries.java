@@ -118,10 +118,20 @@ public class CreatingMinistries {
             e.printStackTrace();
         }
     }
-    public static void resetToOriginalBudgets(int year) {
-        ministries2026 = new Ministry[20];
-        ministryCreation(Path.of("NecessaryFilesAndData/MinistriesBudgets" + year + ".csv"));
+    public static void resetGovernorToOriginal(int year) {
+        Path original = Path.of(
+            "NecessaryFilesAndData/OriginalBudget/MinistriesBudgets" + year + "_original.csv"
+        );
+        Path governor = Path.of("NecessaryFilesAndData/Governor_" + year + ".csv");
+
+        try {
+            Files.copy(original, governor, StandardCopyOption.REPLACE_EXISTING);
+            loadGovernorDraft(year);
+        } catch (IOException e) {
+            throw new RuntimeException("Reset failed", e);
+        }
     }
+
     public static void saveCurrentBudgetsAsOfficial(Path file, int year) {
         try {
             StringBuilder sb = new StringBuilder();
@@ -140,5 +150,25 @@ public class CreatingMinistries {
      public static void loadOfficialBudgets(int year) {
         ministries2026 = new Ministry[20];
         ministryCreation(Path.of("NecessaryFilesAndData/MinistriesBudgets" + year + ".csv"));
+    }
+    public static void loadGovernorDraft(int year) {
+
+        Path governorFile = Path.of("NecessaryFilesAndData/Governor_" + year + ".csv");
+        Path originalFile = Path.of(
+            "NecessaryFilesAndData/OriginalBudget/MinistriesBudgets" + year + "_original.csv"
+        );
+
+        try {
+            
+            if (!Files.exists(governorFile)) {
+                Files.copy(originalFile, governorFile);
+            }
+            ministries2026 = new Ministry[20];
+            ministryCreation(originalFile);
+            loadUserBudgets(governorFile, year);
+
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to load governor draft", e);
+        }
     }
 }

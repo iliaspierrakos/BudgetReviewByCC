@@ -1,4 +1,8 @@
 package UserManagement;
+/**
+ * This is a class that contains static methods for having 
+ * easy access to the user object.
+ */
 
 public class CurrentSession {
 

@@ -1,4 +1,9 @@
 package UserFeatures;
+/**
+ * This is a class that has only one method {@Code saveUserBudgets}.
+ * Its only purpose is to store ministry budgets and the balance created
+ * for each user, so he can reload after he signs in again.
+ */
 
 import UserManagement.User;
 import java.io.BufferedWriter;

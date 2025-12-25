@@ -261,7 +261,7 @@ public class ViewEditBudget {
 
                         try {
                             Files.copy(original, official, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
-                            CreatingMinistries.resetToOriginalBudgets(2026);
+                            CreatingMinistries.resetGovernorToOriginal(2026);
                             System.out.println("Original 2026 budget successfully restored.");
                         } catch (IOException e) {
                             System.out.println("Failed to restore original budget.");

@@ -15,15 +15,15 @@ public class BudgetReviewMain {
             budg.budget(Path.of("NecessaryFilesAndData/BudgetReview" + i + ".txt"));
         }
         min.minlist();
-        for (int i = 2020; i <= 2026; i++) {
+        for (int i = 2020; i <= 2025; i++) {
             CreatingMinistries.ministryCreation(Path.of("NecessaryFilesAndData/MinistriesBudgets" + i + ".csv"));
-        }  
+        } 
+        CreatingMinistries.loadGovernorDraft(2026);
         UserManager userManager = new UserManager();
          AuthUI authUI = new AuthUI(userManager);
         authUI.start();
         ClearHistory.clearFile(Path.of("NecessaryFilesAndData/edithistory.txt"));
         for (int i = 2020; i <= 2026; i++) {
-            ClearHistory.clearFile(Path.of("NecessaryFilesAndData/MinistriesBudgets" + i + ".csv"));
             ClearHistory.clearFile(Path.of("NecessaryFilesAndData/view" + i + ".txt"));
             for (int j = 2020; j <= 2026; j++) {
                 try {

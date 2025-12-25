@@ -2,6 +2,7 @@ package UserFeatures;
 
 import UserManagement.CurrentSession;
 import UserManagement.User;
+import java.nio.file.Path;
 import java.util.Scanner;
 
 
@@ -111,7 +112,14 @@ public class Edit {
                 2026
             );
         }
-        UserBudgetPersistence.saveUserBudgets(user, CreatingMinistries.ministries2026, 2026);
+        if (user.getRole() == User.Role.GOVERNOR) {
+            CreatingMinistries.saveCurrentBudgetsAsOfficial(
+                Path.of("NecessaryFilesAndData/Governor_2026.csv"),
+                2026
+            );
+        } else {
+            UserBudgetPersistence.saveUserBudgets(user, CreatingMinistries.ministries2026, 2026);
+        }
         EditHistory.historyOfEdit(ministryName, previousBudget, finalBudget, 0);
         if (undo == false) {
             System.out.println("Budget updated successfully!");
