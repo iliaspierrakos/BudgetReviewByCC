@@ -1,7 +1,11 @@
 package UserFeatures;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Scanner;
+
+import UserManagement.CurrentSession;
+import UserManagement.User;
 /**
  * The BulkEdit class handles bulk operations on ministry budgets.
  * It allows applying changes to all ministries or selected ones,
@@ -360,6 +364,7 @@ public class BulkEdit {
      * @param selectedIndices List of selected ministry indices (null = apply to all)
      */
     private void applyPercentageChange(double percentage, ArrayList<Integer> selectedIndices) {
+        User user = CurrentSession.getUser();
         for (int i = 0; i < CreatingMinistries.ministries2026.length; i++) {
             Ministry m = CreatingMinistries.ministries2026[i];
             
@@ -372,6 +377,21 @@ public class BulkEdit {
                         obj1 = new Edit(m.getMinistryName(), "Increase", Math.abs(percentage), "percentage");
                     }else {
                         obj1 = new Edit(m.getMinistryName(), "Decrease", Math.abs(percentage), "percentage");
+                    }
+                    if (user != null) {
+                        UserBudgetPersistence.saveUserBudgets(
+                        user,
+                        CreatingMinistries.ministries2026,
+                        2026
+                        );
+                    }
+                    if (user.getRole() == User.Role.GOVERNOR) {
+                        CreatingMinistries.saveCurrentBudgetsAsOfficial(
+                            Path.of("NecessaryFilesAndData/Governor_2026.csv"),
+                            2026
+                        );
+                    } else {
+                        UserBudgetPersistence.saveUserBudgets(user, CreatingMinistries.ministries2026, 2026);
                     }
                     Edit.history.addEdit(obj1);
                     EditHistory.historyOfEdit(m.getMinistryName(), oldBudget, newBudget, i);
@@ -388,6 +408,7 @@ public class BulkEdit {
      * @param selectedIndices List of selected ministry indices (null = apply to all)
      */
     private void applyFixedAmountChange(double amount, ArrayList<Integer> selectedIndices) {
+        User user = CurrentSession.getUser();
         for (int i = 0; i < CreatingMinistries.ministries2026.length; i++) {
             Ministry m = CreatingMinistries.ministries2026[i];
             
@@ -402,6 +423,21 @@ public class BulkEdit {
                         obj1 = new Edit(m.getMinistryName(), "Increase", Math.abs(amount), "fixed");
                     }else {
                         obj1 = new Edit(m.getMinistryName(), "Decrease", Math.abs(amount), "fixed");
+                    }
+                    if (user != null) {
+                        UserBudgetPersistence.saveUserBudgets(
+                            user,
+                            CreatingMinistries.ministries2026,
+                            2026
+                        );
+                    }
+                    if (user.getRole() == User.Role.GOVERNOR) {
+                        CreatingMinistries.saveCurrentBudgetsAsOfficial(
+                            Path.of("NecessaryFilesAndData/Governor_2026.csv"),
+                            2026
+                        );
+                    } else {
+                        UserBudgetPersistence.saveUserBudgets(user, CreatingMinistries.ministries2026, 2026);
                     }
                     Edit.history.addEdit(obj1);
                     EditHistory.historyOfEdit(m.getMinistryName(), oldBudget, newBudget, i);

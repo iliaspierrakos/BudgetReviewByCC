@@ -5,10 +5,12 @@ package UserFeatures;
  * for each user, so he can reload after he signs in again.
  */
 
-import UserManagement.User;
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.nio.file.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
+import UserManagement.User;
 
 public class UserBudgetPersistence {
 
@@ -17,7 +19,6 @@ public class UserBudgetPersistence {
 
         try {
             Files.createDirectories(file.getParent());
-
             try (BufferedWriter writer = Files.newBufferedWriter(file)) {
                 writer.write("BALANCE," + Edit.balance);
                 writer.newLine();
