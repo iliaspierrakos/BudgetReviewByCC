@@ -90,4 +90,82 @@ public class CreatingMinistries {
 
 
     }
+    public static void loadUserBudgets(Path file, int year) {
+        try {
+            List<String> lines = Files.readAllLines(file);
+
+            for (String line : lines) {
+                if (line.isBlank()) continue;
+
+                String[] parts = line.split(",");
+                if (parts[0].equalsIgnoreCase("BALANCE")) {
+                    Edit.balance = Double.parseDouble(parts[1].trim());
+                    continue;
+                }
+                if (parts.length != 2) continue;
+
+                String ministryName = parts[0].trim();
+                double budget = Double.parseDouble(parts[1].trim());
+                for (Ministry m : ministries2026) {
+                    if (m != null && m.getMinistryName().equalsIgnoreCase(ministryName)) {
+                        m.setBudget(budget);
+                        break;
+                    }
+                }
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    public static void resetGovernorToOriginal(int year) {
+        Path original = Path.of(
+            "NecessaryFilesAndData/OriginalBudget/MinistriesBudgets" + year + "_original.csv"
+        );
+        Path governor = Path.of("NecessaryFilesAndData/Governor_" + year + ".csv");
+
+        ministries2026 = new Ministry[20];
+
+        ministryCreation(original);
+
+        saveCurrentBudgetsAsOfficial(governor, year);
+
+        loadUserBudgets(governor, year);
+    }
+
+    public static void saveCurrentBudgetsAsOfficial(Path file, int year) {
+        try {
+            StringBuilder sb = new StringBuilder();
+
+            for (Ministry m : ministries2026) {
+                sb.append(m.getMinistryName()).append(",");
+                sb.append(m.getBudget()).append("\n");
+            }
+
+            Files.writeString(file, sb.toString());
+
+        } catch (IOException e) {
+            System.out.println("Failed to publish official budget.");
+        }
+    }
+     public static void loadOfficialBudgets(int year) {
+        ministries2026 = new Ministry[20];
+        ministryCreation(Path.of("NecessaryFilesAndData/MinistriesBudgets" + year + ".csv"));
+    }
+    public static void loadGovernorDraft(int year) {
+        Path governorFile = Path.of("NecessaryFilesAndData/Governor_" + year + ".csv");
+        Path originalFile = Path.of(
+            "NecessaryFilesAndData/OriginalBudget/MinistriesBudgets" + year + "_original.csv"
+        );
+
+        ministries2026 = new Ministry[20];
+
+        
+        ministryCreation(originalFile);
+
+        if (!Files.exists(governorFile)) {
+            saveCurrentBudgetsAsOfficial(governorFile, year);
+        }
+        loadUserBudgets(governorFile, year);
+    }
 }

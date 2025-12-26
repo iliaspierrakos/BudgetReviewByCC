@@ -2,7 +2,7 @@ Total Votes:0
 Ministry of Interior,0 Votes
 Ministry of Foreign Affairs,0 Votes
 Ministry of National Defense,0 Votes
-Ministry of Health,1 Votes
+Ministry of Health,0 Votes
 Ministry of Justice,0 Votes
 Ministry of Education, Religious Affairs, and Sports,0 Votes
 Ministry of Culture,0 Votes
@@ -14,7 +14,7 @@ Ministry of Social Cohesion and Family,0 Votes
 Ministry of Development,0 Votes
 Ministry of Infrastructure and Transport,0 Votes
 Ministry of Shipping and Island Policy,0 Votes
-Ministry of Tourism,0 Votes
+Ministry of Tourism,1 Votes
 Ministry of Digital Governance,0 Votes
 Ministry of Migration and Asylum,0 Votes
 Ministry of Citizen Protection,0 Votes
