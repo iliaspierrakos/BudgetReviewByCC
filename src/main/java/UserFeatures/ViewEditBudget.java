@@ -60,14 +60,17 @@ public class ViewEditBudget {
                 int selectedYear = Compare.validityYear(0);
                 ViewGovernmentBudget v = new ViewGovernmentBudget();
                 if (u.getRole() == User.Role.CITIZEN) {
-
-                    System.out.println("Which budget would you like to view?");
-                    System.out.println("1. Original government budget");
-                    System.out.println("2. My edited budget");
-
-                    int viewChoice = scanner.nextInt();
-                    scanner.nextLine();
-
+                    
+                    int viewChoice = 1;
+                    if (selectedYear == 2026) {
+                        if (Files.exists(userBudgetFile)) {
+                            System.out.println("Which budget would you like to view?");
+                            System.out.println("1. Original government budget");
+                            System.out.println("2. My edited budget");
+                            viewChoice = scanner.nextInt();
+                            scanner.nextLine();
+                        }
+                    }
                     if (viewChoice == 2 && Files.exists(userBudgetFile)) {
                         CreatingMinistries.loadUserBudgets(userBudgetFile, selectedYear);
                         System.out.println("Showing your edited budget...");
@@ -78,7 +81,7 @@ public class ViewEditBudget {
                 }
                 System.out.println("Would you like to see the budget sorted?");
                 String a = scanner.nextLine();
-
+                a = Ministry.yesOrNo(a);
                 if (a.equalsIgnoreCase("yes")) {
                     v.viewGovBudget(selectedYear, true);
                 } else {

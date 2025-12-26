@@ -48,7 +48,7 @@ public class ViewGovernmentBudget {
 
         // Validation: Cannot calculate percentages if total is zero
         if (inUseBudget == 0) {
-            System.out.println("Total budget is 0. cannot calculate percentages.");
+            System.out.println("Total budget is 0. Cannot calculate percentages.");
             return;
         }
 
@@ -63,7 +63,7 @@ public class ViewGovernmentBudget {
         // ========== COLUMN HEADERS ==========
         TableUtils.appendTableRow(sb, "MINISTRY", "BUDGET", "PERCENTAGE");
         TableUtils.appendSeparator(sb, 105, '-');
-
+        
         // ========== DATA ROWS ==========
         for (Ministry m : selectedMinistries) {
             if (m != null) {
