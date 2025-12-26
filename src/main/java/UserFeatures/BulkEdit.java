@@ -17,16 +17,15 @@ public class BulkEdit {
         
         int choice = scanner.nextInt();
         scanner.nextLine();
-        while ( choice != 1 || choice != 4 || choice != 2 || choice != 3) {
-            System.out.println("Invalid option. Please select again:");
-            choice = scanner.nextInt();
-            scanner.nextLine();
-        }
         switch(choice) {
             case 1 -> percentageChangeAll(1, choice);
             case 2 -> fixedAmountChangeAll(1, choice);
             case 3 -> selectedMinistriesEdit(1, choice);
             case 4 -> { 
+                break;
+            }
+            default -> {
+                System.out.println("Invalid option");
                 break;
             }
         }

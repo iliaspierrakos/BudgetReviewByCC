@@ -1,9 +1,10 @@
 package UserFeatures;
 
-import UserManagement.CurrentSession;
-import UserManagement.User;
 import java.nio.file.Path;
 import java.util.Scanner;
+
+import UserManagement.CurrentSession;
+import UserManagement.User;
 
 
 /**
@@ -171,11 +172,11 @@ public class Edit {
         System.out.println("The budget of the " + fromName + " is " + Ministry.getFormattedBudget(Ministry.budgetSearchByName(fromName, CreatingMinistries.ministries2026)));
         // Ask for amount
         System.out.println("Enter amount to decrease:");
-        double localAmount = validityAmount(Ministry.budgetSearchByName(fromName, CreatingMinistries.ministries2026)); //Validate the amount with ministry's budget
-        balance = balance + localAmount;
+        double amount = validityAmount(Ministry.budgetSearchByName(fromName, CreatingMinistries.ministries2026)); //Validate the amount with ministry's budget
+        balance = balance + amount;
         // Show previous budget and perform the decrease
         System.out.println(fromName + " previous budget: " + Ministry.getFormattedBudget(Ministry.budgetSearchByName(fromName, CreatingMinistries.ministries2026)));
-        Edit obj1 = new Edit(fromName, "Decrease", localAmount, "fixed");
+        Edit obj1 = new Edit(fromName, "Decrease", amount, "fixed");
         history.addEdit(obj1);
         obj1.editingbudget(obj1, false, isProposal);
         System.out.println("Available money for Investment : " + Ministry.getFormattedBudget(balance));
@@ -205,12 +206,12 @@ public class Edit {
             toName = validityCheck(toName); //Validate
             System.out.println("Available money for Investment : " + Ministry.getFormattedBudget(balance));
             System.out.println("Do you want to Increase or Decrease the budget of " + toName + "?" );
-            String localChange = scanner.nextLine();
-            localChange = validityChange(localChange); //Validation for change
+            String change = scanner.nextLine();
+            change = validityChange(change); //Validation for change
             System.out.println("By how much?");
             double changeamount;
 
-            if (localChange.equalsIgnoreCase("Decrease")) {
+            if (change.equalsIgnoreCase("Decrease")) {
                 changeamount = validityAmount(Ministry.budgetSearchByName(toName, CreatingMinistries.ministries2026)); //Validate the amount with ministry's budget
                 balance=balance + changeamount;
             } else {
