@@ -59,21 +59,23 @@ public class ViewEditBudget {
                 int selectedYear = Compare.validityYear(0);
                 ViewGovernmentBudget v = new ViewGovernmentBudget();
                 if (u.getRole() == User.Role.CITIZEN) {
+                    if (selectedYear == 2026) {
+                        System.out.println("Which budget would you like to view?");
+                        System.out.println("1. Original government budget");
+                        System.out.println("2. My edited budget");
 
-                    System.out.println("Which budget would you like to view?");
-                    System.out.println("1. Original government budget");
-                    System.out.println("2. My edited budget");
-
-                    int viewChoice = scanner.nextInt();
-                    scanner.nextLine();
-
-                    if (viewChoice == 2 && Files.exists(userBudgetFile)) {
-                        CreatingMinistries.loadUserBudgets(userBudgetFile, selectedYear);
-                        System.out.println("Showing your edited budget...");
+                        int viewChoice = scanner.nextInt();
+                        scanner.nextLine();
+                        if (viewChoice == 2 && Files.exists(userBudgetFile)) {
+                            CreatingMinistries.loadUserBudgets(userBudgetFile, selectedYear);
+                            System.out.println("Showing your edited budget...");
+                        } else {
+                            CreatingMinistries.loadUserBudgets(governorPath, 2026);
+                            System.out.println("Showing original government budget...");
+                        }
                     } else {
-                        CreatingMinistries.loadUserBudgets(governorPath, 2026);
-                        System.out.println("Showing original government budget...");
-                    }
+                        System.out.println("Showing " + selectedYear + " original budget...");
+                    }                    
                 }
                 System.out.println("Would you like to see the budget sorted?");
                 String a = scanner.nextLine();

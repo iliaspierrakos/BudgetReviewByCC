@@ -25,6 +25,7 @@ public class BudgetReviewMain {
         ClearHistory.clearFile(Path.of("NecessaryFilesAndData/edithistory.txt"));
         for (int i = 2020; i <= 2026; i++) {
             ClearHistory.clearFile(Path.of("NecessaryFilesAndData/view" + i + ".txt"));
+            ClearHistory.clearFile(Path.of("NecessaryFilesAndData/MinistriesBudgets" + i + ".csv"));
             for (int j = 2020; j <= 2026; j++) {
                 try {
                     Files.deleteIfExists(Paths.get("NecessaryFilesAndData/compare" + i + "with" + j + ".txt"));
