@@ -11,8 +11,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import guiFolder.CompareScreen;
-import guiFolder.SubmitRecommendationScreen;
 
 /**
  * Main application menu displayed after successful login.
@@ -108,15 +106,16 @@ public class ViewEditBudgetScreen {
 
         buttonsBox.getChildren().add(recButton);
 
-        if (user.getRole() == User.Role.CITIZEN) {
-            Button taxButton = new Button("Tax Receipt");
-            taxButton.setMinWidth(220);
-            taxButton.setOnAction(e -> {
-                ViewEditBudget.taxReceipt(user);
-                showInfo("Tax Receipt", "Tax receipt generated.");
-            });
-            buttonsBox.getChildren().add(taxButton);
-        }
+    
+    if (user.getRole() == User.Role.CITIZEN) {
+    Button taxButton = new Button("Tax Receipt");
+    taxButton.setMinWidth(220);
+    taxButton.setOnAction(e ->
+        new TaxReceiptScreen(user, userManager).show(stage)
+    );
+    buttonsBox.getChildren().add(taxButton);
+}
+
 
         Button logoutButton = new Button("Logout");
         logoutButton.setMinWidth(220);
