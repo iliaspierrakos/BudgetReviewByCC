@@ -303,7 +303,6 @@ public class ViewEditBudget {
                 break;
             }
             default:
-                System.out.println("Invalid");
                 return;
             }
         } while (true);

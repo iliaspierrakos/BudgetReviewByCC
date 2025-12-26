@@ -13,7 +13,6 @@ import java.util.Scanner;
 public class RecommendationSystem {
     private String targetMinistry;
     private static final String VOTES_CSV_FILE = "NecessaryFilesAndData/ProposalsFromCitizens/VotesData.csv";
-    private static final String BASH_LOAD_SCRIPT = "UserFeatures/LoadVotes.sh";
     private static final String MINISTRIES_REC = "NecessaryFilesAndData/ProposalsFromCitizens/MinistryVotes.txt";
 
 
