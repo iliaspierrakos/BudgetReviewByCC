@@ -1,7 +1,7 @@
 package UserFeatures;
 
-import UserManagement.User;
 import UserManagement.MinistryMember;
+import UserManagement.User;
 
 /**
  * ViewEditBudget
@@ -133,7 +133,8 @@ public class ViewEditBudget {
         if (user.getRole() != User.Role.CITIZEN) {
             throw new IllegalStateException("Only citizens can view tax receipts");
         }
-        TaxReceiptVisualizer receipt = new TaxReceiptVisualizer();
-        receipt.generateReceipt();
+        throw new UnsupportedOperationException(
+            "Tax receipt is GUI-based. Open TaxReceiptScreen from the menu."
+        );
     }
 }
