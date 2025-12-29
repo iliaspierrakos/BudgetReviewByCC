@@ -3,12 +3,17 @@ package guiFolder;
 import UserFeatures.Compare;
 import UserFeatures.Compare.CompareRow;
 import UserManagement.User;
+import UserManagement.UserManager;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -16,16 +21,15 @@ import javafx.stage.Stage;
 
 /**
  * JavaFX screen for comparing ministry budgets between two years.
- *
- * <p>This class belongs to the GUI layer and delegates all logic
- * to the {@link Compare} class.</p>
  */
 public class CompareScreen {
 
     private final User user;
+    private final UserManager userManager;
 
-    public CompareScreen(User user) {
+    public CompareScreen(User user, UserManager userManager) {
         this.user = user;
+        this.userManager = userManager;
     }
 
     public void show(Stage stage) {
@@ -108,7 +112,7 @@ public class CompareScreen {
         });
 
         backButton.setOnAction(e ->
-                new ViewEditBudgetScreen(user, null).show(stage)
+                new ViewEditBudgetScreen(user, userManager).show(stage)
         );
 
         /* =========================

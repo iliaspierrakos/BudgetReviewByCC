@@ -1,6 +1,6 @@
 package guiFolder;
 
-import UserFeatures.ViewEditBudget;
+import UserFeatures.ViewEditBudgetInitializer;
 import UserManagement.User;
 import UserManagement.UserManager;
 import javafx.geometry.Insets;
@@ -35,7 +35,7 @@ public class ViewEditBudgetScreen {
     public void show(Stage stage) {
 
         // Ensure data are loaded (safe to call multiple times)
-        ViewEditBudget.ensureInitialized();
+        ViewEditBudgetInitializer.ensureInitialized();
 
         Label title = new Label("Welcome, " + user.getUsername());
         title.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
@@ -43,15 +43,15 @@ public class ViewEditBudgetScreen {
         VBox buttonsBox = new VBox(12);
         buttonsBox.setAlignment(Pos.CENTER);
 
+        // ===== VIEW BUDGET BUTTON (all roles) =====
         Button viewButton = new Button("View Budget");
         viewButton.setMinWidth(220);
         viewButton.setOnAction(e -> {
-        new ViewBudgetScreen(user).show(stage);
-
+            new ViewBudgetScreen(user, userManager).show(stage);
         });
-
         buttonsBox.getChildren().add(viewButton);
 
+        // ===== EDIT/PROPOSE/VIRTUAL EDIT BUTTON =====
         if (user.getRole() != User.Role.CITIZEN) {
             Button editButton = new Button(
                 user.getRole() == User.Role.MINISTRYMEMBER
@@ -60,7 +60,7 @@ public class ViewEditBudgetScreen {
             );
             editButton.setMinWidth(220);
             editButton.setOnAction(e -> {
-                showInfo("Edit", "Edit feature will be GUI-based.");
+                new EditBudgetScreen(user, userManager).show(stage);
             });
             buttonsBox.getChildren().add(editButton);
         }
@@ -69,23 +69,25 @@ public class ViewEditBudgetScreen {
             Button virtualEditButton = new Button("Virtual Edit");
             virtualEditButton.setMinWidth(220);
             virtualEditButton.setOnAction(e -> {
-                showInfo("Virtual Edit", "Virtual Edit feature will be GUI-based.");
+                new VirtualEditScreen(user, userManager).show(stage);
             });
             buttonsBox.getChildren().add(virtualEditButton);
         }
 
+        // ===== COMPARE BUDGETS BUTTON (all roles) =====
         Button compareButton = new Button("Compare Budgets");
         compareButton.setMinWidth(220);
         compareButton.setOnAction(e -> 
-          new CompareScreen(user).show(stage)
+          new CompareScreen(user, userManager).show(stage)
         );
         buttonsBox.getChildren().add(compareButton);
 
+        // ===== RECOMMENDATIONS BUTTON (role-specific) =====
         Button recButton = new Button();
         recButton.setMinWidth(220);
 
         switch (user.getRole()) {
-            case GOVERNOR -> recButton.setText("View Proposals");
+            case GOVERNOR -> recButton.setText("View Statistics");
             case CITIZEN -> recButton.setText("Submit Recommendation");
             case MINISTRYMEMBER -> recButton.setText("View Citizen Proposals");
         }
@@ -96,27 +98,26 @@ public class ViewEditBudgetScreen {
                     new SubmitRecommendationScreen(user).show(stage);
 
                 case MINISTRYMEMBER -> 
-                    new ViewRecommendationsScreen(user).show(stage);
+                    new ViewRecommendationsScreen(user, userManager).show(stage);
 
                 case GOVERNOR -> 
                     new ViewStatisticsScreen(user).show(stage);
             }
         });
 
-
         buttonsBox.getChildren().add(recButton);
 
-    
-    if (user.getRole() == User.Role.CITIZEN) {
-    Button taxButton = new Button("Tax Receipt");
-    taxButton.setMinWidth(220);
-    taxButton.setOnAction(e ->
-        new TaxReceiptScreen(user, userManager).show(stage)
-    );
-    buttonsBox.getChildren().add(taxButton);
-}
+        // ===== TAX RECEIPT BUTTON (Citizen only) =====
+        if (user.getRole() == User.Role.CITIZEN) {
+            Button taxButton = new Button("Tax Receipt");
+            taxButton.setMinWidth(220);
+            taxButton.setOnAction(e ->
+                new TaxReceiptScreen(user, userManager).show(stage)
+            );
+            buttonsBox.getChildren().add(taxButton);
+        }
 
-
+        // ===== LOGOUT BUTTON (all roles) =====
         Button logoutButton = new Button("Logout");
         logoutButton.setMinWidth(220);
         logoutButton.setOnAction(e -> {

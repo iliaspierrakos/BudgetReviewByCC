@@ -1,18 +1,22 @@
 package guiFolder;
 
-import UserManagement.MinistryMember;
-import UserManagement.User;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+
+import UserManagement.MinistryMember;
+import UserManagement.User;
+import UserManagement.UserManager;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 
 /**
  * ViewRecommendationsScreen
@@ -23,13 +27,15 @@ import java.nio.file.Path;
 public class ViewRecommendationsScreen {
 
     private final User user;
+    private final UserManager userManager;
 
     // BASE directory for runtime data
     private static final Path DATA_DIR =
-            Path.of("data/recommendation");
+            Path.of("NecessaryFilesAndData/ProposalsFromCitizens");
 
-    public ViewRecommendationsScreen(User user) {
+    public ViewRecommendationsScreen(User user, UserManager userManager) {
         this.user = user;
+        this.userManager = userManager;
     }
 
     public void show(Stage stage) {
@@ -55,7 +61,7 @@ public class ViewRecommendationsScreen {
         textArea.setWrapText(true);
 
         Path filePath = DATA_DIR.resolve(
-                "CitizenFor" + ministryName + ".txt"
+                "CitizenForMinistry of " + ministryName + ".txt"
         );
 
         if (Files.exists(filePath)) {
@@ -73,7 +79,7 @@ public class ViewRecommendationsScreen {
 
         Button backButton = new Button("Back");
         backButton.setOnAction(e ->
-                new ViewEditBudgetScreen(user, null).show(stage)
+                new ViewEditBudgetScreen(user, userManager).show(stage)
         );
 
         VBox top = new VBox(6, title, subtitle);
