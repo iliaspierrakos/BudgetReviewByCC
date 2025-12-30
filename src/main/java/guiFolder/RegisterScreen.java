@@ -1,15 +1,21 @@
 package guiFolder;
 
+import java.util.function.Supplier;
+import org.kordamp.ikonli.javafx.FontIcon;
+
 import UserManagement.User;
 import UserManagement.UserManager;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
+import javafx.scene.control.Separator;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.control.ToggleGroup;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
@@ -21,8 +27,11 @@ public class RegisterScreen {
     }
 
     public void show(Stage stage) {
-        Label title = new Label("Register");
-        title.setStyle("-fx-font-size: 22px; -fx-font-weight: bold;");
+        Label title = new Label("Create Account");
+        title.getStyleClass().add("title");
+
+        Label subtitle = new Label("Choose a role and set your credentials.");
+        subtitle.getStyleClass().add("subtitle");
 
         TextField usernameField = new TextField();
         usernameField.setPromptText("Username");
@@ -30,13 +39,45 @@ public class RegisterScreen {
         PasswordField passwordField = new PasswordField();
         passwordField.setPromptText("Password");
 
-        ComboBox<User.Role> roleBox = new ComboBox<>();
-        roleBox.getItems().addAll(
-                User.Role.CITIZEN,
-                User.Role.MINISTRYMEMBER,
-                User.Role.GOVERNOR
-        );
-        roleBox.setPromptText("Select Role");
+        // ---- Pretty role picker (segmented buttons) ----
+        Label roleLabel = new Label("Role");
+        roleLabel.getStyleClass().add("subtitle");
+
+        ToggleGroup roleGroup = new ToggleGroup();
+
+        FontIcon userIcon = new FontIcon("fas-user");
+        FontIcon govIcon  = new FontIcon("fas-landmark");
+        FontIcon kingIcon = new FontIcon("fas-crown");
+
+
+        ToggleButton citizenBtn = new ToggleButton("Citizen", new FontIcon("fas-user"));
+        ToggleButton ministryBtn = new ToggleButton("Ministry", new FontIcon("fas-landmark"));
+        ToggleButton governorBtn = new ToggleButton("Governor", new FontIcon("fas-crown"));
+
+
+        citizenBtn.setToggleGroup(roleGroup);
+        ministryBtn.setToggleGroup(roleGroup);
+        governorBtn.setToggleGroup(roleGroup);
+
+        citizenBtn.getStyleClass().add("role-toggle");
+        ministryBtn.getStyleClass().add("role-toggle");
+        governorBtn.getStyleClass().add("role-toggle");
+
+        // default role (optional): Citizen selected
+        citizenBtn.setSelected(true);
+
+        HBox rolePicker = new HBox(10, citizenBtn, ministryBtn, governorBtn);
+        rolePicker.getStyleClass().add("role-picker");
+        rolePicker.setAlignment(Pos.CENTER);
+        rolePicker.setMaxWidth(Double.MAX_VALUE);
+
+        Supplier<User.Role> getRole = () -> {
+            var sel = roleGroup.getSelectedToggle();
+            if (sel == citizenBtn) return User.Role.CITIZEN;
+            if (sel == ministryBtn) return User.Role.MINISTRYMEMBER;
+            if (sel == governorBtn) return User.Role.GOVERNOR;
+            return null;
+        };
 
         TextField ministryField = new TextField();
         ministryField.setPromptText("Ministry Name");
@@ -44,18 +85,22 @@ public class RegisterScreen {
         ministryField.setManaged(false);
 
         Label errorLabel = new Label();
-        errorLabel.setStyle("-fx-text-fill: red;");
+        errorLabel.getStyleClass().add("error");
 
         Button registerButton = new Button("Register");
-        registerButton.setMinWidth(120);
+        registerButton.getStyleClass().addAll("button", "primary");
+        registerButton.setDisable(true);
 
         Button backButton = new Button("Back");
-        backButton.setMinWidth(120);
+        backButton.getStyleClass().addAll("button", "subtle");
 
+        registerButton.setMaxWidth(Double.MAX_VALUE);
+        backButton.setMaxWidth(Double.MAX_VALUE);
 
+        // keyboard flow
         usernameField.setOnAction(e -> passwordField.requestFocus());
         passwordField.setOnAction(e -> {
-            User.Role r = roleBox.getValue();
+            User.Role r = getRole.get();
             if (r == User.Role.MINISTRYMEMBER) {
                 ministryField.requestFocus();
             } else {
@@ -64,35 +109,38 @@ public class RegisterScreen {
         });
         ministryField.setOnAction(e -> registerButton.fire());
 
-        roleBox.valueProperty().addListener((obs, oldV, newV) -> {
-            boolean show = newV == User.Role.MINISTRYMEMBER;
+        // role change -> show/hide ministry field
+        roleGroup.selectedToggleProperty().addListener((obs, oldT, newT) -> {
+            User.Role r = getRole.get();
+            boolean show = r == User.Role.MINISTRYMEMBER;
+
             ministryField.setVisible(show);
             ministryField.setManaged(show);
+
             errorLabel.setText("");
-            updateDisable(registerButton, usernameField, passwordField, roleBox, ministryField);
+            updateDisable(registerButton, usernameField, passwordField, getRole, ministryField);
         });
 
-        registerButton.setDisable(true);
-
+        // live validation
         usernameField.textProperty().addListener((obs, o, n) -> {
             errorLabel.setText("");
-            updateDisable(registerButton, usernameField, passwordField, roleBox, ministryField);
+            updateDisable(registerButton, usernameField, passwordField, getRole, ministryField);
         });
 
         passwordField.textProperty().addListener((obs, o, n) -> {
             errorLabel.setText("");
-            updateDisable(registerButton, usernameField, passwordField, roleBox, ministryField);
+            updateDisable(registerButton, usernameField, passwordField, getRole, ministryField);
         });
 
         ministryField.textProperty().addListener((obs, o, n) -> {
             errorLabel.setText("");
-            updateDisable(registerButton, usernameField, passwordField, roleBox, ministryField);
+            updateDisable(registerButton, usernameField, passwordField, getRole, ministryField);
         });
 
         registerButton.setOnAction(e -> {
             String username = usernameField.getText().trim();
             String password = passwordField.getText(); // NO trim
-            User.Role role = roleBox.getValue();
+            User.Role role = getRole.get();
             String ministry = ministryField.getText().trim();
 
             if (username.isEmpty() || password.isEmpty() || role == null) {
@@ -118,39 +166,52 @@ public class RegisterScreen {
 
         backButton.setOnAction(e -> new StartMenuScreen(userManager).show(stage));
 
-        VBox layout = new VBox(
+        // ---- Card UI ----
+        VBox card = new VBox(
                 12,
                 title,
+                subtitle,
+                new Separator(),
                 usernameField,
                 passwordField,
-                roleBox,
+                roleLabel,
+                rolePicker,
                 ministryField,
                 registerButton,
                 backButton,
                 errorLabel
         );
-        layout.setAlignment(Pos.CENTER);
-        layout.setPadding(new Insets(20));
+        card.setAlignment(Pos.CENTER);
+        card.getStyleClass().add("card");
+        card.setMaxWidth(420);
 
-        Scene scene = new Scene(layout, 420, 420);
+        VBox root = new VBox(card);
+        root.setAlignment(Pos.CENTER);
+        root.setPadding(new Insets(24));
+
+        Scene scene = new Scene(root, 600, 560);
+        scene.getStylesheets().add(
+                getClass().getResource("/css/DarkTheme.css").toExternalForm()
+        );
+
         stage.setScene(scene);
         stage.setTitle("Register");
         stage.show();
 
         usernameField.requestFocus();
-        updateDisable(registerButton, usernameField, passwordField, roleBox, ministryField);
+        updateDisable(registerButton, usernameField, passwordField, getRole, ministryField);
     }
 
     private static void updateDisable(
             Button registerButton,
             TextField usernameField,
             PasswordField passwordField,
-            ComboBox<User.Role> roleBox,
+            Supplier<User.Role> getRole,
             TextField ministryField
     ) {
         String u = usernameField.getText().trim();
         String p = passwordField.getText();
-        User.Role r = roleBox.getValue();
+        User.Role r = getRole.get();
         boolean needsMinistry = r == User.Role.MINISTRYMEMBER;
         String m = ministryField.getText().trim();
 
