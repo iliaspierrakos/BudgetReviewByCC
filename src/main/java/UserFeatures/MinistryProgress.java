@@ -29,7 +29,7 @@ public class MinistryProgress {
         
         // ========== DATA ROWS ==========
         for (int year = 2020; year <= 2026; year++) {
-            Ministry[] yearArray = View.ministryYear(year);
+            Ministry[] yearArray = ViewGovernmentBudget.ministryYear(year);
             
             if (yearArray != null) {
                 // Search for the ministry in this year's array

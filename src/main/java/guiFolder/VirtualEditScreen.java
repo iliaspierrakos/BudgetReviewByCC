@@ -1,19 +1,30 @@
 package guiFolder;
 
-import UserFeatures.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
+import UserFeatures.CreatingMinistries;
+import UserFeatures.Edit;
+import UserFeatures.Ministry;
+import UserFeatures.UserBudgetFileUtil;
 import UserManagement.User;
 import UserManagement.UserManager;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.RadioButton;
+import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-
-import java.nio.file.Files;
-import java.nio.file.Path;
 
 /**
  * VirtualEditScreen - For Citizens to simulate budget editing
@@ -56,6 +67,9 @@ public class VirtualEditScreen {
                     CreatingMinistries.loadUserBudgets(governorPath, 2026);
                 }
             });
+            if (!Files.exists(userBudgetFile)) {
+                CreatingMinistries.loadUserBudgets(governorPath, 2026);
+            }
         } else {
             CreatingMinistries.loadUserBudgets(governorPath, 2026);
         }
