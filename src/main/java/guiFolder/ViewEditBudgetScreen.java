@@ -1,6 +1,15 @@
 package guiFolder;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+import UserFeatures.ClearHistory;
+import UserFeatures.Edit;
+import UserFeatures.EditHistoryList;
 import UserFeatures.ViewEditBudgetInitializer;
+import UserManagement.CurrentSession;
 import UserManagement.User;
 import UserManagement.UserManager;
 import javafx.geometry.Insets;
@@ -34,6 +43,7 @@ public class ViewEditBudgetScreen {
 
     public void show(Stage stage) {
 
+        CurrentSession.setUser(user);
         // Ensure data are loaded (safe to call multiple times)
         ViewEditBudgetInitializer.ensureInitialized();
 
@@ -121,6 +131,7 @@ public class ViewEditBudgetScreen {
         Button logoutButton = new Button("Logout");
         logoutButton.setMinWidth(220);
         logoutButton.setOnAction(e -> {
+            cleanupOnLogout();
             new StartMenuScreen(userManager).show(stage);
         });
 
@@ -134,6 +145,33 @@ public class ViewEditBudgetScreen {
         stage.setTitle("Main Menu");
         stage.show();
     }
+    private void cleanupOnLogout() {
+    try {
+        // 1. Clear edit history
+        ClearHistory.clearFile(Path.of("NecessaryFilesAndData/edithistory.txt"));
+        
+        // 2. Clear view files (temporary)
+        for (int year = 2020; year <= 2026; year++) {
+            ClearHistory.clearFile(Path.of("NecessaryFilesAndData/view" + year + ".txt"));
+        }
+        
+        // 3. Clear comparison files (temporary)
+        for (int year1 = 2020; year1 <= 2026; year1++) {
+            for (int year2 = 2020; year2 <= 2026; year2++) {
+                Files.deleteIfExists(
+                    Paths.get("NecessaryFilesAndData/compare" + year1 + "with" + year2 + ".txt")
+                );
+            }
+        }
+        
+        // 4. Reset static state
+        Edit.balance = 0;
+        Edit.history = new EditHistoryList();
+        
+    } catch (IOException ex) {
+        System.err.println("Cleanup failed: " + ex.getMessage());
+    }
+}
 
     private void showInfo(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);

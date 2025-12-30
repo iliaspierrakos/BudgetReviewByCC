@@ -1,8 +1,12 @@
 package guiFolder;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+
 import UserFeatures.CreatingMinistries;
 import UserFeatures.Edit;
 import UserFeatures.Ministry;
+import UserFeatures.UserBudgetFileUtil;
 import UserManagement.User;
 import UserManagement.UserManager;
 import javafx.geometry.Insets;
@@ -20,14 +24,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-/**
- * EditBudgetScreen - For Governor and MinistryMember to edit budgets
- * 
- * Provides three options:
- * 1. Simple Edit (single ministry)
- * 2. Bulk Edit (multiple ministries)
- * 3. Edit History (view/undo changes)
- */
 public class EditBudgetScreen {
 
     private final User user;
@@ -39,6 +35,7 @@ public class EditBudgetScreen {
     }
 
     public void show(Stage stage) {
+        reloadUserBudgets();
 
         Label title = new Label("Budget Editing");
         title.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
@@ -74,9 +71,28 @@ public class EditBudgetScreen {
         stage.show();
     }
 
-    /**
-     * Shows a dialog for simple edit (single ministry)
-     */
+    private void reloadUserBudgets() {
+        Path userFile = UserBudgetFileUtil.getUserBudgetFile(user, 2026);
+        
+        try {
+            if (user.getRole() == User.Role.GOVERNOR) {
+                CreatingMinistries.loadUserBudgets(userFile, 2026);
+            } else if (user.getRole() == User.Role.CITIZEN) {
+                if (Files.exists(userFile)) {
+                    CreatingMinistries.loadUserBudgets(userFile, 2026);
+                } else {
+                    Path govPath = Path.of("NecessaryFilesAndData/Governor_2026.csv");
+                    CreatingMinistries.loadUserBudgets(govPath, 2026);
+                }
+            } else {
+                Path govPath = Path.of("NecessaryFilesAndData/Governor_2026.csv");
+                CreatingMinistries.loadUserBudgets(govPath, 2026);
+            }
+        } catch (Exception e) {
+            System.err.println("Failed to load budgets: " + e.getMessage());
+        }
+    }
+
     private void showSimpleEditDialog(Stage parentStage) {
         Stage dialog = new Stage();
         dialog.setTitle("Simple Edit");
@@ -84,7 +100,6 @@ public class EditBudgetScreen {
         Label title = new Label("Edit Single Ministry Budget");
         title.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
 
-        // Ministry selection
         ComboBox<String> ministryBox = new ComboBox<>();
         for (Ministry m : CreatingMinistries.ministries2026) {
             if (m != null) {
@@ -94,9 +109,8 @@ public class EditBudgetScreen {
         ministryBox.setPromptText("Select Ministry");
 
         Label currentBudgetLabel = new Label();
-        currentBudgetLabel.setStyle("-fx-font-weight: bold;");
+        currentBudgetLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #1e3a5f;");
 
-        // Change type
         ToggleGroup changeGroup = new ToggleGroup();
         RadioButton increaseRb = new RadioButton("Increase");
         increaseRb.setToggleGroup(changeGroup);
@@ -107,12 +121,11 @@ public class EditBudgetScreen {
         HBox changeTypeBox = new HBox(15, increaseRb, decreaseRb);
         changeTypeBox.setAlignment(Pos.CENTER);
 
-        // Amount input
         TextField amountField = new TextField();
         amountField.setPromptText("Enter amount");
 
         Label balanceLabel = new Label("Available Balance: " + Ministry.getFormattedBudget(Edit.balance));
-        balanceLabel.setStyle("-fx-text-fill: green;");
+        balanceLabel.setStyle("-fx-text-fill: green; -fx-font-weight: bold;");
 
         Label errorLabel = new Label();
         errorLabel.setStyle("-fx-text-fill: red;");
@@ -120,7 +133,6 @@ public class EditBudgetScreen {
         Button applyBtn = new Button("Apply");
         Button cancelBtn = new Button("Cancel");
 
-        // Update current budget when ministry is selected
         ministryBox.setOnAction(e -> {
             String selected = ministryBox.getValue();
             if (selected != null) {
@@ -158,7 +170,6 @@ public class EditBudgetScreen {
 
             String changeType = increaseRb.isSelected() ? "Increase" : "Decrease";
             
-            // Validation
             double currentBudget = Ministry.budgetSearchByName(ministry, CreatingMinistries.ministries2026);
             
             if (changeType.equals("Decrease") && amount > currentBudget) {
@@ -183,15 +194,41 @@ public class EditBudgetScreen {
                 Edit.balance += amount;
             }
 
+            // Reload from file
+            Path userFile = UserBudgetFileUtil.getUserBudgetFile(user, 2026);
+            try {
+                CreatingMinistries.loadUserBudgets(userFile, 2026);
+            } catch (Exception ex) {
+                System.err.println("Failed to reload budgets: " + ex.getMessage());
+            }
+
+            // Refresh labels
+            balanceLabel.setText("Available Balance: " + Ministry.getFormattedBudget(Edit.balance));
+            double newBudget = Ministry.budgetSearchByName(ministry, CreatingMinistries.ministries2026);
+            currentBudgetLabel.setText("Current Budget: " + Ministry.getFormattedBudget(newBudget));
+
+            // Success message
             Alert success = new Alert(Alert.AlertType.INFORMATION);
             success.setTitle("Success");
-            success.setHeaderText("Budget Updated");
-            success.setContentText("Budget for " + ministry + " has been " + changeType.toLowerCase() + "d by " + 
-                                  Ministry.getFormattedBudget(amount));
+            success.setHeaderText("Budget Updated Successfully");
+            
+            String message = String.format(
+                "Ministry: %s\n" +
+                "Action: %s by %s\n" +
+                "New Budget: %s\n" +
+                "Available Balance: %s",
+                ministry,
+                changeType,
+                Ministry.getFormattedBudget(amount),
+                Ministry.getFormattedBudget(newBudget),
+                Ministry.getFormattedBudget(Edit.balance)
+            );
+            
+            success.setContentText(message);
             success.showAndWait();
 
-            dialog.close();
-            show(parentStage); // Refresh the screen
+            // Close dialog and refresh parent screen
+            
         });
 
         cancelBtn.setOnAction(e -> dialog.close());
@@ -213,7 +250,7 @@ public class EditBudgetScreen {
         dialogRoot.setPadding(new Insets(20));
         dialogRoot.setAlignment(Pos.CENTER);
 
-        dialog.setScene(new Scene(dialogRoot, 450, 400));
+        dialog.setScene(new Scene(dialogRoot, 500, 450));
         dialog.show();
     }
 }

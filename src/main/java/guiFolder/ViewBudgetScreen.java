@@ -1,9 +1,13 @@
 package guiFolder;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
+import UserFeatures.CreatingMinistries;
 import UserFeatures.Ministry;
+import UserFeatures.UserBudgetFileUtil;
 import UserFeatures.ViewGovernmentBudget;
 import UserManagement.User;
 import UserManagement.UserManager;
@@ -12,7 +16,10 @@ import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -29,7 +36,7 @@ import javafx.stage.Stage;
  * <p>This screen displays budget data for a selected year,
  * optionally sorted by budget size.</p>
  * 
- * <p>Uses ViewGovernmentBudget backend class (not View).</p>
+ * <p>Uses ViewGovernmentBudget backend class.</p>
  */
 public class ViewBudgetScreen {
 
@@ -101,7 +108,50 @@ public class ViewBudgetScreen {
 
             table.getItems().clear();
 
-            // Build rows directly here (since ViewGovernmentBudget doesn't have GUI helper)
+            // ✅ NEW: Load Personal vs Original for Citizens viewing 2026
+            if (year == 2026 && user.getRole() == User.Role.CITIZEN) {
+                Path userFile = UserBudgetFileUtil.getUserBudgetFile(user, 2026);
+                
+                if (Files.exists(userFile)) {
+                    Alert loadChoice = new Alert(Alert.AlertType.CONFIRMATION);
+                    loadChoice.setTitle("Load Budget");
+                    loadChoice.setHeaderText("Which budget do you want to view?");
+                    loadChoice.setContentText("Choose between the original government budget or your personal edits.");
+                    
+                    ButtonType originalBtn = new ButtonType("Original Budget");
+                    ButtonType personalBtn = new ButtonType("My Edits");
+                    ButtonType cancelBtn = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
+                    
+                    loadChoice.getButtonTypes().setAll(originalBtn, personalBtn, cancelBtn);
+                    
+                    loadChoice.showAndWait().ifPresent(response -> {
+                        if (response == personalBtn) {
+                            try {
+                                CreatingMinistries.loadUserBudgets(userFile, 2026);
+                            } catch (Exception ex) {
+                                showError("Failed to load personal budget: " + ex.getMessage());
+                            }
+                        } else if (response == originalBtn) {
+                            try {
+                                Path govPath = Path.of("NecessaryFilesAndData/Governor_2026.csv");
+                                CreatingMinistries.loadUserBudgets(govPath, 2026);
+                            } catch (Exception ex) {
+                                showError("Failed to load original budget: " + ex.getMessage());
+                            }
+                        }
+                    });
+                } else {
+                    // No personal budget exists - load original
+                    try {
+                        Path govPath = Path.of("NecessaryFilesAndData/Governor_2026.csv");
+                        CreatingMinistries.loadUserBudgets(govPath, 2026);
+                    } catch (Exception ex) {
+                        showError("Failed to load budget: " + ex.getMessage());
+                    }
+                }
+            }
+
+            // Build rows
             ObservableList<GovBudgetRow> rows = FXCollections.observableArrayList(
                 getGovBudgetRows(year, sort)
             );
@@ -180,6 +230,17 @@ public class ViewBudgetScreen {
             
             return budgetCompare;
         });
+    }
+
+    /**
+     * Shows error alert
+     */
+    private void showError(String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Error");
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 
     /**

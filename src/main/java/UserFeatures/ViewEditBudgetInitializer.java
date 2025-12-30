@@ -24,8 +24,6 @@ public class ViewEditBudgetInitializer {
         }
 
         try {
-            System.out.println("🔄 Initializing application...");
-
             // Step 1: Create all necessary directories
             createDirectories();
 
@@ -88,7 +86,6 @@ public class ViewEditBudgetInitializer {
 
             // Only copy if file doesn't already exist
             if (Files.exists(targetPath)) {
-                System.out.println("   ✓ " + filename + " already exists");
                 continue;
             }
 

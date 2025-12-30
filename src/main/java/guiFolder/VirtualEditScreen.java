@@ -26,12 +26,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-/**
- * VirtualEditScreen - For Citizens to simulate budget editing
- * 
- * Citizens can edit budgets in a sandbox mode. Changes are saved
- * to their personal file and can be viewed later.
- */
 public class VirtualEditScreen {
 
     private final User user;
@@ -67,9 +61,6 @@ public class VirtualEditScreen {
                     CreatingMinistries.loadUserBudgets(governorPath, 2026);
                 }
             });
-            if (!Files.exists(userBudgetFile)) {
-                CreatingMinistries.loadUserBudgets(governorPath, 2026);
-            }
         } else {
             CreatingMinistries.loadUserBudgets(governorPath, 2026);
         }
@@ -127,9 +118,6 @@ public class VirtualEditScreen {
         stage.show();
     }
 
-    /**
-     * Shows a dialog for simple edit (single ministry)
-     */
     private void showSimpleEditDialog(Stage parentStage) {
         Stage dialog = new Stage();
         dialog.setTitle("Virtual Simple Edit");
@@ -137,7 +125,6 @@ public class VirtualEditScreen {
         Label title = new Label("Edit Single Ministry Budget");
         title.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
 
-        // Ministry selection
         ComboBox<String> ministryBox = new ComboBox<>();
         for (Ministry m : CreatingMinistries.ministries2026) {
             if (m != null) {
@@ -147,9 +134,8 @@ public class VirtualEditScreen {
         ministryBox.setPromptText("Select Ministry");
 
         Label currentBudgetLabel = new Label();
-        currentBudgetLabel.setStyle("-fx-font-weight: bold;");
+        currentBudgetLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #1e3a5f;");
 
-        // Change type
         ToggleGroup changeGroup = new ToggleGroup();
         RadioButton increaseRb = new RadioButton("Increase");
         increaseRb.setToggleGroup(changeGroup);
@@ -160,12 +146,11 @@ public class VirtualEditScreen {
         HBox changeTypeBox = new HBox(15, increaseRb, decreaseRb);
         changeTypeBox.setAlignment(Pos.CENTER);
 
-        // Amount input
         TextField amountField = new TextField();
         amountField.setPromptText("Enter amount");
 
         Label balanceLabel = new Label("Available Balance: " + Ministry.getFormattedBudget(Edit.balance));
-        balanceLabel.setStyle("-fx-text-fill: green;");
+        balanceLabel.setStyle("-fx-text-fill: green; -fx-font-weight: bold;");
 
         Label errorLabel = new Label();
         errorLabel.setStyle("-fx-text-fill: red;");
@@ -173,7 +158,6 @@ public class VirtualEditScreen {
         Button applyBtn = new Button("Apply");
         Button cancelBtn = new Button("Cancel");
 
-        // Update current budget when ministry is selected
         ministryBox.setOnAction(e -> {
             String selected = ministryBox.getValue();
             if (selected != null) {
@@ -211,7 +195,6 @@ public class VirtualEditScreen {
 
             String changeType = increaseRb.isSelected() ? "Increase" : "Decrease";
             
-            // Validation
             double currentBudget = Ministry.budgetSearchByName(ministry, CreatingMinistries.ministries2026);
             
             if (changeType.equals("Decrease") && amount > currentBudget) {
@@ -236,15 +219,35 @@ public class VirtualEditScreen {
                 Edit.balance += amount;
             }
 
+            // Reload from file to ensure data consistency
+            Path userFile = UserBudgetFileUtil.getUserBudgetFile(user, 2026);
+            try {
+                CreatingMinistries.loadUserBudgets(userFile, 2026);
+            } catch (Exception ex) {
+                System.err.println("Failed to reload budgets: " + ex.getMessage());
+            }
+
+            // Refresh labels with updated data
+            balanceLabel.setText("Available Balance: " + Ministry.getFormattedBudget(Edit.balance));
+            double newBudget = Ministry.budgetSearchByName(ministry, CreatingMinistries.ministries2026);
+            currentBudgetLabel.setText("Current Budget: " + Ministry.getFormattedBudget(newBudget));
+
             Alert success = new Alert(Alert.AlertType.INFORMATION);
             success.setTitle("Success");
             success.setHeaderText("Virtual Budget Updated");
-            success.setContentText("Virtual budget for " + ministry + " has been " + changeType.toLowerCase() + "d by " + 
-                                  Ministry.getFormattedBudget(amount));
+            success.setContentText(
+                String.format(
+                    "Virtual budget for %s has been %s by %s",
+                    ministry,
+                    changeType.toLowerCase() + "d",
+                    Ministry.getFormattedBudget(amount)
+                )
+            );
             success.showAndWait();
 
-            dialog.close();
-            show(parentStage); // Refresh the screen
+            amountField.clear();
+            errorLabel.setText("");
+            
         });
 
         cancelBtn.setOnAction(e -> dialog.close());
