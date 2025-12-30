@@ -4,14 +4,10 @@ import UserManagement.MinistryMember;
 import UserManagement.User;
 
 /**
- * ViewEditBudget
- * ----------------
- * Central logic class for budget-related features.
- * NO Scanner
- * NO menu
- * NO loops
- *
- * Called ONLY from JavaFX screens (ViewEditBudgetScreen etc.)
+ * ViewEditBudget - Main entry point for budget viewing and editing features.
+ * 
+ * This class has been refactored for GUI compatibility.
+ * All initialization is now handled by ViewEditBudgetInitializer.
  */
 public class ViewEditBudget {
 
@@ -22,12 +18,10 @@ public class ViewEditBudget {
        =============================== */
     public static void ensureInitialized() {
         if (initialized) return;
-
-        for (int year = 2020; year <= 2026; year++) {
-            MinistriesBudgets.loadFromResources(year);
-            CreatingMinistries.ministryCreationFromLoadedBudgets(year);
-        }
-
+        
+        // Delegate to ViewEditBudgetInitializer
+        ViewEditBudgetInitializer.ensureInitialized();
+        
         initialized = true;
     }
 
@@ -119,9 +113,9 @@ public class ViewEditBudget {
         }
         
         else if (user.getRole() == User.Role.MINISTRYMEMBER) {
-            // προσωρινό – θα γίνει GUI screen
+            // GUI screen handles this
             throw new UnsupportedOperationException(
-                "Viewing citizen proposals for ministry member will be GUI-based"
+                "Viewing citizen proposals for ministry member is GUI-based"
             );
         }
     }
