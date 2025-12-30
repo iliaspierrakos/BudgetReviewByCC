@@ -133,7 +133,7 @@ public class ViewBudgetScreen {
                             }
                         } else if (response == originalBtn) {
                             try {
-                                Path govPath = Path.of("NecessaryFilesAndData/Governor_2026.csv");
+                                Path govPath = Path.of("src/main/resources/NecessaryFilesAndData/Governor_2026.csv");
                                 CreatingMinistries.loadUserBudgets(govPath, 2026);
                             } catch (Exception ex) {
                                 showError("Failed to load original budget: " + ex.getMessage());
@@ -143,7 +143,7 @@ public class ViewBudgetScreen {
                 } else {
                     // No personal budget exists - load original
                     try {
-                        Path govPath = Path.of("NecessaryFilesAndData/Governor_2026.csv");
+                        Path govPath = Path.of("src/main/resources/NecessaryFilesAndData/Governor_2026.csv");
                         CreatingMinistries.loadUserBudgets(govPath, 2026);
                     } catch (Exception ex) {
                         showError("Failed to load budget: " + ex.getMessage());

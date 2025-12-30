@@ -31,7 +31,7 @@ public class ViewRecommendationsScreen {
 
     // BASE directory for runtime data
     private static final Path DATA_DIR =
-            Path.of("NecessaryFilesAndData/ProposalsFromCitizens");
+            Path.of("src/main/resources/NecessaryFilesAndData/ProposalsFromCitizens");
 
     public ViewRecommendationsScreen(User user, UserManager userManager) {
         this.user = user;

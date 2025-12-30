@@ -33,7 +33,7 @@ import javafx.stage.Stage;
 public class ViewStatisticsScreen {
 
     private final User user;
-    private static final String VOTES_CSV_FILE = "NecessaryFilesAndData/ProposalsFromCitizens/VotesData.csv";
+    private static final String VOTES_CSV_FILE = "src/main/resources/NecessaryFilesAndData/ProposalsFromCitizens/VotesData.csv";
     private static int[][] allVotes = new int[20][6];
 
     public ViewStatisticsScreen(User user) {

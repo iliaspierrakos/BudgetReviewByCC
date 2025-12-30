@@ -81,11 +81,11 @@ public class EditBudgetScreen {
                 if (Files.exists(userFile)) {
                     CreatingMinistries.loadUserBudgets(userFile, 2026);
                 } else {
-                    Path govPath = Path.of("NecessaryFilesAndData/Governor_2026.csv");
+                    Path govPath = Path.of("src/main/resources/NecessaryFilesAndData/Governor_2026.csv");
                     CreatingMinistries.loadUserBudgets(govPath, 2026);
                 }
             } else {
-                Path govPath = Path.of("NecessaryFilesAndData/Governor_2026.csv");
+                Path govPath = Path.of("src/main/resources/NecessaryFilesAndData/Governor_2026.csv");
                 CreatingMinistries.loadUserBudgets(govPath, 2026);
             }
         } catch (Exception e) {

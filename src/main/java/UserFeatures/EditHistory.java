@@ -19,14 +19,14 @@ import java.nio.file.StandardOpenOption;
 
 public class EditHistory {
     Scanner scanner = new Scanner(System.in);
-    private static final String HISTORY_FILE = "NecessaryFilesAndData/edithistory.txt";
+    private static final String HISTORY_FILE = "src/main/resources/NecessaryFilesAndData/edithistory.txt";
     public static void historyOfEdit(String ministryName, double previousBudget, double newBudget, int type) {
         StringBuilder sb = new StringBuilder();
         FileWriter fw = null;
         PrintWriter pw = null;
         try {
             File file = new File(HISTORY_FILE);
-            /*fw = new FileWriter("NecessaryFilesAndData/edithistory.txt", true);
+            /*fw = new FileWriter("src/main/resources/NecessaryFilesAndData/edithistory.txt", true);
             pw = new PrintWriter(fw);*/
             if (!file.exists() || file.length() == 0) {
                 TableUtils.appendSeparator(sb, 120, '=');

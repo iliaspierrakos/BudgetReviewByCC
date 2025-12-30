@@ -37,13 +37,13 @@ public class ViewEditBudgetInitializer {
             // Step 4: Process BudgetReview files → create CSV files
             MinistriesBudgets budg = new MinistriesBudgets();
             for (int year = 2020; year <= 2026; year++) {
-                budg.budget(Path.of("NecessaryFilesAndData/BudgetReview" + year + ".txt"));
+                budg.budget(Path.of("src/main/resources/NecessaryFilesAndData/BudgetReview" + year + ".txt"));
             }
 
             // Step 5: Create Ministry objects for years 2020-2025
             for (int year = 2020; year <= 2025; year++) {
                 CreatingMinistries.ministryCreation(
-                    Path.of("NecessaryFilesAndData/MinistriesBudgets" + year + ".csv")
+                    Path.of("src/main/resources/NecessaryFilesAndData/MinistriesBudgets" + year + ".csv")
                 );
             }
 
@@ -66,11 +66,11 @@ public class ViewEditBudgetInitializer {
      */
     private static void createDirectories() throws IOException {
 
-        Files.createDirectories(Path.of("NecessaryFilesAndData"));
-        Files.createDirectories(Path.of("NecessaryFilesAndData/OriginalBudget"));
-        Files.createDirectories(Path.of("NecessaryFilesAndData/ProposalsFromCitizens"));
-        Files.createDirectories(Path.of("NecessaryFilesAndData/ProposalsFromMinisters"));
-        Files.createDirectories(Path.of("NecessaryFilesAndData/UserBudgets"));
+        Files.createDirectories(Path.of("src/main/resources/NecessaryFilesAndData"));
+        Files.createDirectories(Path.of("src/main/resources/NecessaryFilesAndData/OriginalBudget"));
+        Files.createDirectories(Path.of("src/main/resources/NecessaryFilesAndData/ProposalsFromCitizens"));
+        Files.createDirectories(Path.of("src/main/resources/NecessaryFilesAndData/ProposalsFromMinisters"));
+        Files.createDirectories(Path.of("src/main/resources/NecessaryFilesAndData/UserBudgets"));
 
     }
 
@@ -82,7 +82,7 @@ public class ViewEditBudgetInitializer {
 
         for (int year = 2020; year <= 2026; year++) {
             String filename = "BudgetReview" + year + ".txt";
-            Path targetPath = Path.of("NecessaryFilesAndData/" + filename);
+            Path targetPath = Path.of("src/main/resources/NecessaryFilesAndData/" + filename);
 
             // Only copy if file doesn't already exist
             if (Files.exists(targetPath)) {
@@ -90,7 +90,7 @@ public class ViewEditBudgetInitializer {
             }
 
             // Try to load from classpath (resources)
-            String resourcePath = "/NecessaryFilesAndData/" + filename;
+            String resourcePath = "src/main/resources/NecessaryFilesAndData/" + filename;
             InputStream resourceStream = ViewEditBudgetInitializer.class.getResourceAsStream(resourcePath);
 
             if (resourceStream == null) {
@@ -111,9 +111,9 @@ public class ViewEditBudgetInitializer {
     private static void setupOriginalBudgetFolder() throws IOException {
 
         Path originalFile = Path.of(
-            "NecessaryFilesAndData/OriginalBudget/MinistriesBudgets2026_original.csv"
+            "src/main/resources/NecessaryFilesAndData/OriginalBudget/MinistriesBudgets2026_original.csv"
         );
-        Path sourceFile = Path.of("NecessaryFilesAndData/MinistriesBudgets2026.csv");
+        Path sourceFile = Path.of("src/main/resources/NecessaryFilesAndData/MinistriesBudgets2026.csv");
 
         // Only copy if original doesn't exist and source does
         if (!Files.exists(originalFile) && Files.exists(sourceFile)) {

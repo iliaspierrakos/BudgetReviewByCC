@@ -148,18 +148,18 @@ public class ViewEditBudgetScreen {
     private void cleanupOnLogout() {
     try {
         // 1. Clear edit history
-        ClearHistory.clearFile(Path.of("NecessaryFilesAndData/edithistory.txt"));
+        ClearHistory.clearFile(Path.of("src/main/resources/NecessaryFilesAndData/edithistory.txt"));
         
         // 2. Clear view files (temporary)
         for (int year = 2020; year <= 2026; year++) {
-            ClearHistory.clearFile(Path.of("NecessaryFilesAndData/view" + year + ".txt"));
+            ClearHistory.clearFile(Path.of("src/main/resources/NecessaryFilesAndData/view" + year + ".txt"));
         }
         
         // 3. Clear comparison files (temporary)
         for (int year1 = 2020; year1 <= 2026; year1++) {
             for (int year2 = 2020; year2 <= 2026; year2++) {
                 Files.deleteIfExists(
-                    Paths.get("NecessaryFilesAndData/compare" + year1 + "with" + year2 + ".txt")
+                    Paths.get("src/main/resources/NecessaryFilesAndData/compare" + year1 + "with" + year2 + ".txt")
                 );
             }
         }

@@ -20,7 +20,7 @@ public class MinistriesBudgets {
     public void budget(Path inputFile) {
         String fileName = inputFile.getFileName().toString();
         String year = fileName.replaceAll("\\D+", "");
-        Path outputFile = Path.of("NecessaryFilesAndData/MinistriesBudgets" + year +".csv");
+        Path outputFile = Path.of("src/main/resources/NecessaryFilesAndData/MinistriesBudgets" + year +".csv");
 
         // Regular expressions for filtering
         Pattern startsWith10 = Pattern.compile("^10");

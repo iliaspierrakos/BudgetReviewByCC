@@ -95,7 +95,7 @@ public class ViewGovernmentBudget {
         // Save to file and handle any errors
         try {
             Files.writeString(
-                Paths.get("NecessaryFilesAndData/view" + year + ".txt"),
+                Paths.get("src/main/resources/NecessaryFilesAndData/view" + year + ".txt"),
                 output,
                 StandardCharsets.UTF_8
             );

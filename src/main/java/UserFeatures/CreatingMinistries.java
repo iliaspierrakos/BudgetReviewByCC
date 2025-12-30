@@ -25,8 +25,8 @@ public class CreatingMinistries {
     public static void ministryCreation(Path budgetsFile) {
         String fileName = budgetsFile.getFileName().toString();
         String year = fileName.replaceAll("\\D+", "");
-        Path ministriesFile = Path.of("NecessaryFilesAndData/ministries.txt");
-        Path outputFile = Path.of("NecessaryFilesAndData/view" + year + ".txt");
+        Path ministriesFile = Path.of("src/main/resources/NecessaryFilesAndData/ministries.txt");
+        Path outputFile = Path.of("src/main/resources/NecessaryFilesAndData/view" + year + ".txt");
 
 
         try {
@@ -102,8 +102,8 @@ public class CreatingMinistries {
      * @param year the year for which to create ministry objects
      */
     public static void ministryCreationFromLoadedBudgets(int year) {
-        Path ministriesFile = Path.of("NecessaryFilesAndData/ministries.txt");
-        Path budgetsFile = Path.of("NecessaryFilesAndData/MinistriesBudgets" + year + ".csv");
+        Path ministriesFile = Path.of("src/main/resources/NecessaryFilesAndData/ministries.txt");
+        Path budgetsFile = Path.of("src/main/resources/NecessaryFilesAndData/MinistriesBudgets" + year + ".csv");
 
         try {
             // Check if the budgets file exists (should have been created by loadFromResources)
@@ -200,9 +200,9 @@ public class CreatingMinistries {
     
     public static void resetGovernorToOriginal(int year) {
         Path original = Path.of(
-            "NecessaryFilesAndData/OriginalBudget/MinistriesBudgets" + year + "_original.csv"
+            "src/main/resources/NecessaryFilesAndData/OriginalBudget/MinistriesBudgets" + year + "_original.csv"
         );
-        Path governor = Path.of("NecessaryFilesAndData/Governor_" + year + ".csv");
+        Path governor = Path.of("src/main/resources/NecessaryFilesAndData/Governor_" + year + ".csv");
 
         ministries2026 = new Ministry[20];
 
@@ -231,13 +231,13 @@ public class CreatingMinistries {
     
     public static void loadOfficialBudgets(int year) {
         ministries2026 = new Ministry[20];
-        ministryCreation(Path.of("NecessaryFilesAndData/MinistriesBudgets" + year + ".csv"));
+        ministryCreation(Path.of("src/main/resources/NecessaryFilesAndData/MinistriesBudgets" + year + ".csv"));
     }
     
     public static void loadGovernorDraft(int year) {
-        Path governorFile = Path.of("NecessaryFilesAndData/Governor_" + year + ".csv");
+        Path governorFile = Path.of("src/main/resources/NecessaryFilesAndData/Governor_" + year + ".csv");
         Path originalFile = Path.of(
-            "NecessaryFilesAndData/OriginalBudget/MinistriesBudgets" + year + "_original.csv"
+            "src/main/resources/NecessaryFilesAndData/OriginalBudget/MinistriesBudgets" + year + "_original.csv"
         );
 
         ministries2026 = new Ministry[20];

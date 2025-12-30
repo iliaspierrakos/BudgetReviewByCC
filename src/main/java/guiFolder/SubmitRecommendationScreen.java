@@ -36,8 +36,8 @@ import javafx.stage.Stage;
 public class SubmitRecommendationScreen {
 
     private final User user;
-    private static final String VOTES_CSV_FILE = "NecessaryFilesAndData/ProposalsFromCitizens/VotesData.csv";
-    private static final String MINISTRIES_REC = "NecessaryFilesAndData/ProposalsFromCitizens/MinistryVotes.txt";
+    private static final String VOTES_CSV_FILE = "src/main/resources/NecessaryFilesAndData/ProposalsFromCitizens/VotesData.csv";
+    private static final String MINISTRIES_REC = "src/main/resources/NecessaryFilesAndData/ProposalsFromCitizens/MinistryVotes.txt";
     
     // All voting data (20 ministries x 6 values)
     private static int[][] allVotes = new int[20][6];
@@ -376,7 +376,7 @@ public class SubmitRecommendationScreen {
             if (CreatingMinistries.ministries2026[i] == null) continue;
 
             String ministryName = CreatingMinistries.ministries2026[i].getMinistryName();
-            String filePath = "NecessaryFilesAndData/ProposalsFromCitizens/CitizenFor" + ministryName + ".txt";
+            String filePath = "src/main/resources/NecessaryFilesAndData/ProposalsFromCitizens/CitizenFor" + ministryName + ".txt";
             String[] options = getOptionsForMinistry(ministryName);
 
             try {

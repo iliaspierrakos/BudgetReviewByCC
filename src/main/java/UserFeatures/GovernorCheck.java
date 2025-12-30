@@ -15,7 +15,7 @@ import java.util.Scanner;
 public class GovernorCheck {
     Scanner scanner = new Scanner(System.in);
     public void viewProposalsNames() {
-        File folder = new File("NecessaryFilesAndData/ProposalsFromMinisters"); //getting access to the folder
+        File folder = new File("src/main/resources/NecessaryFilesAndData/ProposalsFromMinisters"); //getting access to the folder
         File[] files = folder.listFiles(); // saving the files name inside the folder
         if (files != null) {
             int counter = 0;
@@ -40,7 +40,7 @@ public class GovernorCheck {
     public void viewProposal(String fileName) {
         //System.out.println(fileName);
         try {
-            List <String> lines = Files.readAllLines(Paths.get("NecessaryFilesAndData/ProposalsFromMinisters/" + fileName + ".txt"));
+            List <String> lines = Files.readAllLines(Paths.get("src/main/resources/NecessaryFilesAndData/ProposalsFromMinisters/" + fileName + ".txt"));
             for (String line : lines) {
                 System.out.println(line);
             }
@@ -64,7 +64,7 @@ public class GovernorCheck {
         if (accepted == true) {
             Edit.history.applyingEdits();
         } else {
-            Path filePath = Paths.get("NecessaryFilesAndData/ProposalsFromMinisters/" + fileName + ".txt");
+            Path filePath = Paths.get("src/main/resources/NecessaryFilesAndData/ProposalsFromMinisters/" + fileName + ".txt");
             try {
                 Files.deleteIfExists(filePath);
                 System.out.println("File deleted successfully.");

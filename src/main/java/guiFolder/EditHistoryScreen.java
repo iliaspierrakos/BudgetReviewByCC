@@ -49,8 +49,8 @@ public class EditHistoryScreen {
 
         // Load history from file
         try {
-            if (Files.exists(Paths.get("NecessaryFilesAndData/edithistory.txt"))) {
-                String historyContent = Files.readString(Paths.get("NecessaryFilesAndData/edithistory.txt"));
+            if (Files.exists(Paths.get("src/main/resources/NecessaryFilesAndData/edithistory.txt"))) {
+                String historyContent = Files.readString(Paths.get("src/main/resources/NecessaryFilesAndData/edithistory.txt"));
                 if (historyContent.trim().isEmpty()) {
                     historyArea.setText("No edit history available.");
                 } else {
@@ -127,7 +127,7 @@ public class EditHistoryScreen {
             confirm.showAndWait().ifPresent(response -> {
                 if (response == ButtonType.OK) {
                     try {
-                        Files.deleteIfExists(Paths.get("NecessaryFilesAndData/edithistory.txt"));
+                        Files.deleteIfExists(Paths.get("src/main/resources/NecessaryFilesAndData/edithistory.txt"));
                         statusLabel.setStyle("-fx-text-fill: green;");
                         statusLabel.setText("History cleared!");
                         historyArea.setText("No edit history available.");

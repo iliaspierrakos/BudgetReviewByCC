@@ -77,7 +77,7 @@ public class Compare {
         // Save to file and handle any errors
         try {
             Files.writeString(
-                Paths.get("NecessaryFilesAndData/compare" + firstYear + "with" + secondYear + ".txt"),
+                Paths.get("src/main/resources/NecessaryFilesAndData/compare" + firstYear + "with" + secondYear + ".txt"),
                 output,
                 StandardCharsets.UTF_8
             );

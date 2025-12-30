@@ -40,7 +40,7 @@ public class VirtualEditScreen {
 
         // Load user's saved budget if exists
         Path userBudgetFile = UserBudgetFileUtil.getUserBudgetFile(user, 2026);
-        Path governorPath = Path.of("NecessaryFilesAndData/Governor_2026.csv");
+        Path governorPath = Path.of("src/main/resources/NecessaryFilesAndData/Governor_2026.csv");
 
         if (Files.exists(userBudgetFile)) {
             Alert loadAlert = new Alert(Alert.AlertType.CONFIRMATION);

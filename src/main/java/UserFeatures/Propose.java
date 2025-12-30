@@ -14,7 +14,7 @@ public class Propose {
             FileWriter fw = null;
             PrintWriter pw = null;
             try {
-                fw = new FileWriter("NecessaryFilesAndData/ProposalsFromMinisters/MinisterOf" + ministryname + ".txt", true);
+                fw = new FileWriter("src/main/resources/NecessaryFilesAndData/ProposalsFromMinisters/MinisterOf" + ministryname + ".txt", true);
                 pw = new PrintWriter(fw);
                 System.out.println("Editing budget...");
                 Edit proposeEdit = new Edit();

@@ -14,7 +14,7 @@ public class Ministries {
 
     public void minlist() {
 
-        String fileName = "NecessaryFilesAndData/ministries.txt";
+        String fileName = "src/main/resources/NecessaryFilesAndData/ministries.txt";
 
         String[] ministries = {
             "Ministry of Interior",
