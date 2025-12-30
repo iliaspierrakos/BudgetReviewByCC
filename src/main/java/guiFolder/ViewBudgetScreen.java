@@ -23,21 +23,17 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.Separator;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-/**
- * JavaFX screen for viewing the government budget.
- *
- * <p>This screen displays budget data for a selected year,
- * optionally sorted by budget size.</p>
- * 
- * <p>Uses ViewGovernmentBudget backend class.</p>
- */
 public class ViewBudgetScreen {
 
     private final User user;
@@ -51,8 +47,14 @@ public class ViewBudgetScreen {
     public void show(Stage stage) {
 
         /* =========================
-           CONTROLS
+           HEADER (Title + Controls Card)
            ========================= */
+        Label title = new Label("View Government Budget");
+        title.getStyleClass().add("title");
+
+        Label subtitle = new Label("Select a year and load the budget table.");
+        subtitle.getStyleClass().add("subtitle");
+
         ComboBox<Integer> yearBox = new ComboBox<>();
         yearBox.getItems().addAll(2020, 2021, 2022, 2023, 2024, 2025, 2026);
         yearBox.setValue(2026);
@@ -60,44 +62,66 @@ public class ViewBudgetScreen {
         CheckBox sortBox = new CheckBox("Sort by budget (descending)");
 
         Button loadButton = new Button("Load");
-        Button backButton = new Button("Back");
+        loadButton.getStyleClass().addAll("button", "primary");
 
-        HBox controls = new HBox(
-                10,
-                new Label("Year:"),
+        Button backButton = new Button("Back");
+        backButton.getStyleClass().addAll("button", "subtle");
+
+        // Make buttons nicer width
+        loadButton.setMinWidth(110);
+        backButton.setMinWidth(110);
+
+        Label yearLabel = new Label("Year:");
+        yearLabel.getStyleClass().add("subtitle");
+
+        // Spacer so actions align to the right nicely
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+
+        HBox controlsRow = new HBox(
+                12,
+                yearLabel,
                 yearBox,
+                new Separator(),
                 sortBox,
+                spacer,
                 loadButton,
                 backButton
         );
-        controls.setAlignment(Pos.CENTER);
-        controls.setPadding(new Insets(10));
+        controlsRow.setAlignment(Pos.CENTER_LEFT);
+
+        VBox headerCard = new VBox(10, title, subtitle, new Separator(), controlsRow);
+        headerCard.getStyleClass().addAll("card", "toolbar-card");
 
         /* =========================
-           TABLE
+           TABLE (Card + Styling)
            ========================= */
         TableView<GovBudgetRow> table = new TableView<>();
+        table.getStyleClass().add("budget-table");
         table.setPlaceholder(new Label("No data loaded"));
 
-        TableColumn<GovBudgetRow, String> ministryCol =
-                new TableColumn<>("Ministry");
-        ministryCol.setCellValueFactory(
-                new PropertyValueFactory<>("ministry"));
-        ministryCol.setPrefWidth(260);
+        TableColumn<GovBudgetRow, String> ministryCol = new TableColumn<>("Ministry");
+        ministryCol.setCellValueFactory(new PropertyValueFactory<>("ministry"));
+        ministryCol.setMinWidth(280);
+        ministryCol.setPrefWidth(360);
 
-        TableColumn<GovBudgetRow, String> budgetCol =
-                new TableColumn<>("Budget");
-        budgetCol.setCellValueFactory(
-                new PropertyValueFactory<>("budgetText"));
-        budgetCol.setPrefWidth(150);
+        TableColumn<GovBudgetRow, String> budgetCol = new TableColumn<>("Budget");
+        budgetCol.setCellValueFactory(new PropertyValueFactory<>("budgetText"));
+        budgetCol.setMinWidth(150);
+        budgetCol.setPrefWidth(170);
 
-        TableColumn<GovBudgetRow, String> percentCol =
-                new TableColumn<>("Percentage");
-        percentCol.setCellValueFactory(
-                new PropertyValueFactory<>("percentText"));
-        percentCol.setPrefWidth(130);
+        TableColumn<GovBudgetRow, String> percentCol = new TableColumn<>("Percentage");
+        percentCol.setCellValueFactory(new PropertyValueFactory<>("percentText"));
+        percentCol.setMinWidth(130);
+        percentCol.setPrefWidth(150);
 
+        // Let columns resize nicely
+        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
         table.getColumns().addAll(ministryCol, budgetCol, percentCol);
+
+        VBox tableCard = new VBox(table);
+        tableCard.getStyleClass().addAll("card", "table-card");
+        VBox.setVgrow(table, Priority.ALWAYS);
 
         /* =========================
            ACTIONS
@@ -108,22 +132,22 @@ public class ViewBudgetScreen {
 
             table.getItems().clear();
 
-            // ✅ NEW: Load Personal vs Original for Citizens viewing 2026
+            // Load Personal vs Original for Citizens viewing 2026
             if (year == 2026 && user.getRole() == User.Role.CITIZEN) {
                 Path userFile = UserBudgetFileUtil.getUserBudgetFile(user, 2026);
-                
+
                 if (Files.exists(userFile)) {
                     Alert loadChoice = new Alert(Alert.AlertType.CONFIRMATION);
                     loadChoice.setTitle("Load Budget");
                     loadChoice.setHeaderText("Which budget do you want to view?");
                     loadChoice.setContentText("Choose between the original government budget or your personal edits.");
-                    
+
                     ButtonType originalBtn = new ButtonType("Original Budget");
                     ButtonType personalBtn = new ButtonType("My Edits");
                     ButtonType cancelBtn = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
-                    
+
                     loadChoice.getButtonTypes().setAll(originalBtn, personalBtn, cancelBtn);
-                    
+
                     loadChoice.showAndWait().ifPresent(response -> {
                         if (response == personalBtn) {
                             try {
@@ -151,41 +175,39 @@ public class ViewBudgetScreen {
                 }
             }
 
-            // Build rows
             ObservableList<GovBudgetRow> rows = FXCollections.observableArrayList(
-                getGovBudgetRows(year, sort)
+                    getGovBudgetRows(year, sort)
             );
-
             table.setItems(rows);
         });
 
-        backButton.setOnAction(e ->
-                new ViewEditBudgetScreen(user, userManager).show(stage)
-        );
+        backButton.setOnAction(e -> new ViewEditBudgetScreen(user, userManager).show(stage));
 
         /* =========================
            ROOT
            ========================= */
         BorderPane root = new BorderPane();
-        root.setTop(controls);
-        root.setCenter(table);
-        root.setPadding(new Insets(10));
+        root.setPadding(new Insets(18));
+        root.setTop(headerCard);
+        root.setCenter(tableCard);
+        BorderPane.setMargin(tableCard, new Insets(14, 0, 0, 0));
 
-        stage.setScene(new Scene(root, 620, 450));
+        Scene scene = new Scene(root, 880, 580);
+        scene.getStylesheets().add(
+                getClass().getResource("/css/DarkTheme.css").toExternalForm()
+        );
+
+        stage.setScene(scene);
         stage.setTitle("View Government Budget");
         stage.show();
     }
 
-    /**
-     * Builds rows for GUI display using ViewGovernmentBudget logic.
-     */
     private List<GovBudgetRow> getGovBudgetRows(int year, boolean sort) {
         List<GovBudgetRow> rows = new ArrayList<>();
 
         Ministry[] selectedMinistries = ViewGovernmentBudget.ministryYear(year);
         if (selectedMinistries == null) return rows;
 
-        // Clone if sorting (to avoid modifying original)
         if (sort) {
             selectedMinistries = selectedMinistries.clone();
             sortingBudgets(selectedMinistries);
@@ -213,28 +235,20 @@ public class ViewBudgetScreen {
         return rows;
     }
 
-    /**
-     * Sorts ministries by budget (descending) and alphabetically if equal.
-     */
     private void sortingBudgets(Ministry[] ministries) {
         java.util.Arrays.sort(ministries, (m1, m2) -> {
             if (m1 == null && m2 == null) return 0;
             if (m1 == null) return 1;
             if (m2 == null) return -1;
-            
+
             int budgetCompare = Double.compare(m2.getBudget(), m1.getBudget());
-            
             if (budgetCompare == 0) {
                 return m1.getMinistryName().compareToIgnoreCase(m2.getMinistryName());
             }
-            
             return budgetCompare;
         });
     }
 
-    /**
-     * Shows error alert
-     */
     private void showError(String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Error");
@@ -243,9 +257,6 @@ public class ViewBudgetScreen {
         alert.showAndWait();
     }
 
-    /**
-     * Table row model for JavaFX TableView
-     */
     public static class GovBudgetRow {
         private final String ministry;
         private final String budgetText;
@@ -257,16 +268,8 @@ public class ViewBudgetScreen {
             this.percentText = percentText;
         }
 
-        public String getMinistry() {
-            return ministry;
-        }
-
-        public String getBudgetText() {
-            return budgetText;
-        }
-
-        public String getPercentText() {
-            return percentText;
-        }
+        public String getMinistry() { return ministry; }
+        public String getBudgetText() { return budgetText; }
+        public String getPercentText() { return percentText; }
     }
 }
