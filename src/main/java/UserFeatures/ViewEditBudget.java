@@ -1,11 +1,18 @@
 package UserFeatures;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Comparator;
+
 import UserManagement.MinistryMember;
 import UserManagement.User;
 
 /**
  * ViewEditBudget - Main entry point for budget viewing and editing features.
- * 
+ *
  * This class has been refactored for GUI compatibility.
  * All initialization is now handled by ViewEditBudgetInitializer.
  */
@@ -18,10 +25,10 @@ public class ViewEditBudget {
        =============================== */
     public static void ensureInitialized() {
         if (initialized) return;
-        
+
         // Delegate to ViewEditBudgetInitializer
         ViewEditBudgetInitializer.ensureInitialized();
-        
+
         initialized = true;
     }
 
@@ -111,7 +118,7 @@ public class ViewEditBudget {
             GovernorCheck g = new GovernorCheck();
             g.viewProposalsNames();
         }
-        
+
         else if (user.getRole() == User.Role.MINISTRYMEMBER) {
             // GUI screen handles this
             throw new UnsupportedOperationException(
@@ -131,4 +138,26 @@ public class ViewEditBudget {
             "Tax receipt is GUI-based. Open TaxReceiptScreen from the menu."
         );
     }
+
+        public static void resetAll() throws IOException {
+        Path folder1 = Paths.get("src/main/java/NecessaryFilesAndData");
+        if (Files.exists(folder1)) {
+            Files.walk(folder1)
+            .sorted(Comparator.reverseOrder())
+            .map(Path::toFile)
+            .forEach(File::delete);
+        }
+
+        Path folder2 = Paths.get("Data");
+        if (Files.exists(folder2)) {
+            Files.walk(folder2)
+            .sorted(Comparator.reverseOrder())
+            .map(Path::toFile)
+            .forEach(File::delete);
+        }
+
+        // Reset initialization flag
+        initialized = false;
+    }
 }
+
