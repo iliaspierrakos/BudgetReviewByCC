@@ -240,7 +240,19 @@
     -fx-effect: dropshadow(gaussian, rgba(124,92,255,0.35), 30, 0.25, 0, 12);
     -fx-translate-y: -2;
 }
+/* --- Spinner dark fix (arrow buttons) --- */
+.spinner {
+    -fx-background-color: #0f1320;
+    -fx-background-radius: 12;
+    -fx-border-radius: 12;
+    -fx-border-color: rgba(255,255,255,0.10);
+}
 
+.spinner .text-field {
+    -fx-background-color: transparent;
+    -fx-text-fill: #e7eaf0;
+    -fx-prompt-text-fill: #7e879b;
+}
 
 /* ====== Subtitle (το χρησιμοποιούμε παντού) ====== */
 .subtitle{
@@ -262,11 +274,15 @@
     -fx-padding: 6;
 }
 
+/* list cells: keep dark theme + add subtle separators (Ministry selector fix) */
 .combo-box-popup .list-cell{
     -fx-background-color: transparent;
     -fx-text-fill: #e7eaf0;
     -fx-padding: 10 10;
     -fx-background-radius: 10;
+
+    -fx-border-color: rgba(255,255,255,0.06);
+    -fx-border-width: 0 0 1 0; /* bottom separator line */
 }
 
 .combo-box-popup .list-cell:hover{
@@ -341,7 +357,7 @@
     -fx-border-radius: 12;
 }
 
-/* ====== TextArea (για preview) ====== */
+/* ====== TextArea (για preview + ViewRecommendations) ====== */
 .text-area{
     -fx-background-color: #0f1320;
     -fx-text-fill: #e7eaf0;
@@ -349,6 +365,9 @@
     -fx-background-radius: 12;
     -fx-border-radius: 12;
     -fx-border-color: rgba(255,255,255,0.10);
+
+    -fx-highlight-fill: rgba(255,255,255,0.14);
+    -fx-highlight-text-fill: #ffffff;
 }
 .text-area .content{
     -fx-background-color: transparent;
@@ -360,6 +379,7 @@
     -fx-effect: dropshadow(gaussian, rgba(124,92,255,0.22), 14, 0.25, 0, 0);
 }
 
+/* ===== Buttons variants ===== */
 .button.subtle{
     -fx-background-color: rgba(255,255,255,0.05);
     -fx-text-fill: #e7eaf0;
@@ -411,4 +431,40 @@
     -fx-background-color: rgba(231, 76, 60, 0.38);
     -fx-text-fill: #ffeaea;
     -fx-effect: dropshadow(gaussian, rgba(231,76,60,0.45), 12, 0.25, 0, 0);
+}
+
+/* ===== Spinner arrows (remote fix but themed) ===== */
+.spinner .increment-arrow-button,
+.spinner .decrement-arrow-button {
+    -fx-background-color: rgba(255,255,255,0.06);
+    -fx-background-radius: 10;
+    -fx-padding: 6 8;
+    -fx-border-color: rgba(255,255,255,0.10);
+    -fx-border-radius: 10;
+}
+
+.spinner .increment-arrow-button:hover,
+.spinner .decrement-arrow-button:hover {
+    -fx-background-color: rgba(255,255,255,0.10);
+}
+
+.spinner .increment-arrow,
+.spinner .decrement-arrow {
+    -fx-background-color: #e7eaf0; /* visible on dark */
+}
+
+/* ===== Submit Recommendation: make texts readable inside cards (without forcing ugly colors) ===== */
+.card .label,
+.card Label{
+    -fx-text-fill: #e7eaf0;
+}
+
+.card .radio-button,
+.card RadioButton{
+    -fx-text-fill: #e7eaf0;
+}
+
+.card RadioButton .radio{
+    -fx-background-color: rgba(255,255,255,0.10);
+    -fx-border-color: rgba(255,255,255,0.12);
 }

@@ -15,21 +15,22 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 /**
  * ViewRecommendationsScreen
  *
- * Screen for Ministry Members to view citizen recommendations
- * submitted for their assigned ministry.
+ * Ministry Member screen for viewing citizen recommendations.
+ * (UI improved – logic unchanged)
  */
 public class ViewRecommendationsScreen {
 
     private final User user;
     private final UserManager userManager;
 
-    // BASE directory for runtime data
     private static final Path DATA_DIR =
             Path.of("src/main/resources/NecessaryFilesAndData/ProposalsFromCitizens");
 
@@ -40,9 +41,16 @@ public class ViewRecommendationsScreen {
 
     public void show(Stage stage) {
 
+        /* ================= ACCESS CONTROL ================= */
         if (!(user instanceof MinistryMember)) {
             Alert a = new Alert(Alert.AlertType.ERROR,
                     "Access denied: Only Ministry Members can view recommendations.");
+
+            a.getDialogPane().getStylesheets().add(
+                    getClass().getResource("/css/DarkTheme.css").toExternalForm()
+            );
+            a.getDialogPane().getStyleClass().add("dark-dialog");
+
             a.showAndWait();
             return;
         }
@@ -50,15 +58,23 @@ public class ViewRecommendationsScreen {
         MinistryMember mm = (MinistryMember) user;
         String ministryName = mm.getMinistryName();
 
-        Label title = new Label("Citizen Recommendations");
-        title.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
+        /* ================= TITLE ================= */
+        Label title = new Label("CITIZEN RECOMMENDATIONS");
+        title.getStyleClass().add("title");
 
         Label subtitle = new Label("Ministry: " + ministryName);
-        subtitle.setStyle("-fx-font-size: 14px;");
+        subtitle.getStyleClass().add("subtitle");
 
+        VBox headerCard = new VBox(6, title, subtitle);
+        headerCard.getStyleClass().add("card");
+        headerCard.setPadding(new Insets(18));
+
+        /* ================= TEXT AREA ================= */
         TextArea textArea = new TextArea();
         textArea.setEditable(false);
         textArea.setWrapText(true);
+        textArea.setFocusTraversable(false);
+        VBox.setVgrow(textArea, Priority.ALWAYS);
 
         Path filePath = DATA_DIR.resolve(
                 "CitizenForMinistry of " + ministryName + ".txt"
@@ -72,30 +88,39 @@ public class ViewRecommendationsScreen {
             }
         } else {
             textArea.setText(
-                "No citizen recommendations have been submitted yet\n" +
-                "for this ministry."
+                    "No citizen recommendations have been submitted yet\n" +
+                    "for this ministry."
             );
         }
 
+        VBox contentCard = new VBox(textArea);
+        contentCard.getStyleClass().add("card");
+        contentCard.setPadding(new Insets(16));
+        VBox.setVgrow(contentCard, Priority.ALWAYS);
+
+        /* ================= BUTTONS ================= */
         Button backButton = new Button("Back");
+        backButton.getStyleClass().add("button");
+
         backButton.setOnAction(e ->
                 new ViewEditBudgetScreen(user, userManager).show(stage)
         );
 
-        VBox top = new VBox(6, title, subtitle);
-        top.setAlignment(Pos.CENTER);
-        top.setPadding(new Insets(10));
+        HBox actions = new HBox(backButton);
+        actions.setAlignment(Pos.CENTER_RIGHT);
 
-        BorderPane root = new BorderPane();
-        root.setTop(top);
-        root.setCenter(textArea);
-        root.setBottom(backButton);
+        /* ================= ROOT ================= */
+        VBox content = new VBox(20, headerCard, contentCard, actions);
+        content.setPadding(new Insets(26));
+        VBox.setVgrow(contentCard, Priority.ALWAYS);
 
-        BorderPane.setMargin(textArea, new Insets(10));
-        BorderPane.setMargin(backButton, new Insets(10));
-        BorderPane.setAlignment(backButton, Pos.CENTER);
+        BorderPane root = new BorderPane(content);
 
-        Scene scene = new Scene(root, 650, 500);
+        Scene scene = new Scene(root, 1100, 720);
+        scene.getStylesheets().add(
+                getClass().getResource("/css/DarkTheme.css").toExternalForm()
+        );
+
         stage.setTitle("View Recommendations");
         stage.setScene(scene);
         stage.show();
