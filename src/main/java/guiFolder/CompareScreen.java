@@ -16,11 +16,15 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 /**
  * JavaFX screen for comparing ministry budgets between two years.
+ * (UI improved – logic untouched)
  */
 public class CompareScreen {
 
@@ -34,11 +38,14 @@ public class CompareScreen {
 
     public void show(Stage stage) {
 
-        /* =========================
-           Top controls
-           ========================= */
+        /* ================= TITLE ================= */
+        Label title = new Label("COMPARE BUDGETS");
+        title.getStyleClass().add("title");
+
+        /* ================= CONTROLS ================= */
         ComboBox<Integer> firstYearBox = new ComboBox<>();
         ComboBox<Integer> secondYearBox = new ComboBox<>();
+
         firstYearBox.getItems().addAll(2020, 2021, 2022, 2023, 2024, 2025, 2026);
         secondYearBox.getItems().addAll(2020, 2021, 2022, 2023, 2024, 2025, 2026);
 
@@ -46,51 +53,63 @@ public class CompareScreen {
         secondYearBox.setValue(2026);
 
         Button compareButton = new Button("Compare");
+        compareButton.getStyleClass().addAll("button", "primary");
+
         Button backButton = new Button("Back");
+        backButton.getStyleClass().add("button");
 
         Label errorLabel = new Label();
-        errorLabel.setStyle("-fx-text-fill: red;");
+        errorLabel.getStyleClass().add("error");
 
-        HBox controls = new HBox(
-                10,
-                new Label("First year:"),
-                firstYearBox,
-                new Label("Second year:"),
-                secondYearBox,
-                compareButton,
-                backButton
-        );
-        controls.setAlignment(Pos.CENTER);
-        controls.setPadding(new Insets(10));
+        GridPane controlsGrid = new GridPane();
+        controlsGrid.setHgap(14);
+        controlsGrid.setVgap(14);
 
-        /* =========================
-           TableView
-           ========================= */
+        controlsGrid.addRow(0, new Label("First year:"), firstYearBox);
+        controlsGrid.addRow(1, new Label("Second year:"), secondYearBox);
+
+        HBox buttons = new HBox(12, compareButton, backButton);
+        buttons.setAlignment(Pos.CENTER_LEFT);
+        controlsGrid.add(buttons, 0, 2, 2, 1);
+
+        VBox controlsCard = new VBox(14, title, controlsGrid, errorLabel);
+        controlsCard.getStyleClass().add("card");
+        controlsCard.setPadding(new Insets(22));
+        controlsCard.setMinWidth(320);
+        controlsCard.setMaxWidth(380);
+
+        /* ================= TABLE ================= */
         TableView<CompareRow> table = new TableView<>();
+        table.getStyleClass().add("budget-table");
+        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
         TableColumn<CompareRow, String> ministryCol =
                 new TableColumn<>("Ministry");
         ministryCol.setCellValueFactory(
-                new PropertyValueFactory<>("ministry"));
-        ministryCol.setPrefWidth(260);
+                new PropertyValueFactory<>("ministry")
+        );
 
         TableColumn<CompareRow, String> firstCol =
                 new TableColumn<>("First Year Budget");
         firstCol.setCellValueFactory(
-                new PropertyValueFactory<>("firstYearBudget"));
-        firstCol.setPrefWidth(160);
+                new PropertyValueFactory<>("firstYearBudget")
+        );
 
         TableColumn<CompareRow, String> secondCol =
                 new TableColumn<>("Second Year Budget");
         secondCol.setCellValueFactory(
-                new PropertyValueFactory<>("secondYearBudget"));
-        secondCol.setPrefWidth(160);
+                new PropertyValueFactory<>("secondYearBudget")
+        );
 
         table.getColumns().addAll(ministryCol, firstCol, secondCol);
 
-        /* =========================
-           Actions
-           ========================= */
+        VBox tableCard = new VBox(table);
+        tableCard.getStyleClass().add("card");
+        tableCard.setPadding(new Insets(12));
+
+        HBox.setHgrow(tableCard, Priority.ALWAYS);
+
+        /* ================= ACTIONS (UNCHANGED) ================= */
         compareButton.setOnAction(e -> {
             int y1 = firstYearBox.getValue();
             int y2 = secondYearBox.getValue();
@@ -115,18 +134,20 @@ public class CompareScreen {
                 new ViewEditBudgetScreen(user, userManager).show(stage)
         );
 
-        /* =========================
-           Root layout
-           ========================= */
-        BorderPane root = new BorderPane();
-        root.setTop(controls);
-        root.setCenter(table);
-        root.setBottom(errorLabel);
-        BorderPane.setAlignment(errorLabel, Pos.CENTER);
-        BorderPane.setMargin(errorLabel, new Insets(5));
+        /* ================= MAIN LAYOUT ================= */
+        HBox mainContent = new HBox(22, controlsCard, tableCard);
+        mainContent.setPadding(new Insets(26));
+        mainContent.setAlignment(Pos.TOP_LEFT);
 
-        stage.setScene(new Scene(root, 650, 450));
+        BorderPane root = new BorderPane(mainContent);
+
+        Scene scene = new Scene(root, 1200, 700);
+        scene.getStylesheets().add(
+                getClass().getResource("/css/DarkTheme.css").toExternalForm()
+        );
+
         stage.setTitle("Compare Budgets");
+        stage.setScene(scene);
         stage.show();
     }
 }
