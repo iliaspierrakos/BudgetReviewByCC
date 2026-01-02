@@ -5,9 +5,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-
 import UserFeatures.ClearHistory;
 import UserFeatures.Edit;
 import UserFeatures.EditHistoryList;
@@ -15,16 +12,18 @@ import UserFeatures.ViewEditBudgetInitializer;
 import UserManagement.CurrentSession;
 import UserManagement.User;
 import UserManagement.UserManager;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -56,13 +55,13 @@ public class ViewEditBudgetScreen {
 
         Region spacer = new Region();
         HBox headerTop = new HBox(12, title, spacer, roleBadge);
-        HBox.setHgrow(spacer, javafx.scene.layout.Priority.ALWAYS);
+        HBox.setHgrow(spacer, Priority.ALWAYS);
         headerTop.setAlignment(Pos.CENTER_LEFT);
 
         VBox headerCard = new VBox(10, headerTop, subtitle);
         headerCard.getStyleClass().addAll("card", "toolbar-card");
 
-        // ===== Actions as cards in a grid =====
+        // ===== Actions grid =====
         GridPane grid = new GridPane();
         grid.getStyleClass().add("action-grid");
         grid.setHgap(14);
@@ -70,79 +69,83 @@ public class ViewEditBudgetScreen {
         grid.setPadding(new Insets(6, 0, 0, 0));
         grid.setAlignment(Pos.TOP_CENTER);
 
+        ColumnConstraints col = new ColumnConstraints();
+        col.setPercentWidth(50);
+        col.setHgrow(Priority.ALWAYS);
+        grid.getColumnConstraints().addAll(col, col);
+
         int r = 0, c = 0;
 
-        // View Budget (all)
-        Button viewBtn = makeActionButton("View Budget", "Browse government budget tables.");
-        viewBtn.setOnAction(e -> new ViewBudgetScreen(user, userManager).show(stage));
-        addToGrid(grid, wrapActionCard(viewBtn), r, c++);
+        addToGrid(grid, actionCard(
+                "View Budget",
+                "Browse government budget tables.",
+                () -> new ViewBudgetScreen(user, userManager).show(stage)
+        ), r, c++);
 
-        // Edit / Propose (not citizen)
         if (user.getRole() != User.Role.CITIZEN) {
             String txt = (user.getRole() == User.Role.MINISTRYMEMBER) ? "Propose Edit" : "Edit Budget";
             String desc = (user.getRole() == User.Role.MINISTRYMEMBER)
                     ? "Submit proposals for your ministry."
                     : "Edit budgets with governor permissions.";
 
-            Button editBtn = makeActionButton(txt, desc);
-            editBtn.setOnAction(e -> new EditBudgetScreen(user, userManager).show(stage));
             if (c > 1) { r++; c = 0; }
-            addToGrid(grid, wrapActionCard(editBtn), r, c++);
+            addToGrid(grid, actionCard(txt, desc,
+                    () -> new EditBudgetScreen(user, userManager).show(stage)
+            ), r, c++);
         }
 
-        // Virtual Edit (citizen)
         if (user.getRole() == User.Role.CITIZEN) {
-            Button virtualBtn = makeActionButton("Virtual Edit", "Simulate changes without affecting official data.");
-            virtualBtn.setOnAction(e -> new VirtualEditScreen(user, userManager).show(stage));
             if (c > 1) { r++; c = 0; }
-            addToGrid(grid, wrapActionCard(virtualBtn), r, c++);
+            addToGrid(grid, actionCard(
+                    "Virtual Edit",
+                    "Simulate changes without affecting official data.",
+                    () -> new VirtualEditScreen(user, userManager).show(stage)
+            ), r, c++);
         }
 
-        // Compare (all)
-        Button compareBtn = makeActionButton("Compare Budgets", "Compare years and view differences.");
-        compareBtn.setOnAction(e -> new CompareScreen(user, userManager).show(stage));
         if (c > 1) { r++; c = 0; }
-        addToGrid(grid, wrapActionCard(compareBtn), r, c++);
+        addToGrid(grid, actionCard(
+                "Compare Budgets",
+                "Compare years and view differences.",
+                () -> new CompareScreen(user, userManager).show(stage)
+        ), r, c++);
 
-        // Recommendations / Statistics (role-based)
         String recTitle;
         String recDesc;
+        Runnable recAction;
+
         switch (user.getRole()) {
             case GOVERNOR -> {
                 recTitle = "View Statistics";
                 recDesc = "Review trends, totals and distributions.";
+                recAction = () -> new ViewStatisticsScreen(user).show(stage);
             }
             case CITIZEN -> {
                 recTitle = "Submit Recommendation";
                 recDesc = "Send your proposal to the government.";
+                recAction = () -> new SubmitRecommendationScreen(user).show(stage);
             }
-            default -> { // MINISTRYMEMBER
+            default -> {
                 recTitle = "View Citizen Proposals";
                 recDesc = "Review and evaluate citizen submissions.";
+                recAction = () -> new ViewRecommendationsScreen(user, userManager).show(stage);
             }
         }
 
-        Button recBtn = makeActionButton(recTitle, recDesc);
-        recBtn.setOnAction(e -> {
-            switch (user.getRole()) {
-                case CITIZEN -> new SubmitRecommendationScreen(user).show(stage);
-                case MINISTRYMEMBER -> new ViewRecommendationsScreen(user, userManager).show(stage);
-                case GOVERNOR -> new ViewStatisticsScreen(user).show(stage);
-            }
-        });
         if (c > 1) { r++; c = 0; }
-        addToGrid(grid, wrapActionCard(recBtn), r, c++);
+        addToGrid(grid, actionCard(recTitle, recDesc, recAction), r, c++);
 
-        // Tax Receipt (citizen only)
         if (user.getRole() == User.Role.CITIZEN) {
-            Button taxBtn = makeActionButton("Tax Receipt", "Generate and view your tax receipt.");
-            taxBtn.setOnAction(e -> new TaxReceiptScreen(user, userManager).show(stage));
             if (c > 1) { r++; c = 0; }
-            addToGrid(grid, wrapActionCard(taxBtn), r, c++);
+            addToGrid(grid, actionCard(
+                    "Tax Receipt",
+                    "Generate and view your tax receipt.",
+                    () -> new TaxReceiptScreen(user, userManager).show(stage)
+            ), r, c++);
         }
 
-        // ===== Footer actions =====
-        Button logoutBtn = new Button("Logout");
+        // ===== Footer =====
+        javafx.scene.control.Button logoutBtn = new javafx.scene.control.Button("Logout");
         logoutBtn.getStyleClass().addAll("button", "danger");
         logoutBtn.setOnAction(e -> {
             cleanupOnLogout();
@@ -168,21 +171,22 @@ public class ViewEditBudgetScreen {
         stage.show();
     }
 
-    private static VBox wrapActionCard(Button btn) {
-        VBox box = new VBox(10, btn);
-        box.getStyleClass().addAll("card", "action-card");
-        box.setAlignment(Pos.CENTER_LEFT);
-        return box;
-    }
+    private static VBox actionCard(String title, String desc, Runnable onClick) {
+        Label t = new Label(title);
+        t.getStyleClass().add("action-title");
 
-    private static Button makeActionButton(String title, String desc) {
-        // Using a button with multi-line text (title + description) gives “app card” feel.
-        Button b = new Button(title + "\n" + desc);
-        b.getStyleClass().addAll("button", "action-button");
-        b.setMaxWidth(Double.MAX_VALUE);
-        b.setWrapText(true);
-        b.setAlignment(Pos.CENTER_LEFT);
-        return b;
+        Label d = new Label(desc);
+        d.getStyleClass().add("action-desc");
+        d.setWrapText(true);
+
+        VBox text = new VBox(4, t, d);
+        text.setAlignment(Pos.CENTER_LEFT);
+
+        VBox card = new VBox(text);
+        card.getStyleClass().addAll("card", "action-card", "image-card");
+        card.setOnMouseClicked(e -> onClick.run());
+
+        return card;
     }
 
     private static void addToGrid(GridPane grid, VBox node, int row, int col) {
@@ -239,32 +243,4 @@ public class ViewEditBudgetScreen {
         alert.setContentText(message);
         alert.showAndWait();
     }
-
-    private static VBox actionCardWithImage(String title, String desc, String imagePath, Runnable onClick) {
-    ImageView img = new ImageView(new Image(
-            ViewEditBudgetScreen.class.getResourceAsStream(imagePath)
-    ));
-    img.setFitWidth(56);
-    img.setFitHeight(56);
-    img.setPreserveRatio(true);
-
-    Label t = new Label(title);
-    t.getStyleClass().add("action-title");
-
-    Label d = new Label(desc);
-    d.getStyleClass().add("action-desc");
-    d.setWrapText(true);
-
-    VBox text = new VBox(4, t, d);
-
-    HBox content = new HBox(12, img, text);
-    content.setAlignment(Pos.CENTER_LEFT);
-
-    VBox card = new VBox(content);
-    card.getStyleClass().addAll("card", "action-card", "image-card");
-    card.setOnMouseClicked(e -> onClick.run());
-
-    return card;
-}
-
 }
