@@ -1,35 +1,115 @@
 package UserFeatures;
-/** 
-This is a class that creates the proposals the ministers make.
-Each minister has a .txt proposal that are saved in a specific
-folder where the governor will have access and take action.*/
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.Scanner;
-public class Propose {
-    Scanner s = new Scanner(System.in);
-    public static double sharedBalance;
-    public void editProposal(String ministryname) {// taking the user's username as a parameter to create the unique file 
-            FileWriter fw = null;
-            PrintWriter pw = null;
-            try {
-                fw = new FileWriter("src/main/resources/NecessaryFilesAndData/ProposalsFromMinisters/MinisterOf" + ministryname + ".txt", true);
-                pw = new PrintWriter(fw);
-                System.out.println("Editing budget...");
-                Edit proposeEdit = new Edit();
-                proposeEdit.collectData(true); // calling the collectData method enables editing
-                //System.out.println("Number of edits in history: " + Edit.history.editList.size());
-                for (Edit e : Edit.history.editList) {
-                    //System.out.println("this works");
-                    pw.println(e.toString()); // calling the edit objects toString
-                }
-                System.out.println("Would you like to add a reasoning for the changes you made?");
-                String reason = s.nextLine();
-                pw.println("Reasoning for changes made:" + reason);
-                pw.close();
-                fw.close();
 
-            } catch(IOException e) {}
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Propose
+ *
+ * GUI-friendly backend (backward compatible with CLI usage).
+ */
+public class Propose {
+
+    private static final String BASE_DIR =
+            "src/main/resources/NecessaryFilesAndData/ProposalsFromMinisters/";
+
+    private String ministryName;
+
+    /* =========================
+       CONSTRUCTORS
+       ========================= */
+
+    // ✔ Default constructor (for existing code)
+    public Propose() {
+        createDirectories();
+    }
+
+    // ✔ New constructor (for GUI usage)
+    public Propose(String ministryName) {
+        this.ministryName = ministryName;
+        createDirectories();
+    }
+
+    /* =========================
+       BACKWARD COMPATIBILITY
+       ========================= */
+
+    /**
+     * Old method used by ViewEditBudget
+     */
+    public void editProposal(String proposalText) {
+        if (ministryName == null || ministryName.isBlank()) {
+            throw new IllegalStateException(
+                    "Ministry name not set. Use Propose(String ministryName)."
+            );
+        }
+        submitProposal(proposalText);
+    }
+
+    /* =========================
+       GUI-FRIENDLY API
+       ========================= */
+
+    public void setMinistryName(String ministryName) {
+        this.ministryName = ministryName;
+    }
+
+    public String getMinistryName() {
+        return ministryName;
+    }
+
+    public void submitProposal(String proposalText) {
+        if (proposalText == null || proposalText.trim().isEmpty()) {
+            throw new IllegalArgumentException("Proposal text cannot be empty.");
+        }
+        saveProposalToFile(proposalText.trim());
+    }
+
+    public File getProposalFile() {
+        return new File(BASE_DIR + "MinisterFor" + ministryName + ".txt");
+    }
+
+    public List<String> getAllProposals() {
+        File file = getProposalFile();
+        List<String> proposals = new ArrayList<>();
+
+        if (!file.exists()) {
+            return proposals;
+        }
+
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                if (!line.isBlank()) {
+                    proposals.add(line);
+                }
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Error reading proposals file.", e);
+        }
+
+        return proposals;
+    }
+
+    /* =========================
+       INTERNAL HELPERS
+       ========================= */
+
+    private void createDirectories() {
+        File dir = new File(BASE_DIR);
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
+    }
+
+    private void saveProposalToFile(String proposal) {
+        File file = getProposalFile();
+
+        try (PrintWriter pw = new PrintWriter(new FileWriter(file, true))) {
+            pw.println(proposal);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to save proposal.", e);
+        }
     }
 }
