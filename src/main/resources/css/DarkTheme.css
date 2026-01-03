@@ -254,6 +254,186 @@
     -fx-prompt-text-fill: #7e879b;
 }
 
+/* ====== Subtitle (το χρησιμοποιούμε παντού) ====== */
+.subtitle{
+    -fx-text-fill: #9aa3b8;
+    -fx-font-weight: 600;
+}
+
+/* ====== Separators ====== */
+.separator .line{
+    -fx-border-color: rgba(255,255,255,0.08);
+}
+
+/* ====== ComboBox popup / ListView / Menu ====== */
+.combo-box-popup .list-view{
+    -fx-background-color: #101424;
+    -fx-background-radius: 12;
+    -fx-border-radius: 12;
+    -fx-border-color: rgba(255,255,255,0.10);
+    -fx-padding: 6;
+}
+
+/* list cells: keep dark theme + add subtle separators (Ministry selector fix) */
+.combo-box-popup .list-cell{
+    -fx-background-color: transparent;
+    -fx-text-fill: #e7eaf0;
+    -fx-padding: 10 10;
+    -fx-background-radius: 10;
+
+    -fx-border-color: rgba(255,255,255,0.06);
+    -fx-border-width: 0 0 1 0; /* bottom separator line */
+}
+
+.combo-box-popup .list-cell:hover{
+    -fx-background-color: rgba(124,92,255,0.14);
+}
+
+.combo-box-popup .list-cell:selected{
+    -fx-background-color: rgba(124,92,255,0.22);
+}
+
+/* ====== Table header separators (πιο καθαρό) ====== */
+.table-view .column-header-background{
+    -fx-border-color: rgba(255,255,255,0.08);
+    -fx-border-width: 0 0 1 0;
+}
+
+/* ====== Scrollbars (big difference στο look) ====== */
+.scroll-bar:vertical, .scroll-bar:horizontal{
+    -fx-background-color: transparent;
+}
+
+.scroll-bar .track{
+    -fx-background-color: rgba(255,255,255,0.04);
+    -fx-background-radius: 999;
+}
+
+.scroll-bar .thumb{
+    -fx-background-color: rgba(255,255,255,0.18);
+    -fx-background-radius: 999;
+}
+
+.scroll-bar .thumb:hover{
+    -fx-background-color: rgba(255,255,255,0.26);
+}
+
+.scroll-bar .increment-button,
+.scroll-bar .decrement-button{
+    -fx-padding: 0;
+    -fx-background-color: transparent;
+}
+
+.scroll-bar .increment-arrow,
+.scroll-bar .decrement-arrow{
+    -fx-shape: "";
+    -fx-padding: 0;
+}
+
+/* ====== Dialogs / Alerts: να μην φαίνονται "Windows default" ====== */
+.dialog-pane{
+    -fx-background-color: #141824;
+    -fx-border-color: rgba(255,255,255,0.10);
+    -fx-border-radius: 16;
+    -fx-background-radius: 16;
+}
+
+.dialog-pane .header-panel{
+    -fx-background-color: transparent;
+}
+
+.dialog-pane .header-panel .label{
+    -fx-text-fill: #f0f2f8;
+    -fx-font-weight: 800;
+    -fx-font-size: 16px;
+}
+
+.dialog-pane .content{
+    -fx-text-fill: #e7eaf0;
+}
+
+.dialog-pane .button-bar .button{
+    -fx-background-radius: 12;
+    -fx-border-radius: 12;
+}
+
+/* ====== TextArea (για preview + ViewRecommendations) ====== */
+.text-area{
+    -fx-background-color: #0f1320;
+    -fx-text-fill: #e7eaf0;
+    -fx-prompt-text-fill: #7e879b;
+    -fx-background-radius: 12;
+    -fx-border-radius: 12;
+    -fx-border-color: rgba(255,255,255,0.10);
+
+    -fx-highlight-fill: rgba(255,255,255,0.14);
+    -fx-highlight-text-fill: #ffffff;
+}
+.text-area .content{
+    -fx-background-color: transparent;
+}
+
+/* ====== (Optional) subtle focus ring για inputs ====== */
+.text-field:focused, .password-field:focused, .combo-box:focused, .text-area:focused{
+    -fx-border-color: rgba(124,92,255,0.60);
+    -fx-effect: dropshadow(gaussian, rgba(124,92,255,0.22), 14, 0.25, 0, 0);
+}
+
+/* ===== Buttons variants ===== */
+.button.subtle{
+    -fx-background-color: rgba(255,255,255,0.05);
+    -fx-text-fill: #e7eaf0;
+    -fx-border-color: rgba(255,255,255,0.10);
+}
+.button.subtle:hover{
+    -fx-background-color: rgba(255,255,255,0.09);
+}
+
+.button.danger{
+    -fx-background-color: rgba(255, 107, 107, 0.16);
+    -fx-text-fill: #ffb4b4;
+    -fx-border-color: rgba(255, 107, 107, 0.35);
+    -fx-font-weight: 800;
+}
+.button.danger:hover{
+    -fx-background-color: rgba(255, 107, 107, 0.22);
+}
+
+/* ===== Segmented buttons ===== */
+.segmented-box{
+    -fx-background-color: rgba(255,255,255,0.04);
+    -fx-padding: 4;
+    -fx-background-radius: 12;
+}
+
+.segment-btn{
+    -fx-background-color: transparent;
+    -fx-text-fill: #cfd6ff;
+    -fx-font-weight: 800;
+    -fx-padding: 8 22;
+    -fx-background-radius: 10;
+    -fx-cursor: hand;
+}
+
+.segment-btn:hover{
+    -fx-background-color: rgba(255,255,255,0.08);
+}
+
+/* Increase */
+.segment-btn.increase:selected{
+    -fx-background-color: rgba(46, 204, 113, 0.35);
+    -fx-text-fill: #eafff3;
+    -fx-effect: dropshadow(gaussian, rgba(46,204,113,0.45), 12, 0.25, 0, 0);
+}
+
+/* Decrease */
+.segment-btn.decrease:selected{
+    -fx-background-color: rgba(231, 76, 60, 0.38);
+    -fx-text-fill: #ffeaea;
+    -fx-effect: dropshadow(gaussian, rgba(231,76,60,0.45), 12, 0.25, 0, 0);
+}
+
+/* ===== Spinner arrows (remote fix but themed) ===== */
 .spinner .increment-arrow-button,
 .spinner .decrement-arrow-button {
     -fx-background-color: rgba(255,255,255,0.06);
@@ -270,93 +450,21 @@
 
 .spinner .increment-arrow,
 .spinner .decrement-arrow {
-    -fx-background-color: #e7eaf0; /* makes the arrows visible on dark */
-}
-/* ===== Submit Recommendation fixes ===== */
-
-.card Label {
-    -fx-text-fill: #e6e6e6;
+    -fx-background-color: #e7eaf0; /* visible on dark */
 }
 
-.card RadioButton {
-    -fx-text-fill: #e6e6e6;
+/* ===== Submit Recommendation: make texts readable inside cards (without forcing ugly colors) ===== */
+.card .label,
+.card Label{
+    -fx-text-fill: #e7eaf0;
 }
 
-.card RadioButton .radio {
-    -fx-background-color: #2a2a2a;
+.card .radio-button,
+.card RadioButton{
+    -fx-text-fill: #e7eaf0;
 }
 
-.combo-box,
-.combo-box .list-cell {
-    -fx-text-fill: #e6e6e6;
-}
-
-.combo-box-popup .list-cell {
-    -fx-background-color: #2a2a2a;
-    -fx-text-fill: #e6e6e6;
-}
-
-.error {
-    -fx-text-fill: #ff6b6b;
-}
-/* ===== ComboBox list separation (Ministry selector fix) ===== */
-
-.combo-box-popup .list-cell {
-    -fx-background-color: #2a2a2a;
-    -fx-text-fill: #e6e6e6;
-    -fx-border-color: #3a3a3a;
-    -fx-border-width: 0 0 1 0; /* bottom separator line */
-}
-
-.combo-box-popup .list-cell:hover {
-    -fx-background-color: #3a3a3a;
-}
-
-.combo-box-popup .list-cell:selected {
-    -fx-background-color: #4a4a4a;
-    -fx-text-fill: white;
-}
-/* ===== Dark Alert Dialog ===== */
-
-.dark-dialog {
-    -fx-background-color: #1e1e1e;
-}
-
-.dark-dialog .content.label {
-    -fx-text-fill: #e6e6e6;
-}
-
-.dark-dialog .header-panel {
-    -fx-background-color: #252525;
-}
-
-.dark-dialog .header-panel .label {
-    -fx-text-fill: #ffffff;
-    -fx-font-weight: bold;
-}
-
-.dark-dialog .button-bar .button {
-    -fx-background-color: #3a3a3a;
-    -fx-text-fill: #ffffff;
-    -fx-background-radius: 6;
-}
-
-.dark-dialog .button-bar .button:hover {
-    -fx-background-color: #5a5a5a;
-}
-/* ===== TextArea dark fix (ViewRecommendations) ===== */
-
-.text-area {
-    -fx-control-inner-background: #1f1f1f;
-    -fx-background-color: #1f1f1f;
-    -fx-text-fill: #e6e6e6;
-    -fx-highlight-fill: #3a3a3a;
-    -fx-highlight-text-fill: white;
-    -fx-border-color: #3a3a3a;
-    -fx-border-radius: 6;
-    -fx-background-radius: 6;
-}
-
-.text-area .content {
-    -fx-background-color: #1f1f1f;
+.card RadioButton .radio{
+    -fx-background-color: rgba(255,255,255,0.10);
+    -fx-border-color: rgba(255,255,255,0.12);
 }

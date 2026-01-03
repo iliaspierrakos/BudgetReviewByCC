@@ -3,6 +3,8 @@ package guiFolder;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import javafx.scene.layout.*;
+
 import UserFeatures.CreatingMinistries;
 import UserFeatures.Edit;
 import UserFeatures.Ministry;
@@ -18,9 +20,11 @@ import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.RadioButton;
+import javafx.scene.control.Separator;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -47,13 +51,13 @@ public class VirtualEditScreen {
             loadAlert.setTitle("Load Saved Budget");
             loadAlert.setHeaderText("You have a saved virtual budget.");
             loadAlert.setContentText("Do you want to load it or start fresh?");
-            
+
             ButtonType loadBtn = new ButtonType("Load Saved");
             ButtonType freshBtn = new ButtonType("Start Fresh");
             ButtonType cancelBtn = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
-            
+
             loadAlert.getButtonTypes().setAll(loadBtn, freshBtn, cancelBtn);
-            
+
             loadAlert.showAndWait().ifPresent(response -> {
                 if (response == loadBtn) {
                     CreatingMinistries.loadUserBudgets(userBudgetFile, 2026);
@@ -65,32 +69,37 @@ public class VirtualEditScreen {
             CreatingMinistries.loadUserBudgets(governorPath, 2026);
         }
 
+        // ===== UI (με DarkTheme classes) =====
         Label title = new Label("Virtual Budget Editing");
-        title.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
+        title.getStyleClass().add("title");
 
         Label subtitle = new Label("Simulate budget changes (your changes are saved separately)");
-        subtitle.setStyle("-fx-font-size: 12px; -fx-font-style: italic;");
+        subtitle.getStyleClass().add("subtitle");
 
         Button simpleEditBtn = new Button("Simple Edit");
-        simpleEditBtn.setMinWidth(200);
+        simpleEditBtn.getStyleClass().addAll("button", "primary");
+        simpleEditBtn.setMaxWidth(Double.MAX_VALUE);
         simpleEditBtn.setOnAction(e -> showSimpleEditDialog(stage));
 
         Button bulkEditBtn = new Button("Bulk Edit");
-        bulkEditBtn.setMinWidth(200);
+        bulkEditBtn.getStyleClass().addAll("button", "subtle");
+        bulkEditBtn.setMaxWidth(Double.MAX_VALUE);
         bulkEditBtn.setOnAction(e -> new BulkEditScreen(user, userManager).show(stage));
 
         Button historyBtn = new Button("View Edit History");
-        historyBtn.setMinWidth(200);
+        historyBtn.getStyleClass().addAll("button", "subtle");
+        historyBtn.setMaxWidth(Double.MAX_VALUE);
         historyBtn.setOnAction(e -> new EditHistoryScreen(user, userManager).show(stage));
 
         Button resetBtn = new Button("Reset to Original");
-        resetBtn.setMinWidth(200);
+        resetBtn.getStyleClass().addAll("button", "subtle");
+        resetBtn.setMaxWidth(Double.MAX_VALUE);
         resetBtn.setOnAction(e -> {
             Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
             confirm.setTitle("Reset Budget");
             confirm.setHeaderText("Are you sure?");
             confirm.setContentText("This will discard all your virtual changes.");
-            
+
             confirm.showAndWait().ifPresent(response -> {
                 if (response == ButtonType.OK) {
                     CreatingMinistries.loadUserBudgets(governorPath, 2026);
@@ -103,60 +112,100 @@ public class VirtualEditScreen {
         });
 
         Button backBtn = new Button("Back");
-        backBtn.setMinWidth(200);
+        backBtn.getStyleClass().addAll("button", "subtle");
+        backBtn.setMaxWidth(Double.MAX_VALUE);
         backBtn.setOnAction(e -> new ViewEditBudgetScreen(user, userManager).show(stage));
 
-        VBox buttonsBox = new VBox(12, simpleEditBtn, bulkEditBtn, historyBtn, resetBtn, backBtn);
+        VBox buttonsBox = new VBox(10,
+                simpleEditBtn,
+                bulkEditBtn,
+                historyBtn,
+                resetBtn,
+                new Separator(),
+                backBtn
+        );
         buttonsBox.setAlignment(Pos.CENTER);
+        buttonsBox.setFillWidth(true);
 
-        VBox root = new VBox(15, title, subtitle, buttonsBox);
-        root.setAlignment(Pos.CENTER);
-        root.setPadding(new Insets(25));
+        VBox card = new VBox(12, title, subtitle, buttonsBox);
+        card.getStyleClass().addAll("card");
+        card.setMaxWidth(520);
 
-        stage.setScene(new Scene(root, 450, 450));
+        BorderPane root = new BorderPane();
+        root.setPadding(new Insets(24));
+        root.setCenter(card);
+        BorderPane.setAlignment(card, Pos.CENTER);
+
+        Scene scene = new Scene(root, 720, 520);
+        scene.getStylesheets().add(getClass().getResource("/css/DarkTheme.css").toExternalForm());
+
+        stage.setScene(scene);
         stage.setTitle("Virtual Edit");
         stage.show();
     }
 
+    // ===== Simple Edit Dialog (με έντονα Increase/Decrease + Select Ministry) =====
     private void showSimpleEditDialog(Stage parentStage) {
         Stage dialog = new Stage();
+        dialog.initOwner(parentStage);
         dialog.setTitle("Virtual Simple Edit");
 
+        VBox card = new VBox(14);
+        card.getStyleClass().add("card");
+
         Label title = new Label("Edit Single Ministry Budget");
-        title.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
+        title.getStyleClass().add("title");
 
+        Label hint = new Label("Choose ministry, select Increase/Decrease, and apply amount.");
+        hint.getStyleClass().add("subtitle");
+
+        // ComboBox (έντονο)
         ComboBox<String> ministryBox = new ComboBox<>();
-        for (Ministry m : CreatingMinistries.ministries2026) {
-            if (m != null) {
-                ministryBox.getItems().add(m.getMinistryName());
-            }
-        }
+        ministryBox.getStyleClass().add("combo-box");
         ministryBox.setPromptText("Select Ministry");
+        ministryBox.setMaxWidth(Double.MAX_VALUE);
 
-        Label currentBudgetLabel = new Label();
-        currentBudgetLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #1e3a5f;");
+        for (Ministry m : CreatingMinistries.ministries2026) {
+            if (m != null) ministryBox.getItems().add(m.getMinistryName());
+        }
 
+        Label currentBudgetLabel = new Label("");
+        currentBudgetLabel.getStyleClass().add("subtitle");
+
+        // ===== Segmented ToggleButtons (Increase/Decrease) =====
         ToggleGroup changeGroup = new ToggleGroup();
-        RadioButton increaseRb = new RadioButton("Increase");
-        increaseRb.setToggleGroup(changeGroup);
-        increaseRb.setSelected(true);
-        RadioButton decreaseRb = new RadioButton("Decrease");
-        decreaseRb.setToggleGroup(changeGroup);
 
-        HBox changeTypeBox = new HBox(15, increaseRb, decreaseRb);
-        changeTypeBox.setAlignment(Pos.CENTER);
+        ToggleButton increaseBtn = new ToggleButton("Increase");
+        increaseBtn.getStyleClass().addAll("segment-btn", "increase");
+        increaseBtn.setToggleGroup(changeGroup);
+        increaseBtn.setSelected(true);
+        increaseBtn.setMinWidth(140);
+
+        ToggleButton decreaseBtn = new ToggleButton("Decrease");
+        decreaseBtn.getStyleClass().addAll("segment-btn", "decrease");
+        decreaseBtn.setToggleGroup(changeGroup);
+        decreaseBtn.setMinWidth(140);
+
+        HBox segmented = new HBox(increaseBtn, decreaseBtn);
+        segmented.getStyleClass().add("segmented-box");
+        segmented.setAlignment(Pos.CENTER_LEFT);
 
         TextField amountField = new TextField();
         amountField.setPromptText("Enter amount");
+        amountField.setMaxWidth(Double.MAX_VALUE);
 
         Label balanceLabel = new Label("Available Balance: " + Ministry.getFormattedBudget(Edit.balance));
-        balanceLabel.setStyle("-fx-text-fill: green; -fx-font-weight: bold;");
+        balanceLabel.getStyleClass().add("subtitle");
 
         Label errorLabel = new Label();
-        errorLabel.setStyle("-fx-text-fill: red;");
+        errorLabel.getStyleClass().add("error");
 
         Button applyBtn = new Button("Apply");
+        applyBtn.getStyleClass().addAll("button", "primary");
+
         Button cancelBtn = new Button("Cancel");
+        cancelBtn.getStyleClass().addAll("button", "subtle");
+        cancelBtn.setOnAction(e -> dialog.close());
 
         ministryBox.setOnAction(e -> {
             String selected = ministryBox.getValue();
@@ -168,7 +217,7 @@ public class VirtualEditScreen {
 
         applyBtn.setOnAction(e -> {
             errorLabel.setText("");
-            
+
             String ministry = ministryBox.getValue();
             if (ministry == null) {
                 errorLabel.setText("Please select a ministry");
@@ -193,33 +242,29 @@ public class VirtualEditScreen {
                 return;
             }
 
-            String changeType = increaseRb.isSelected() ? "Increase" : "Decrease";
-            
+            String changeType = increaseBtn.isSelected() ? "Increase" : "Decrease";
             double currentBudget = Ministry.budgetSearchByName(ministry, CreatingMinistries.ministries2026);
-            
+
             if (changeType.equals("Decrease") && amount > currentBudget) {
                 errorLabel.setText("Cannot decrease more than current budget");
                 return;
             }
-            
+
             if (changeType.equals("Increase") && amount > Edit.balance) {
                 errorLabel.setText("Insufficient balance");
                 return;
             }
 
-            // Apply the edit
+            // Apply the edit (backend logic)
             Edit editObj = new Edit(ministry, changeType, amount, "fixed");
             Edit.history.addEdit(editObj);
             editObj.editingbudget(editObj, false, false);
 
             // Update balance
-            if (changeType.equals("Increase")) {
-                Edit.balance -= amount;
-            } else {
-                Edit.balance += amount;
-            }
+            if (changeType.equals("Increase")) Edit.balance -= amount;
+            else Edit.balance += amount;
 
-            // Reload from file to ensure data consistency
+            // Reload user's file budgets (consistency)
             Path userFile = UserBudgetFileUtil.getUserBudgetFile(user, 2026);
             try {
                 CreatingMinistries.loadUserBudgets(userFile, 2026);
@@ -227,7 +272,6 @@ public class VirtualEditScreen {
                 System.err.println("Failed to reload budgets: " + ex.getMessage());
             }
 
-            // Refresh labels with updated data
             balanceLabel.setText("Available Balance: " + Ministry.getFormattedBudget(Edit.balance));
             double newBudget = Ministry.budgetSearchByName(ministry, CreatingMinistries.ministries2026);
             currentBudgetLabel.setText("Current Budget: " + Ministry.getFormattedBudget(newBudget));
@@ -236,40 +280,54 @@ public class VirtualEditScreen {
             success.setTitle("Success");
             success.setHeaderText("Virtual Budget Updated");
             success.setContentText(
-                String.format(
-                    "Virtual budget for %s has been %s by %s",
-                    ministry,
-                    changeType.toLowerCase() + "d",
-                    Ministry.getFormattedBudget(amount)
-                )
+                    String.format(
+                            "Virtual budget for %s has been %s by %s",
+                            ministry,
+                            changeType.toLowerCase() + "d",
+                            Ministry.getFormattedBudget(amount)
+                    )
             );
             success.showAndWait();
 
             amountField.clear();
-            errorLabel.setText("");
-            
         });
 
-        cancelBtn.setOnAction(e -> dialog.close());
-
         GridPane form = new GridPane();
-        form.setHgap(10);
+        form.setHgap(12);
         form.setVgap(12);
-        form.setPadding(new Insets(10));
-        form.addRow(0, new Label("Ministry:"), ministryBox);
+        form.setPadding(new Insets(6));
+
+        Label ministryLbl = new Label("Ministry:");
+        ministryLbl.getStyleClass().add("subtitle");
+        Label changeLbl = new Label("Change Type:");
+        changeLbl.getStyleClass().add("subtitle");
+        Label amountLbl = new Label("Amount:");
+        amountLbl.getStyleClass().add("subtitle");
+
+        form.addRow(0, ministryLbl, ministryBox);
         form.addRow(1, new Label(""), currentBudgetLabel);
-        form.addRow(2, new Label("Change Type:"), changeTypeBox);
-        form.addRow(3, new Label("Amount:"), amountField);
+        form.addRow(2, changeLbl, segmented);
+        form.addRow(3, amountLbl, amountField);
         form.addRow(4, new Label(""), balanceLabel);
 
+        ColumnConstraints c1 = new ColumnConstraints();
+        c1.setMinWidth(110);
+        ColumnConstraints c2 = new ColumnConstraints();
+        c2.setHgrow(Priority.ALWAYS);
+        form.getColumnConstraints().setAll(c1, c2);
+
         HBox buttons = new HBox(10, applyBtn, cancelBtn);
-        buttons.setAlignment(Pos.CENTER);
+        buttons.setAlignment(Pos.CENTER_RIGHT);
 
-        VBox dialogRoot = new VBox(15, title, form, errorLabel, buttons);
-        dialogRoot.setPadding(new Insets(20));
-        dialogRoot.setAlignment(Pos.CENTER);
+        card.getChildren().addAll(title, hint, form, errorLabel, buttons);
 
-        dialog.setScene(new Scene(dialogRoot, 450, 400));
+        BorderPane root = new BorderPane(card);
+        root.setPadding(new Insets(18));
+
+        Scene s = new Scene(root, 620, 440);
+        s.getStylesheets().add(getClass().getResource("/css/DarkTheme.css").toExternalForm());
+
+        dialog.setScene(s);
         dialog.show();
     }
 }
