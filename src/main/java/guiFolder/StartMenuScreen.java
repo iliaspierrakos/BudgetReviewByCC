@@ -28,7 +28,7 @@ public class StartMenuScreen {
     public void show(Stage stage) {
 
         ImageView logo = new ImageView();
-        var logoStream = getClass().getResourceAsStream("logo.png");
+        var logoStream = getClass().getResourceAsStream("logo1.png");
         if (logoStream != null) {
             logo.setImage(new Image(logoStream));
         }

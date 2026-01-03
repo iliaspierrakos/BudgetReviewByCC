@@ -8,6 +8,7 @@ import java.nio.file.Paths;
 import UserFeatures.ClearHistory;
 import UserFeatures.Edit;
 import UserFeatures.EditHistoryList;
+import UserFeatures.ViewEditBudget;
 import UserFeatures.ViewEditBudgetInitializer;
 import UserManagement.CurrentSession;
 import UserManagement.User;
@@ -17,6 +18,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
 import javafx.scene.layout.BorderPane;
@@ -28,6 +30,11 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+/**
+ * ViewEditBudgetScreen
+ *
+ * Main GUI menu for budget viewing and editing.
+ */
 public class ViewEditBudgetScreen {
 
     private final User user;
@@ -40,10 +47,11 @@ public class ViewEditBudgetScreen {
 
     public void show(Stage stage) {
 
+        /* ================= SESSION & INIT ================= */
         CurrentSession.setUser(user);
         ViewEditBudgetInitializer.ensureInitialized();
 
-        // ===== Header card =====
+        /* ================= HEADER ================= */
         Label title = new Label("Welcome, " + user.getUsername());
         title.getStyleClass().add("title");
 
@@ -61,7 +69,7 @@ public class ViewEditBudgetScreen {
         VBox headerCard = new VBox(10, headerTop, subtitle);
         headerCard.getStyleClass().addAll("card", "toolbar-card");
 
-        // ===== Actions grid =====
+        /* ================= ACTION GRID ================= */
         GridPane grid = new GridPane();
         grid.getStyleClass().add("action-grid");
         grid.setHgap(14);
@@ -83,7 +91,10 @@ public class ViewEditBudgetScreen {
         ), r, c++);
 
         if (user.getRole() != User.Role.CITIZEN) {
-            String txt = (user.getRole() == User.Role.MINISTRYMEMBER) ? "Propose Edit" : "Edit Budget";
+            String txt = (user.getRole() == User.Role.MINISTRYMEMBER)
+                    ? "Propose Edit"
+                    : "Edit Budget";
+
             String desc = (user.getRole() == User.Role.MINISTRYMEMBER)
                     ? "Submit proposals for your ministry."
                     : "Edit budgets with governor permissions.";
@@ -144,17 +155,26 @@ public class ViewEditBudgetScreen {
             ), r, c++);
         }
 
-        // ===== Footer =====
-        javafx.scene.control.Button logoutBtn = new javafx.scene.control.Button("Logout");
+        /* ================= FOOTER ================= */
+        Button logoutBtn = new Button("Logout");
         logoutBtn.getStyleClass().addAll("button", "danger");
         logoutBtn.setOnAction(e -> {
             cleanupOnLogout();
             new StartMenuScreen(userManager).show(stage);
         });
 
-        HBox footer = new HBox(logoutBtn);
+        HBox footer = new HBox(10);
         footer.setAlignment(Pos.CENTER_RIGHT);
         footer.setPadding(new Insets(14, 0, 0, 0));
+
+        if (user.getRole() == User.Role.GOVERNOR) {
+            Button resetBtn = new Button("Restart All");
+            resetBtn.getStyleClass().addAll("button", "danger-outline");
+            resetBtn.setOnAction(e -> handleReset(stage));
+            footer.getChildren().add(resetBtn);
+        }
+
+        footer.getChildren().add(logoutBtn);
 
         VBox center = new VBox(14, headerCard, new Separator(), grid, footer);
         center.setPadding(new Insets(18));
@@ -166,10 +186,12 @@ public class ViewEditBudgetScreen {
                 getClass().getResource("/css/DarkTheme.css").toExternalForm()
         );
 
-        stage.setScene(scene);
         stage.setTitle("Main Menu");
+        stage.setScene(scene);
         stage.show();
     }
+
+    /* ================= HELPERS ================= */
 
     private static VBox actionCard(String title, String desc, Runnable onClick) {
         Label t = new Label(title);
@@ -211,18 +233,50 @@ public class ViewEditBudgetScreen {
         };
     }
 
+    private void handleReset(Stage stage) {
+
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+        confirm.setTitle("Confirm Reset");
+        confirm.setHeaderText("Restart all data");
+        confirm.setContentText(
+                "This will DELETE all generated data and restart the application.\n\n" +
+                "This action cannot be undone."
+        );
+
+        confirm.getDialogPane().getStylesheets().add(
+                getClass().getResource("/css/DarkTheme.css").toExternalForm()
+        );
+        confirm.getDialogPane().getStyleClass().add("dark-dialog");
+
+        confirm.showAndWait().ifPresent(result -> {
+            if (result == javafx.scene.control.ButtonType.OK) {
+                try {
+                    ViewEditBudget.resetAll();
+                    new StartMenuScreen(userManager).show(stage);
+                } catch (IOException ex) {
+                    Alert err = new Alert(Alert.AlertType.ERROR,
+                            "Reset failed:\n" + ex.getMessage());
+                    err.showAndWait();
+                }
+            }
+        });
+    }
+
     private void cleanupOnLogout() {
         try {
             ClearHistory.clearFile(Path.of("src/main/resources/NecessaryFilesAndData/edithistory.txt"));
 
             for (int year = 2020; year <= 2026; year++) {
-                ClearHistory.clearFile(Path.of("src/main/resources/NecessaryFilesAndData/view" + year + ".txt"));
+                ClearHistory.clearFile(
+                        Path.of("src/main/resources/NecessaryFilesAndData/view" + year + ".txt")
+                );
             }
 
             for (int year1 = 2020; year1 <= 2026; year1++) {
                 for (int year2 = 2020; year2 <= 2026; year2++) {
                     Files.deleteIfExists(
-                            Paths.get("src/main/resources/NecessaryFilesAndData/compare" + year1 + "with" + year2 + ".txt")
+                            Paths.get("src/main/resources/NecessaryFilesAndData/compare" +
+                                    year1 + "with" + year2 + ".txt")
                     );
                 }
             }
@@ -233,14 +287,5 @@ public class ViewEditBudgetScreen {
         } catch (IOException ex) {
             System.err.println("Cleanup failed: " + ex.getMessage());
         }
-    }
-
-    @SuppressWarnings("unused")
-    private void showInfo(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
     }
 }
