@@ -1,6 +1,10 @@
 package guiFolder;
 
-import UserFeatures.*;
+import UserFeatures.CreatingMinistries;
+import UserFeatures.Edit;
+import UserFeatures.EditHistory;
+import UserFeatures.Ministry;
+import UserFeatures.UserBudgetPersistence;
 import UserManagement.User;
 import UserManagement.UserManager;
 import javafx.beans.property.SimpleStringProperty;
@@ -9,9 +13,19 @@ import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.Separator;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.*;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
@@ -25,7 +39,7 @@ public class BulkEditScreen {
         this.userManager = userManager;
     }
 
-    // ===== Row model για preview =====
+    // ===== Row model Î³Î¹Î± preview =====
     public static class PreviewRow {
         private final SimpleStringProperty ministry = new SimpleStringProperty("");
         private final SimpleStringProperty previous = new SimpleStringProperty("");
@@ -188,6 +202,23 @@ public class BulkEditScreen {
                 return;
             }
 
+            // Calculate total change for balance
+            double totalChange = 0;
+            for (Ministry m : CreatingMinistries.ministries2026) {
+                if (m == null) continue;
+                double oldBudget = m.getBudget();
+                double change = oldBudget * (pct / 100.0);
+                totalChange += change;
+            }
+
+            // Update balance BEFORE applying changes
+            if (pct >= 0) {
+                Edit.balance -= totalChange;
+            } else {
+                Edit.balance += Math.abs(totalChange);
+            }
+
+            // Apply changes to ministries
             for (Ministry m : CreatingMinistries.ministries2026) {
                 if (m == null) continue;
 
@@ -207,6 +238,9 @@ public class BulkEditScreen {
                 );
                 Edit.history.addEdit(editObj);
             }
+
+            // Save to user file
+            UserBudgetPersistence.saveUserBudgets(user, CreatingMinistries.ministries2026, 2026);
 
             dialog.close();
             new EditHistoryScreen(user, userManager).show(parent);
@@ -309,6 +343,21 @@ public class BulkEditScreen {
             try { amount = Double.parseDouble(txt); }
             catch (Exception ex) { error.setText("Invalid amount."); return; }
 
+            // Count ministries for total change
+            int ministryCount = 0;
+            for (Ministry m : CreatingMinistries.ministries2026) {
+                if (m != null) ministryCount++;
+            }
+            double totalChange = amount * ministryCount;
+
+            // Update balance BEFORE applying changes
+            if (amount >= 0) {
+                Edit.balance -= totalChange;
+            } else {
+                Edit.balance += Math.abs(totalChange);
+            }
+
+            // Apply changes to ministries
             for (Ministry m : CreatingMinistries.ministries2026) {
                 if (m == null) continue;
 
@@ -331,6 +380,9 @@ public class BulkEditScreen {
                 );
                 Edit.history.addEdit(editObj);
             }
+
+            // Save to user file
+            UserBudgetPersistence.saveUserBudgets(user, CreatingMinistries.ministries2026, 2026);
 
             dialog.close();
             new EditHistoryScreen(user, userManager).show(parent);
@@ -390,7 +442,7 @@ public class BulkEditScreen {
         colDelta.setCellValueFactory(new PropertyValueFactory<>("delta"));
         colDelta.setPrefWidth(140);
 
-        // χρώμα στο delta
+        // Ï‡ÏÏŽÎ¼Î± ÏƒÏ„Î¿ delta
         colDelta.setCellFactory(tc -> new TableCell<>() {
             @Override
             protected void updateItem(String item, boolean empty) {
