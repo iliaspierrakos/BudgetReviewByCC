@@ -6,17 +6,16 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import UserManagement.User;
-
 /**
  * Utility class responsible for persisting a user's budget data.
- *
  * <p>
- * This class stores:
+ * This class stores the following information:
+ * </p>
  * <ul>
  *   <li>The user's remaining balance</li>
  *   <li>The budget assigned to each ministry</li>
  * </ul>
- *
+ * <p>
  * The data is saved to a CSV file so that it can be reloaded
  * when the user signs in again.
  * </p>
@@ -28,11 +27,11 @@ public class UserBudgetPersistence {
      *
      * <p>
      * The generated CSV file contains:
+     * </p>
      * <ul>
      *   <li>A balance entry</li>
      *   <li>One entry per ministry containing its budget</li>
      * </ul>
-     * </p>
      *
      * @param user the user whose budget data is being saved
      * @param ministries an array of ministries containing budget information

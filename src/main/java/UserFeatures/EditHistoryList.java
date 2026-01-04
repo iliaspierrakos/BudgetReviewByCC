@@ -4,20 +4,14 @@ import java.util.LinkedList;
 import java.util.Scanner;
 
 /**
- * The {@code EditHistoryList} class manages a history of edits made by the user.
+ * Manages a history of edits made by the user.
  * <p>
- * It stores edits in a linked list and provides functionality to:
- * <ul>
- *     <li>Add new edits to the history</li>
- *     <li>Undo the most recent edits</li>
- *     <li>Reverse a specific edit</li>
- *     <li>Apply all stored edits</li>
- *     <li>Interactively undo multiple changes</li>
- * </ul>
+ * Provides functionality to add edits, undo the most recent edits, reverse
+ * specific edits, apply all edits, and interactively undo multiple changes.
  * </p>
  * <p>
  * This class is useful for applications that need undo/redo functionality and
- * keep track of changes in budgets or other editable items.
+ * for tracking changes in budgets or other editable items.
  * </p>
  */
 public class EditHistoryList { 
@@ -29,12 +23,12 @@ public class EditHistoryList {
     private int index = -1;
 
     /** Scanner for reading user input when reversing changes interactively. */
-    Scanner scanner = new Scanner(System.in);
+    private Scanner scanner = new Scanner(System.in);
 
     /**
      * Adds an edit to the history list and updates the current index.
-     * 
-     * @param edit The {@link Edit} object representing the change to be added.
+     *
+     * @param edit the {@link Edit} object representing the change to be added
      */
     public void addEdit(Edit edit) {
         editList.add(edit);
@@ -44,7 +38,7 @@ public class EditHistoryList {
     /**
      * Undoes the most recent edit in the history.
      * <p>
-     * If there are no edits to undo, a message is printed to the console.
+     * If there are no edits to undo, prints a message to the console.
      * </p>
      */
     public void undo() {
@@ -61,21 +55,21 @@ public class EditHistoryList {
     /**
      * Reverses the effect of a given edit.
      * <p>
-     * For "Fixed" type edits, it simply inverts the increase/decrease change.
-     * For percentage-based edits, it calculates the original value and reverses
-     * the change proportionally.
+     * For "Fixed" type edits, it inverts the increase/decrease change.
+     * For percentage-based edits, it calculates the original value and
+     * reverses the change proportionally.
      * </p>
-     * 
-     * @param lastEdit The {@link Edit} object representing the edit to reverse.
+     *
+     * @param lastEdit the {@link Edit} object representing the edit to reverse
      */
     public void reverseEdit(Edit lastEdit) {
         if (lastEdit.getChangeType().equalsIgnoreCase("Fixed")) {
             if (lastEdit.getChange().equalsIgnoreCase("Increase")) {
-                var e = new Edit(lastEdit.getName(), "Decrease", lastEdit.getAmount());
+                Edit e = new Edit(lastEdit.getName(), "Decrease", lastEdit.getAmount());
                 Edit.balance += lastEdit.getAmount();
                 e.editingbudget(e, true, false);
             } else {
-                var e = new Edit(lastEdit.getName(), "Increase", lastEdit.getAmount());
+                Edit e = new Edit(lastEdit.getName(), "Increase", lastEdit.getAmount());
                 Edit.balance -= lastEdit.getAmount();
                 e.editingbudget(e, true, false);
             }
@@ -86,13 +80,13 @@ public class EditHistoryList {
             if (lastEdit.getChange().equalsIgnoreCase("Increase")) {
                 double oldBudget = currentBudget * 100 / (100 + lastEdit.getAmount());
                 double updatedAmount = currentBudget - oldBudget;
-                var e = new Edit(lastEdit.getName(), "Decrease", updatedAmount);
+                Edit e = new Edit(lastEdit.getName(), "Decrease", updatedAmount);
                 Edit.balance += updatedAmount;
                 e.editingbudget(e, true, false);
             } else {
                 double oldBudget = currentBudget * 100 / (100 - lastEdit.getAmount());
                 double updatedAmount = oldBudget - currentBudget;
-                var e = new Edit(lastEdit.getName(), "Increase", updatedAmount);
+                Edit e = new Edit(lastEdit.getName(), "Increase", updatedAmount);
                 Edit.balance -= updatedAmount;
                 e.editingbudget(e, true, false);
             }
@@ -102,7 +96,7 @@ public class EditHistoryList {
     /**
      * Applies all edits stored in the history list.
      * <p>
-     * Once applied, the index is reset. If there are no edits, a message is printed.
+     * Once applied, the index is reset. If there are no edits, prints a message.
      * </p>
      */
     public void applyingEdits() {
@@ -118,8 +112,8 @@ public class EditHistoryList {
 
     /**
      * Returns the current index of the last edit in the list.
-     * 
-     * @return The index of the most recent edit, or -1 if the list is empty.
+     *
+     * @return the index of the most recent edit, or -1 if the list is empty
      */
     public int getIndex() {
         return index;
@@ -129,16 +123,18 @@ public class EditHistoryList {
      * Allows the user to interactively undo multiple recent edits.
      * <p>
      * Prompts the user for the number of last changes to undo, validates the input,
-     * and then undoes the specified number of edits.
+     * and undoes the specified number of edits.
      * </p>
      */
     public void reverseChanges() {
         System.out.println("How many of your last changes do you want to undo?");
         int changes = scanner.nextInt();
+
         while (changes < 0 || changes > (Edit.history.getIndex() + 1)) {
             System.out.println("Invalid. Your response must be <= " + Edit.history.getIndex());
             changes = scanner.nextInt();
         }
+
         for (int i = 0; i < changes; i++) {
             Edit.history.undo();
         }

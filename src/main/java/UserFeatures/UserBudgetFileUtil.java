@@ -4,11 +4,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import UserManagement.User;
-
 /**
  * Utility class responsible for resolving the file path
  * of a user's budget CSV file for a specific year.
- *
  * <p>
  * Governors use a shared budget file, while other users
  * have individual budget files based on their username.
