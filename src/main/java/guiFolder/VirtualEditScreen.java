@@ -294,14 +294,14 @@ public class VirtualEditScreen {
                 return;
             }
 
+            // Update balance BEFORE edit (so it's saved correctly)
+            if (changeType.equals("Increase")) Edit.balance -= amount;
+            else Edit.balance += amount;
+
             // Apply the edit (backend logic)
             Edit editObj = new Edit(ministry, changeType, amount, "fixed");
             Edit.history.addEdit(editObj);
             editObj.editingbudget(editObj, false, false);
-
-            // Update balance
-            if (changeType.equals("Increase")) Edit.balance -= amount;
-            else Edit.balance += amount;
 
             balanceLabel.setText("Available Balance: " + Ministry.getFormattedBudget(Edit.balance));
             double newBudget = Ministry.budgetSearchByName(ministry, CreatingMinistries.ministries2026);
