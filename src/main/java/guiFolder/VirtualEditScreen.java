@@ -46,9 +46,9 @@ public class VirtualEditScreen {
         // Set current user in session for auto-save
         CurrentSession.setUser(user);
 
-        // Load governor budget by default (alert will appear when entering edit mode)
+        // Don't load anything here - the alert in edit modes will handle loading
+        // But define governorPath for Reset button
         Path governorPath = Path.of("src/main/resources/NecessaryFilesAndData/Governor_2026.csv");
-        CreatingMinistries.loadUserBudgets(governorPath, 2026);
 
         // ===== UI (Î¼Îµ DarkTheme classes) =====
         Label title = new Label("Virtual Budget Editing");
@@ -83,6 +83,7 @@ public class VirtualEditScreen {
 
             confirm.showAndWait().ifPresent(response -> {
                 if (response == ButtonType.OK) {
+                    Edit.balance = 0;
                     CreatingMinistries.loadUserBudgets(governorPath, 2026);
                     Alert success = new Alert(Alert.AlertType.INFORMATION);
                     success.setTitle("Reset Complete");
@@ -162,16 +163,20 @@ public class VirtualEditScreen {
             var result = loadAlert.showAndWait();
             if (result.isPresent()) {
                 if (result.get() == loadBtn) {
+                    // Load saved budget (balance is loaded from file)
                     CreatingMinistries.loadUserBudgets(userBudgetFile, 2026);
                     return true;
                 } else if (result.get() == freshBtn) {
+                    // Start fresh: reset balance and load governor budget
+                    Edit.balance = 0;
                     CreatingMinistries.loadUserBudgets(governorPath, 2026);
                     return true;
                 }
             }
             return false; // User cancelled
         } else {
-            // First time: load governor budget and create user file immediately
+            // First time: reset balance, load governor budget and create user file
+            Edit.balance = 0;
             CreatingMinistries.loadUserBudgets(governorPath, 2026);
             UserBudgetPersistence.saveUserBudgets(user, CreatingMinistries.ministries2026, 2026);
             return true;
