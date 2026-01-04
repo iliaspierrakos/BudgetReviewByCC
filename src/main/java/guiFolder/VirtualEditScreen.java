@@ -3,8 +3,6 @@ package guiFolder;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import javafx.scene.layout.*;
-
 import UserFeatures.CreatingMinistries;
 import UserFeatures.Edit;
 import UserFeatures.Ministry;
@@ -25,8 +23,10 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
@@ -42,6 +42,7 @@ public class VirtualEditScreen {
 
     public void show(Stage stage) {
 
+        UserManagement.CurrentSession.setUser(user);
         // Load user's saved budget if exists
         Path userBudgetFile = UserBudgetFileUtil.getUserBudgetFile(user, 2026);
         Path governorPath = Path.of("src/main/resources/NecessaryFilesAndData/Governor_2026.csv");
