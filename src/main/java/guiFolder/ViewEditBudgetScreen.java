@@ -139,7 +139,7 @@ public class ViewEditBudgetScreen {
             default -> {
                 recTitle = "View Citizen Proposals";
                 recDesc = "Review and evaluate citizen submissions.";
-                recAction = () -> new ViewRecommendationsScreen(user, userManager).show(stage);
+                recAction = () -> new ViewRecommendationStatisticsScreen(user, userManager).show(stage);
             }
         }
 
