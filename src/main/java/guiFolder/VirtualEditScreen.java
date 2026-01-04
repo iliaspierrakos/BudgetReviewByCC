@@ -8,6 +8,7 @@ import UserFeatures.Edit;
 import UserFeatures.Ministry;
 import UserFeatures.UserBudgetFileUtil;
 import UserFeatures.UserBudgetPersistence;
+import UserManagement.CurrentSession;
 import UserManagement.User;
 import UserManagement.UserManager;
 import javafx.geometry.Insets;
@@ -42,35 +43,12 @@ public class VirtualEditScreen {
     }
 
     public void show(Stage stage) {
+        // Set current user in session for auto-save
+        CurrentSession.setUser(user);
 
-        // Load user's saved budget if exists
-        Path userBudgetFile = UserBudgetFileUtil.getUserBudgetFile(user, 2026);
+        // Load governor budget by default (alert will appear when entering edit mode)
         Path governorPath = Path.of("src/main/resources/NecessaryFilesAndData/Governor_2026.csv");
-
-        if (Files.exists(userBudgetFile)) {
-            Alert loadAlert = new Alert(Alert.AlertType.CONFIRMATION);
-            loadAlert.setTitle("Load Saved Budget");
-            loadAlert.setHeaderText("You have a saved virtual budget.");
-            loadAlert.setContentText("Do you want to load it or start fresh?");
-
-            ButtonType loadBtn = new ButtonType("Load Saved");
-            ButtonType freshBtn = new ButtonType("Start Fresh");
-            ButtonType cancelBtn = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
-
-            loadAlert.getButtonTypes().setAll(loadBtn, freshBtn, cancelBtn);
-
-            loadAlert.showAndWait().ifPresent(response -> {
-                if (response == loadBtn) {
-                    CreatingMinistries.loadUserBudgets(userBudgetFile, 2026);
-                } else if (response == freshBtn) {
-                    CreatingMinistries.loadUserBudgets(governorPath, 2026);
-                }
-            });
-        } else {
-            // First time: load governor budget and create user file immediately
-            CreatingMinistries.loadUserBudgets(governorPath, 2026);
-            UserBudgetPersistence.saveUserBudgets(user, CreatingMinistries.ministries2026, 2026);
-        }
+        CreatingMinistries.loadUserBudgets(governorPath, 2026);
 
         // ===== UI (Î¼Îµ DarkTheme classes) =====
         Label title = new Label("Virtual Budget Editing");
@@ -82,12 +60,12 @@ public class VirtualEditScreen {
         Button simpleEditBtn = new Button("Simple Edit");
         simpleEditBtn.getStyleClass().addAll("button", "primary");
         simpleEditBtn.setMaxWidth(Double.MAX_VALUE);
-        simpleEditBtn.setOnAction(e -> showSimpleEditDialog(stage));
+        simpleEditBtn.setOnAction(e -> showLoadAlertThenSimpleEdit(stage));
 
         Button bulkEditBtn = new Button("Bulk Edit");
         bulkEditBtn.getStyleClass().addAll("button", "subtle");
         bulkEditBtn.setMaxWidth(Double.MAX_VALUE);
-        bulkEditBtn.setOnAction(e -> new BulkEditScreen(user, userManager).show(stage));
+        bulkEditBtn.setOnAction(e -> showLoadAlertThenBulkEdit(stage));
 
         Button historyBtn = new Button("View Edit History");
         historyBtn.getStyleClass().addAll("button", "subtle");
@@ -145,6 +123,59 @@ public class VirtualEditScreen {
         stage.setScene(scene);
         stage.setTitle("Virtual Edit");
         stage.show();
+    }
+
+    // ===== Load Alert Helper Methods =====
+    private void showLoadAlertThenSimpleEdit(Stage parentStage) {
+        if (checkAndShowLoadAlert(parentStage)) {
+            showSimpleEditDialog(parentStage);
+        }
+    }
+
+    private void showLoadAlertThenBulkEdit(Stage parentStage) {
+        if (checkAndShowLoadAlert(parentStage)) {
+            new BulkEditScreen(user, userManager).show(parentStage);
+        }
+    }
+
+    /**
+     * Checks if user has saved budget and shows load alert.
+     * Returns true if user should proceed (loaded or fresh start).
+     * Returns false if user cancelled.
+     */
+    private boolean checkAndShowLoadAlert(Stage parentStage) {
+        Path userBudgetFile = UserBudgetFileUtil.getUserBudgetFile(user, 2026);
+        Path governorPath = Path.of("src/main/resources/NecessaryFilesAndData/Governor_2026.csv");
+
+        if (Files.exists(userBudgetFile)) {
+            Alert loadAlert = new Alert(Alert.AlertType.CONFIRMATION);
+            loadAlert.setTitle("Load Saved Budget");
+            loadAlert.setHeaderText("You have a saved virtual budget.");
+            loadAlert.setContentText("Do you want to load it or start fresh?");
+
+            ButtonType loadBtn = new ButtonType("Load Saved");
+            ButtonType freshBtn = new ButtonType("Start Fresh");
+            ButtonType cancelBtn = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
+
+            loadAlert.getButtonTypes().setAll(loadBtn, freshBtn, cancelBtn);
+
+            var result = loadAlert.showAndWait();
+            if (result.isPresent()) {
+                if (result.get() == loadBtn) {
+                    CreatingMinistries.loadUserBudgets(userBudgetFile, 2026);
+                    return true;
+                } else if (result.get() == freshBtn) {
+                    CreatingMinistries.loadUserBudgets(governorPath, 2026);
+                    return true;
+                }
+            }
+            return false; // User cancelled
+        } else {
+            // First time: load governor budget and create user file immediately
+            CreatingMinistries.loadUserBudgets(governorPath, 2026);
+            UserBudgetPersistence.saveUserBudgets(user, CreatingMinistries.ministries2026, 2026);
+            return true;
+        }
     }
 
     // ===== Simple Edit Dialog (Î¼Îµ Î­Î½Ï„Î¿Î½Î± Increase/Decrease + Select Ministry) =====
