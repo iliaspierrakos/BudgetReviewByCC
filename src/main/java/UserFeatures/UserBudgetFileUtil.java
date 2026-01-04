@@ -16,7 +16,7 @@ public class UserBudgetFileUtil {
             username = "Governor";
         }
         return Paths.get(
-            "src/main/resources/NecessaryFilesAndData/UserBudgets/" +
+            "src/main/java/NecessaryFilesAndData/UserBudgets/" +
             username + "_" + year + ".csv"
         );
     }

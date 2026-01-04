@@ -7,6 +7,7 @@ import UserFeatures.CreatingMinistries;
 import UserFeatures.Edit;
 import UserFeatures.Ministry;
 import UserFeatures.UserBudgetFileUtil;
+import UserFeatures.UserBudgetPersistence;
 import UserManagement.User;
 import UserManagement.UserManager;
 import javafx.geometry.Insets;
@@ -42,7 +43,6 @@ public class VirtualEditScreen {
 
     public void show(Stage stage) {
 
-        UserManagement.CurrentSession.setUser(user);
         // Load user's saved budget if exists
         Path userBudgetFile = UserBudgetFileUtil.getUserBudgetFile(user, 2026);
         Path governorPath = Path.of("src/main/resources/NecessaryFilesAndData/Governor_2026.csv");
@@ -67,10 +67,12 @@ public class VirtualEditScreen {
                 }
             });
         } else {
+            // First time: load governor budget and create user file immediately
             CreatingMinistries.loadUserBudgets(governorPath, 2026);
+            UserBudgetPersistence.saveUserBudgets(user, CreatingMinistries.ministries2026, 2026);
         }
 
-        // ===== UI (με DarkTheme classes) =====
+        // ===== UI (Î¼Îµ DarkTheme classes) =====
         Label title = new Label("Virtual Budget Editing");
         title.getStyleClass().add("title");
 
@@ -145,7 +147,7 @@ public class VirtualEditScreen {
         stage.show();
     }
 
-    // ===== Simple Edit Dialog (με έντονα Increase/Decrease + Select Ministry) =====
+    // ===== Simple Edit Dialog (Î¼Îµ Î­Î½Ï„Î¿Î½Î± Increase/Decrease + Select Ministry) =====
     private void showSimpleEditDialog(Stage parentStage) {
         Stage dialog = new Stage();
         dialog.initOwner(parentStage);
@@ -160,7 +162,7 @@ public class VirtualEditScreen {
         Label hint = new Label("Choose ministry, select Increase/Decrease, and apply amount.");
         hint.getStyleClass().add("subtitle");
 
-        // ComboBox (έντονο)
+        // ComboBox (Î­Î½Ï„Î¿Î½Î¿)
         ComboBox<String> ministryBox = new ComboBox<>();
         ministryBox.getStyleClass().add("combo-box");
         ministryBox.setPromptText("Select Ministry");
@@ -264,14 +266,6 @@ public class VirtualEditScreen {
             // Update balance
             if (changeType.equals("Increase")) Edit.balance -= amount;
             else Edit.balance += amount;
-
-            // Reload user's file budgets (consistency)
-            Path userFile = UserBudgetFileUtil.getUserBudgetFile(user, 2026);
-            try {
-                CreatingMinistries.loadUserBudgets(userFile, 2026);
-            } catch (Exception ex) {
-                System.err.println("Failed to reload budgets: " + ex.getMessage());
-            }
 
             balanceLabel.setText("Available Balance: " + Ministry.getFormattedBudget(Edit.balance));
             double newBudget = Ministry.budgetSearchByName(ministry, CreatingMinistries.ministries2026);

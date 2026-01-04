@@ -2,6 +2,9 @@ package UserFeatures;
 
 import java.util.Scanner;
 
+import UserManagement.CurrentSession;
+import UserManagement.User;
+
 
 /**
  * The {@code Edit} class provides the methods for transferring and editing ministry budgets.
@@ -102,6 +105,11 @@ public class Edit {
         String ministryName = CreatingMinistries.ministries2026[i].getMinistryName();
         CreatingMinistries.ministries2026[i].setBudget(finalBudget);
         EditHistory.historyOfEdit(ministryName, previousBudget, finalBudget, 0);
+        // Auto-save for GUI (if user is set in CurrentSession)
+        User user = CurrentSession.getUser();
+        if (user != null) {
+            UserBudgetPersistence.saveUserBudgets(user, CreatingMinistries.ministries2026, 2026);
+        }
         if (undo == false) {
             System.out.println("Budget updated successfully!");
             System.out.println("New budget for " + CreatingMinistries.ministries2026[i].getMinistryName() +
