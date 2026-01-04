@@ -1,17 +1,43 @@
 package UserFeatures;
-/**
- 
-This is a class that has only one method {@Code saveUserBudgets}.
-Its only purpose is to store ministry budgets and the balance created
-for each user, so he can reload after he signs in again.*/
 
-import UserManagement.User;
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.nio.file.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
+import UserManagement.User;
+
+/**
+ * Utility class responsible for persisting a user's budget data.
+ *
+ * <p>
+ * This class stores:
+ * <ul>
+ *   <li>The user's remaining balance</li>
+ *   <li>The budget assigned to each ministry</li>
+ * </ul>
+ *
+ * The data is saved to a CSV file so that it can be reloaded
+ * when the user signs in again.
+ * </p>
+ */
 public class UserBudgetPersistence {
 
+    /**
+     * Saves the user's budget data for a specific year.
+     *
+     * <p>
+     * The generated CSV file contains:
+     * <ul>
+     *   <li>A balance entry</li>
+     *   <li>One entry per ministry containing its budget</li>
+     * </ul>
+     * </p>
+     *
+     * @param user the user whose budget data is being saved
+     * @param ministries an array of ministries containing budget information
+     * @param year the year for which the budget data applies
+     */
     public static void saveUserBudgets(User user, Ministry[] ministries, int year) {
         Path file = UserBudgetFileUtil.getUserBudgetFile(user, year);
 
@@ -21,6 +47,7 @@ public class UserBudgetPersistence {
             try (BufferedWriter writer = Files.newBufferedWriter(file)) {
                 writer.write("BALANCE," + Edit.balance);
                 writer.newLine();
+
                 for (Ministry m : ministries) {
                     if (m != null) {
                         writer.write(m.getMinistryName() + "," + m.getBudget());
