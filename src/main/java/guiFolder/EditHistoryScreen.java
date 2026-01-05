@@ -327,7 +327,7 @@ public class EditHistoryScreen {
         return out;
     }
 
-    // ✅ σωστό parse για "1.234.567,89"
+    // ✅σωστό parse για "1.234.567,89"
     private double parseBudget(String s) {
         String clean = s.trim().replace(".", "").replace(",", ".");
         return Double.parseDouble(clean);

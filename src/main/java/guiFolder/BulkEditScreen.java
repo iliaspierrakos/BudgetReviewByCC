@@ -493,7 +493,7 @@ public class BulkEditScreen {
             applyBtn.setDisable(false);
         });
 
-        // ✅ APPLY (fixed amount) + balance + save
+        //  APPLY (fixed amount) + balance + save
         applyBtn.setOnAction(e -> {
             error.setText("");
             String txt = amountField.getText().trim();

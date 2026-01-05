@@ -74,6 +74,8 @@ public class ViewRecommendationsScreen {
         textArea.setEditable(false);
         textArea.setWrapText(true);
         textArea.setFocusTraversable(false);
+        textArea.getStyleClass().add("dark-textarea");
+
         VBox.setVgrow(textArea, Priority.ALWAYS);
 
         Path filePath = DATA_DIR.resolve(
@@ -124,5 +126,7 @@ public class ViewRecommendationsScreen {
         stage.setTitle("View Recommendations");
         stage.setScene(scene);
         stage.show();
+        stage.centerOnScreen();
+
     }
 }

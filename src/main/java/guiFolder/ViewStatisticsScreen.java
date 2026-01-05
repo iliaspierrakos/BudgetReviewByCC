@@ -215,6 +215,8 @@ public class ViewStatisticsScreen {
         stage.setTitle("View Statistics");
         stage.setScene(scene);
         stage.show();
+        stage.centerOnScreen();
+
     }
 
     /* ================= ANIMATION ================= */

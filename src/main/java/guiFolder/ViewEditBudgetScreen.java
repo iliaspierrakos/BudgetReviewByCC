@@ -240,6 +240,8 @@ public class ViewEditBudgetScreen {
         stage.setScene(scene);
         stage.setTitle("Main Menu");
         stage.show();
+        stage.centerOnScreen();
+
 
         // Subtle fade
         FadeTransition screenFade = new FadeTransition(Duration.millis(220), root);

@@ -665,3 +665,20 @@
     -fx-border-color: rgba(255,255,255,0.06);
     -fx-border-width: 1 0 0 0;
 }
+
+.dark-textarea {
+    -fx-control-inner-background: #1e1e1e;
+    -fx-text-fill: #eaeaea;
+    -fx-highlight-fill: #3a3a3a;
+    -fx-highlight-text-fill: #ffffff;
+    -fx-prompt-text-fill: #9a9a9a;
+}
+
+.dark-textarea .content {
+    -fx-background-color: #1e1e1e;
+}
+
+.dark-textarea:focused {
+    -fx-faint-focus-color: transparent;
+    -fx-focus-color: #5a5a5a;
+}

@@ -11,6 +11,7 @@ import UserFeatures.UserBudgetFileUtil;
 import UserFeatures.ViewGovernmentBudget;
 import UserManagement.User;
 import UserManagement.UserManager;
+import guiFolder.ViewBudgetScreen.GovBudgetRow;
 import javafx.animation.FadeTransition;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -254,6 +255,8 @@ public class ViewBudgetScreen {
         stage.setScene(scene);
         stage.setTitle("View Government Budget");
         stage.show();
+        stage.centerOnScreen();
+
 
         FadeTransition ft = new FadeTransition(Duration.millis(200), root);
         ft.setFromValue(0);

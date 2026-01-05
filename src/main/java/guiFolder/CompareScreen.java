@@ -149,5 +149,7 @@ public class CompareScreen {
         stage.setTitle("Compare Budgets");
         stage.setScene(scene);
         stage.show();
+        stage.centerOnScreen();
+
     }
 }
