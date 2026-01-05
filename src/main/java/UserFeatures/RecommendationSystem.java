@@ -1,7 +1,15 @@
 package UserFeatures;
 
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * RecommendationSystem
@@ -335,6 +343,6 @@ public class RecommendationSystem {
     public int getTotalVotesForMinistry(String ministry) {
     int idx = getMinistryIndex(ministry);
     return idx == -1 ? 0 : votes[idx][0];
-}
+    }
 
 }
