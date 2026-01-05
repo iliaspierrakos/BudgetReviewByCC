@@ -1,35 +1,57 @@
 package UserFeatures;
-/** 
-This is a class that creates the proposals the ministers make.
-Each minister has a .txt proposal that are saved in a specific
-folder where the governor will have access and take action.*/
+
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Scanner;
-public class Propose {
-    Scanner s = new Scanner(System.in);
-    public static double sharedBalance;
-    public void editProposal(String ministryname) {// taking the user's username as a parameter to create the unique file 
-            FileWriter fw = null;
-            PrintWriter pw = null;
-            try {
-                fw = new FileWriter("src/main/resources/NecessaryFilesAndData/ProposalsFromMinisters/MinisterOf" + ministryname + ".txt", true);
-                pw = new PrintWriter(fw);
-                System.out.println("Editing budget...");
-                Edit proposeEdit = new Edit();
-                proposeEdit.collectData(true); // calling the collectData method enables editing
-                //System.out.println("Number of edits in history: " + Edit.history.editList.size());
-                for (Edit e : Edit.history.editList) {
-                    //System.out.println("this works");
-                    pw.println(e.toString()); // calling the edit objects toString
-                }
-                System.out.println("Would you like to add a reasoning for the changes you made?");
-                String reason = s.nextLine();
-                pw.println("Reasoning for changes made:" + reason);
-                pw.close();
-                fw.close();
 
-            } catch(IOException e) {}
+public class Propose {
+    private final Scanner s = new Scanner(System.in);
+
+    // proposal-only balance (δεν επηρεάζει το global app balance)
+    public static double sharedBalance = 0;
+
+    public void editProposal(String ministryname) {
+
+        // Backup του κανονικού balance του app
+        double appBalanceBackup = Edit.balance;
+
+        // Για το proposal, δουλεύουμε με sharedBalance
+        Edit.balance = sharedBalance;
+
+        // Καλύτερο file name (χωρίς κενά/περίεργους χαρακτήρες)
+        String safeName = ministryname.replaceAll("[^a-zA-Z0-9]", "");
+        String path = "src/main/resources/NecessaryFilesAndData/ProposalsFromMinisters/MinisterOf" + safeName + ".txt";
+
+        try (FileWriter fw = new FileWriter(path, false);
+             PrintWriter pw = new PrintWriter(fw)) {
+
+            System.out.println("Editing budget...");
+            Edit proposeEdit = new Edit();
+
+            // ΣΗΜΑΝΤΙΚΟ: true => proposal mode (δεν εφαρμόζει budgets)
+            proposeEdit.collectData(true);
+
+            // αποθήκευση του proposal balance (ό,τι έμεινε διαθέσιμο)
+            sharedBalance = Edit.balance;
+
+            // γράψιμο edits
+            for (Edit e : Edit.history.getEditList()) {
+                pw.println(e.toString());
+            }
+
+            System.out.println("Would you like to add a reasoning for the changes you made?");
+            String reason = s.nextLine();
+            pw.println("Reasoning for changes made: " + reason);
+
+        } catch (IOException e) {
+            System.err.println("Failed to write proposal file: " + e.getMessage());
+        } finally {
+            // Επαναφέρουμε το app balance όπως ήταν
+            Edit.balance = appBalanceBackup;
+
+            // Καθαρίζουμε το history για να μην ανακατεύονται proposals
+            Edit.history.clear();
+        }
     }
 }
