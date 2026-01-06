@@ -6,32 +6,24 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
+import UserFeatures.CreatingMinistries;
 import UserFeatures.Edit;
+import UserFeatures.UserBudgetPersistence;
 import UserManagement.User;
 import UserManagement.UserManager;
 
+import javafx.animation.FadeTransition;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Label;
-import javafx.scene.control.OverrunStyle;
-import javafx.scene.control.Spinner;
-import javafx.scene.control.TableCell;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.Tooltip;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 public class EditHistoryScreen {
 
@@ -67,39 +59,61 @@ public class EditHistoryScreen {
 
     public void show(Stage stage) {
 
-        // ===== Header =====
+        Label appLogo = new Label("GovBudget");
+        appLogo.getStyleClass().add("app-logo");
+
+        Label bell = new Label("🔔");
+        bell.getStyleClass().add("top-icon");
+
+        Label settings = new Label("⚙");
+        settings.getStyleClass().add("top-icon");
+
+        Region topSpacer = new Region();
+        HBox.setHgrow(topSpacer, Priority.ALWAYS);
+
+        HBox topBar = new HBox(14, appLogo, topSpacer, bell, settings);
+        topBar.getStyleClass().add("topbar");
+        topBar.setAlignment(Pos.CENTER_LEFT);
+        topBar.setPadding(new Insets(14, 18, 14, 18));
+
         Label title = new Label("Edit History");
         title.getStyleClass().add("title");
 
         Label subtitle = new Label("Review changes and undo recent operations.");
         subtitle.getStyleClass().add("subtitle");
 
-        VBox headerCard = new VBox(8, title, subtitle);
-        headerCard.getStyleClass().addAll("card", "toolbar-card");
+        Label chip1 = new Label("Audit Trail");
+        chip1.getStyleClass().add("chip");
+        Label chip2 = new Label("Undo supported");
+        chip2.getStyleClass().add("chip");
+        Label chip3 = new Label("Role: " + user.getRole().name());
+        chip3.getStyleClass().add("chip");
 
-        // ===== Table =====
+        HBox chips = new HBox(10, chip1, chip2, chip3);
+        chips.setAlignment(Pos.CENTER_LEFT);
+
+        VBox heroCard = new VBox(10, title, subtitle, chips);
+        heroCard.getStyleClass().addAll("card", "toolbar-card", "hero-card");
+
         TableView<HistoryRow> table = new TableView<>();
         table.getStyleClass().add("budget-table");
         table.setPlaceholder(new Label("No changes yet."));
-        table.setPrefHeight(320);
         table.setFixedCellSize(46);
-
-        // KEY: μην στριμώχνει τις στήλες -> horizontal scroll όταν χρειάζεται
         table.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
 
         TableColumn<HistoryRow, String> colMin = new TableColumn<>("Ministry");
         colMin.setCellValueFactory(new PropertyValueFactory<>("ministry"));
-        colMin.setPrefWidth(560);
-        colMin.setMinWidth(340);
+        colMin.setPrefWidth(520);
+        colMin.setMinWidth(320);
 
         TableColumn<HistoryRow, String> colPrev = new TableColumn<>("Previous");
         colPrev.setCellValueFactory(new PropertyValueFactory<>("previous"));
-        colPrev.setPrefWidth(220);
+        colPrev.setPrefWidth(210);
         colPrev.setMinWidth(170);
 
         TableColumn<HistoryRow, String> colNew = new TableColumn<>("New");
         colNew.setCellValueFactory(new PropertyValueFactory<>("now"));
-        colNew.setPrefWidth(220);
+        colNew.setPrefWidth(210);
         colNew.setMinWidth(170);
 
         TableColumn<HistoryRow, String> colDelta = new TableColumn<>("Change");
@@ -107,101 +121,18 @@ public class EditHistoryScreen {
         colDelta.setPrefWidth(150);
         colDelta.setMinWidth(120);
 
-        // --- Ministry: NO WRAP + CLIP + tooltip ---
-        colMin.setCellFactory(tc -> new TableCell<>() {
-            @Override
-            protected void updateItem(String item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty || item == null) {
-                    setText(null);
-                    setTooltip(null);
-                    return;
-                }
-                setText(item);
-                setWrapText(false);
-                setTextOverrun(OverrunStyle.CLIP);
-                setTooltip(new Tooltip(item));
-                setAlignment(Pos.CENTER_LEFT);
-            }
-        });
-
-        // --- Numbers: NO WRAP + CLIP + right align + tooltip ---
-        colPrev.setCellFactory(tc -> new TableCell<>() {
-            @Override
-            protected void updateItem(String item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty || item == null) {
-                    setText(null);
-                    setTooltip(null);
-                    return;
-                }
-                setText(item);
-                setWrapText(false);
-                setTextOverrun(OverrunStyle.CLIP);
-                setAlignment(Pos.CENTER_RIGHT);
-                setTooltip(new Tooltip(item));
-            }
-        });
-
-        colNew.setCellFactory(tc -> new TableCell<>() {
-            @Override
-            protected void updateItem(String item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty || item == null) {
-                    setText(null);
-                    setTooltip(null);
-                    return;
-                }
-                setText(item);
-                setWrapText(false);
-                setTextOverrun(OverrunStyle.CLIP);
-                setAlignment(Pos.CENTER_RIGHT);
-                setTooltip(new Tooltip(item));
-            }
-        });
-
-        // --- Delta: NO WRAP + χρώμα + tooltip ---
-        colDelta.setCellFactory(tc -> new TableCell<>() {
-            @Override
-            protected void updateItem(String item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty || item == null) {
-                    setText(null);
-                    setTooltip(null);
-                    setStyle("");
-                    return;
-                }
-                setText(item);
-                setWrapText(false);
-                setTextOverrun(OverrunStyle.CLIP);
-                setAlignment(Pos.CENTER_RIGHT);
-                setTooltip(new Tooltip(item));
-
-                if (item.startsWith("-")) {
-                    setStyle("-fx-text-fill: #ff6b6b;");
-                } else if (item.startsWith("+")) {
-                    setStyle("-fx-text-fill: #2ecc71;");
-                } else {
-                    setStyle("-fx-text-fill: #e7eaf0;");
-                }
-            }
-        });
+        colPrev.setStyle("-fx-alignment: CENTER-RIGHT;");
+        colNew.setStyle("-fx-alignment: CENTER-RIGHT;");
+        colDelta.setStyle("-fx-alignment: CENTER-RIGHT;");
 
         table.getColumns().addAll(colMin, colPrev, colNew, colDelta);
+        table.setItems(FXCollections.observableArrayList(parseHistoryFile()));
 
-        List<HistoryRow> rows = parseHistoryFile();
-        table.setItems(FXCollections.observableArrayList(rows));
-
-        Label tableLbl = new Label("Recent changes");
-        tableLbl.getStyleClass().add("subtitle");
-
-        VBox tableCard = new VBox(10, tableLbl, table);
+        VBox tableCard = new VBox(10, new Label("Recent changes"), table);
         tableCard.getStyleClass().addAll("card", "table-card");
-        VBox.setVgrow(table, Priority.NEVER);
+        VBox.setVgrow(table, Priority.ALWAYS);
 
-        // ===== Undo =====
         int maxUndo = Math.max(0, Edit.history.getIndex() + 1);
-
         Spinner<Integer> undoSpinner = new Spinner<>(0, maxUndo, 0);
         undoSpinner.setEditable(true);
         undoSpinner.setPrefWidth(110);
@@ -236,9 +167,16 @@ public class EditHistoryScreen {
             confirm.setHeaderText("Undo " + num + " changes?");
             confirm.setContentText("This will reverse the last " + num + " budget changes.");
 
+            var css = getClass().getResource("/css/DarkTheme.css");
+            if (css != null) confirm.getDialogPane().getStylesheets().add(css.toExternalForm());
+
             confirm.showAndWait().ifPresent(btn -> {
                 if (btn == ButtonType.OK) {
                     for (int i = 0; i < num; i++) Edit.history.undo();
+
+                    // ✅ persist budgets+balance after undo
+                    UserBudgetPersistence.saveUserBudgets(user, CreatingMinistries.ministries2026, 2026);
+
                     show(stage);
                 }
             });
@@ -247,13 +185,25 @@ public class EditHistoryScreen {
         VBox undoCard = new VBox(
                 10,
                 new Label("Undo"),
+                new Separator(),
                 new HBox(12, new Label("Changes:"), undoSpinner, undoBtn),
                 status
         );
-        undoCard.getStyleClass().addAll("card");
-        ((HBox) undoCard.getChildren().get(1)).setAlignment(Pos.CENTER_LEFT);
+        undoCard.getStyleClass().addAll("card", "glass-card");
 
-        // ===== Footer =====
+        VBox sidePanel = buildSidePanel(maxUndo);
+        sidePanel.setMinWidth(280);
+        sidePanel.setMaxWidth(280);
+
+        VBox leftContent = new VBox(14, heroCard, new Separator(), tableCard, undoCard);
+        leftContent.setFillWidth(true);
+        leftContent.setMaxWidth(780);
+        HBox.setHgrow(leftContent, Priority.ALWAYS);
+
+        HBox mainRow = new HBox(18, leftContent, sidePanel);
+        mainRow.setAlignment(Pos.TOP_CENTER);
+        mainRow.setPadding(new Insets(18));
+
         Button clearBtn = new Button("Clear History");
         clearBtn.getStyleClass().addAll("button", "danger");
         clearBtn.setOnAction(e -> {
@@ -263,6 +213,9 @@ public class EditHistoryScreen {
             confirm.setTitle("Clear History");
             confirm.setHeaderText("Delete edit history?");
             confirm.setContentText("This will permanently remove the history file.");
+
+            var css = getClass().getResource("/css/DarkTheme.css");
+            if (css != null) confirm.getDialogPane().getStylesheets().add(css.toExternalForm());
 
             confirm.showAndWait().ifPresent(btn -> {
                 if (btn == ButtonType.OK) {
@@ -281,24 +234,62 @@ public class EditHistoryScreen {
 
         HBox footer = new HBox(10, clearBtn, backBtn);
         footer.setAlignment(Pos.CENTER_RIGHT);
+        footer.setPadding(new Insets(12, 18, 12, 18));
+        footer.getStyleClass().add("footer-bar");
 
-        // ===== Page =====
-        VBox page = new VBox(14, headerCard, tableCard, undoCard, footer);
-        page.setPadding(new Insets(18));
+        BorderPane root = new BorderPane();
+        root.setTop(topBar);
+        root.setCenter(mainRow);
+        root.setBottom(footer);
 
-        Scene scene = new Scene(new BorderPane(page), 980, 720);
-
+        Scene scene = new Scene(root,
+                stage.getWidth() > 0 ? stage.getWidth() : 1180,
+                stage.getHeight() > 0 ? stage.getHeight() : 760
+        );
         var css = getClass().getResource("/css/DarkTheme.css");
         if (css != null) scene.getStylesheets().add(css.toExternalForm());
 
-        stage.setScene(scene);
-        stage.setTitle("Edit History");
-        stage.show();
+        applyScenePreserveWindow(stage, scene, "Edit History");
+
+        FadeTransition ft = new FadeTransition(Duration.millis(200), root);
+        ft.setFromValue(0);
+        ft.setToValue(1);
+        ft.play();
+    }
+
+    private VBox buildSidePanel(int maxUndo) {
+        Label t1 = new Label("Summary");
+        t1.getStyleClass().add("side-title");
+
+        Label l1 = new Label("• Available undos: " + maxUndo);
+        Label l2 = new Label("• History file: edithistory.txt");
+        Label l3 = new Label("• Undo saves immediately");
+
+        l1.getStyleClass().add("side-text");
+        l2.getStyleClass().add("side-text");
+        l3.getStyleClass().add("side-text");
+
+        VBox card1 = new VBox(10, t1, l1, l2, l3);
+        card1.getStyleClass().addAll("card", "side-card");
+
+        Label t2 = new Label("Tips");
+        t2.getStyleClass().add("side-title");
+
+        Label k1 = new Label("• Undo reverses the most recent edits first");
+        Label k2 = new Label("• Clear history deletes the file permanently");
+        k1.getStyleClass().add("side-text");
+        k2.getStyleClass().add("side-text");
+
+        VBox card2 = new VBox(10, t2, k1, k2);
+        card2.getStyleClass().addAll("card", "side-card");
+
+        VBox side = new VBox(14, card1, card2);
+        side.setAlignment(Pos.TOP_LEFT);
+        return side;
     }
 
     private List<HistoryRow> parseHistoryFile() {
         List<HistoryRow> out = new ArrayList<>();
-
         if (!Files.exists(HISTORY_PATH)) return out;
 
         try {
@@ -320,7 +311,6 @@ public class EditHistoryScreen {
             }
         } catch (IOException ignored) {}
 
-        if (out.isEmpty()) out.add(new HistoryRow("No edit history available.", "", "", ""));
         return out;
     }
 
@@ -353,5 +343,34 @@ public class EditHistoryScreen {
             if (c == 3 && i != 0) { sb.append('.'); c = 0; }
         }
         return sb.reverse().toString();
+    }
+
+    private static void applyScenePreserveWindow(Stage stage, Scene scene, String title) {
+        boolean wasShowing = stage.isShowing();
+        double x = stage.getX();
+        double y = stage.getY();
+        double w = stage.getWidth();
+        double h = stage.getHeight();
+        boolean max = stage.isMaximized();
+        boolean fs = stage.isFullScreen();
+
+        stage.setScene(scene);
+        stage.setTitle(title);
+
+        if (!wasShowing) {
+            stage.show();
+            stage.centerOnScreen();
+            return;
+        }
+
+        stage.setMaximized(max);
+        stage.setFullScreen(fs);
+
+        if (!max && !fs && w > 0 && h > 0) {
+            stage.setWidth(w);
+            stage.setHeight(h);
+            stage.setX(x);
+            stage.setY(y);
+        }
     }
 }

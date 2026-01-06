@@ -4,7 +4,7 @@ import UserManagement.UserManager;
 import guiFolder.StartMenuScreen;
 import javafx.application.Application;
 import javafx.stage.Stage;
-import de.codecentric.centerdevice.javafxsvg.SvgImageLoaderFactory;
+
 
 public class BudgetReviewFxMain extends Application {
 
@@ -18,7 +18,7 @@ public class BudgetReviewFxMain extends Application {
     @Override
     public void start(Stage stage) {
 
-        SvgImageLoaderFactory.install();
+     
 
        
         new StartMenuScreen(userManager).show(stage);

@@ -62,7 +62,8 @@ public class GovernorCheck {
     }
     public void fileManagement(boolean accepted, String fileName) {
         if (accepted == true) {
-            Edit.history.applyingEdits();
+            EditHistoryList history = new EditHistoryList();
+            history.applyingEdits();
         } else {
             Path filePath = Paths.get("src/main/resources/NecessaryFilesAndData/ProposalsFromMinisters/" + fileName + ".txt");
             try {

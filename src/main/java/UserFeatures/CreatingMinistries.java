@@ -10,24 +10,23 @@ import java.util.List;
 /**
  * This class provides a static method to read ministry names and budgets
  * from files, create Ministry objects and then write a summary to an output file.
- * It requires the existence of a "Ministry" class with a constructor that accepts a String
- * for the name and a double for the budget.
  */
 public class CreatingMinistries {
-    public static Ministry[] ministries2020 = new Ministry[20];  //array used for saving the ministry objects
+
+    public static Ministry[] ministries2020 = new Ministry[20];
     public static Ministry[] ministries2021 = new Ministry[20];
     public static Ministry[] ministries2022 = new Ministry[20];
     public static Ministry[] ministries2023 = new Ministry[20];
     public static Ministry[] ministries2024 = new Ministry[20];
     public static Ministry[] ministries2025 = new Ministry[20];
     public static Ministry[] ministries2026 = new Ministry[20];
-    
+
     public static void ministryCreation(Path budgetsFile) {
         String fileName = budgetsFile.getFileName().toString();
         String year = fileName.replaceAll("\\D+", "");
+
         Path ministriesFile = Path.of("src/main/resources/NecessaryFilesAndData/ministries.txt");
         Path outputFile = Path.of("src/main/resources/NecessaryFilesAndData/view" + year + ".txt");
-
 
         try {
             List<String> budgetLines = Files.readAllLines(budgetsFile, StandardCharsets.UTF_8);
@@ -39,74 +38,52 @@ public class CreatingMinistries {
                 for (int i = 0; i < total; i++) {
                     String budgetLine = budgetLines.get(i).trim();
                     String ministryName = ministryNames.get(i).trim();
+
                     String[] tokens = budgetLine.split("\\s+");
                     String lastNumber = "N/A";
 
-
                     for (int j = tokens.length - 1; j >= 0; j--) {
-                        if (tokens[j].matches("[\\d\\.]+")) {
+                        // πιάσε το τελευταίο “νούμερο” (με . ,)
+                        if (tokens[j].matches("[\\d\\.,]+")) {
                             lastNumber = tokens[j];
                             break;
                         }
                     }
+
                     double budget;
                     try {
-                        // Remove . (thousands separator)
                         String cleanNumber = lastNumber.replace(".", "");
-                        
-                        // Replace , with . for decimals
                         cleanNumber = cleanNumber.replace(",", ".");
-                        
                         budget = Double.parseDouble(cleanNumber);
                     } catch (NumberFormatException e) {
                         System.err.println("Error parsing budget for " + ministryName + ": " + lastNumber);
                         System.err.println("Exception: " + e.getMessage());
                         budget = 0.0;
                     }
-                    if (year.equalsIgnoreCase("2020")) {
-                        ministries2020[i]= new Ministry(ministryName, budget); //making the ministry objects and saving them in the array
-                    } else if (year.equalsIgnoreCase("2021")) {
-                        ministries2021[i]= new Ministry(ministryName, budget);
-                    } else if (year.equalsIgnoreCase("2022")) {
-                        ministries2022[i]= new Ministry(ministryName, budget);
-                    } else if (year.equalsIgnoreCase("2023")) {
-                        ministries2023[i]= new Ministry(ministryName, budget);
-                    } else if (year.equalsIgnoreCase("2024")) {
-                        ministries2024[i]= new Ministry(ministryName, budget);
-                    } else if (year.equalsIgnoreCase("2025")) {
-                        ministries2025[i]= new Ministry(ministryName, budget);
-                    } else if (year.equalsIgnoreCase("2026")) {
-                        ministries2026[i]= new Ministry(ministryName, budget);
-                    }
+
+                    if (year.equalsIgnoreCase("2020")) ministries2020[i] = new Ministry(ministryName, budget);
+                    else if (year.equalsIgnoreCase("2021")) ministries2021[i] = new Ministry(ministryName, budget);
+                    else if (year.equalsIgnoreCase("2022")) ministries2022[i] = new Ministry(ministryName, budget);
+                    else if (year.equalsIgnoreCase("2023")) ministries2023[i] = new Ministry(ministryName, budget);
+                    else if (year.equalsIgnoreCase("2024")) ministries2024[i] = new Ministry(ministryName, budget);
+                    else if (year.equalsIgnoreCase("2025")) ministries2025[i] = new Ministry(ministryName, budget);
+                    else if (year.equalsIgnoreCase("2026")) ministries2026[i] = new Ministry(ministryName, budget);
 
                     writer.write(ministryName + " " + lastNumber);
                     writer.newLine();
                 }
-
-
-
             }
 
         } catch (IOException e) {
             System.err.println("Error processing files: " + e.getMessage());
         }
-
-
     }
 
-    /**
-     * Creates ministry objects from already loaded budget data.
-     * This method assumes that MinistriesBudgets.loadFromResources(year) 
-     * has already been called and the data is available.
-     * 
-     * @param year the year for which to create ministry objects
-     */
     public static void ministryCreationFromLoadedBudgets(int year) {
         Path ministriesFile = Path.of("src/main/resources/NecessaryFilesAndData/ministries.txt");
         Path budgetsFile = Path.of("src/main/resources/NecessaryFilesAndData/MinistriesBudgets" + year + ".csv");
 
         try {
-            // Check if the budgets file exists (should have been created by loadFromResources)
             if (!Files.exists(budgetsFile)) {
                 System.err.println("Warning: Budget file not found for year " + year + ": " + budgetsFile);
                 return;
@@ -121,11 +98,12 @@ public class CreatingMinistries {
             for (int i = 0; i < total; i++) {
                 String budgetLine = budgetLines.get(i).trim();
                 String ministryName = ministryNames.get(i).trim();
+
                 String[] tokens = budgetLine.split("\\s+");
                 String lastNumber = "N/A";
 
                 for (int j = tokens.length - 1; j >= 0; j--) {
-                    if (tokens[j].matches("[\\d\\.]+")) {
+                    if (tokens[j].matches("[\\d\\.,]+")) {
                         lastNumber = tokens[j];
                         break;
                     }
@@ -133,12 +111,8 @@ public class CreatingMinistries {
 
                 double budget;
                 try {
-                    // Remove . (thousands separator)
                     String cleanNumber = lastNumber.replace(".", "");
-                    
-                    // Replace , with . for decimals
                     cleanNumber = cleanNumber.replace(",", ".");
-                    
                     budget = Double.parseDouble(cleanNumber);
                 } catch (NumberFormatException e) {
                     System.err.println("Error parsing budget for " + ministryName + ": " + lastNumber);
@@ -153,9 +127,6 @@ public class CreatingMinistries {
         }
     }
 
-    /**
-     * Helper method to get the appropriate ministry array for a given year.
-     */
     private static Ministry[] getYearArray(int year) {
         return switch (year) {
             case 2020 -> ministries2020;
@@ -168,23 +139,41 @@ public class CreatingMinistries {
             default -> throw new IllegalArgumentException("Invalid year: " + year);
         };
     }
-    
+
+    /**
+     * ✅ FIXED CSV parsing:
+     * - ministry names may contain commas
+     * - budget is always AFTER the LAST comma
+     * - BALANCE,<value> supported
+     */
     public static void loadUserBudgets(Path file, int year) {
         try {
-            List<String> lines = Files.readAllLines(file);
+            List<String> lines = Files.readAllLines(file, StandardCharsets.UTF_8);
 
-            for (String line : lines) {
-                if (line.isBlank()) continue;
+            for (String raw : lines) {
+                String line = raw == null ? "" : raw.trim();
+                if (line.isEmpty()) continue;
 
-                String[] parts = line.split(",");
-                if (parts[0].equalsIgnoreCase("BALANCE")) {
-                    Edit.balance = Double.parseDouble(parts[1].trim());
+                // BALANCE line (first comma is enough)
+                if (line.regionMatches(true, 0, "BALANCE", 0, "BALANCE".length())) {
+                    int idx = line.indexOf(',');
+                    if (idx >= 0 && idx < line.length() - 1) {
+                        String val = line.substring(idx + 1).trim();
+                        Edit.balance = Double.parseDouble(val);
+                    }
                     continue;
                 }
-                if (parts.length != 2) continue;
 
-                String ministryName = parts[0].trim();
-                double budget = Double.parseDouble(parts[1].trim());
+                // ministry line: name may include commas -> use last comma
+                int lastComma = line.lastIndexOf(',');
+                if (lastComma <= 0 || lastComma >= line.length() - 1) continue;
+
+                String ministryName = unquote(line.substring(0, lastComma).trim());
+                String budgetStr = line.substring(lastComma + 1).trim();
+
+                double budget = Double.parseDouble(budgetStr);
+
+                // apply to current array (2026 in your flows)
                 for (Ministry m : ministries2026) {
                     if (m != null && m.getMinistryName().equalsIgnoreCase(ministryName)) {
                         m.setBudget(budget);
@@ -195,12 +184,25 @@ public class CreatingMinistries {
 
         } catch (IOException e) {
             e.printStackTrace();
+        } catch (NumberFormatException e) {
+            // Δείχνουμε ακριβώς το file για debugging
+            System.err.println("Failed to load budgets from: " + file);
+            throw e;
         }
     }
-    
+
+    private static String unquote(String s) {
+        if (s == null) return null;
+        String t = s.trim();
+        if (t.length() >= 2 && t.startsWith("\"") && t.endsWith("\"")) {
+            t = t.substring(1, t.length() - 1).replace("\"\"", "\"");
+        }
+        return t;
+    }
+
     public static void resetGovernorToOriginal(int year) {
         Path original = Path.of(
-            "src/main/resources/NecessaryFilesAndData/OriginalBudget/MinistriesBudgets" + year + "_original.csv"
+                "src/main/resources/NecessaryFilesAndData/OriginalBudget/MinistriesBudgets" + year + "_original.csv"
         );
         Path governor = Path.of("src/main/resources/NecessaryFilesAndData/Governor_" + year + ".csv");
 
@@ -218,31 +220,32 @@ public class CreatingMinistries {
             StringBuilder sb = new StringBuilder();
 
             for (Ministry m : ministries2026) {
-                sb.append(m.getMinistryName()).append(",");
+                if (m == null) continue;
+                // γράφουμε "name",budget για να είναι safe με κόμματα
+                sb.append("\"").append(m.getMinistryName().replace("\"", "\"\"")).append("\"").append(",");
                 sb.append(m.getBudget()).append("\n");
             }
 
-            Files.writeString(file, sb.toString());
+            Files.writeString(file, sb.toString(), StandardCharsets.UTF_8);
 
         } catch (IOException e) {
             System.out.println("Failed to publish official budget.");
         }
     }
-    
+
     public static void loadOfficialBudgets(int year) {
         ministries2026 = new Ministry[20];
         ministryCreation(Path.of("src/main/resources/NecessaryFilesAndData/MinistriesBudgets" + year + ".csv"));
     }
-    
+
     public static void loadGovernorDraft(int year) {
         Path governorFile = Path.of("src/main/resources/NecessaryFilesAndData/Governor_" + year + ".csv");
         Path originalFile = Path.of(
-            "src/main/resources/NecessaryFilesAndData/OriginalBudget/MinistriesBudgets" + year + "_original.csv"
+                "src/main/resources/NecessaryFilesAndData/OriginalBudget/MinistriesBudgets" + year + "_original.csv"
         );
 
         ministries2026 = new Ministry[20];
 
-        
         ministryCreation(originalFile);
 
         if (!Files.exists(governorFile)) {

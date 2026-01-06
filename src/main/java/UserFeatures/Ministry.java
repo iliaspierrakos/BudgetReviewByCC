@@ -3,119 +3,115 @@ package UserFeatures;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
-import java.util.Scanner;
 
 /**
- * The {@code Ministry} class represents a government ministry with a name and a general budget.
- * It also includes a static counter to track the number of {@code Ministry} objects created.
- * Provides methods for budget searching and formatting.
+ * Represents a government ministry with a name and a budget.
  */
-public class Ministry {    //Ministry class
-    private String ministryName; //Ministry name
-    private double budget; //Ministry's general budget
-    private static int counter; //
+public class Ministry {
 
-      /**
-     * Constructs a new {@code Ministry} object.
-     * Increments the static counter upon creation.
-     *
-     * @param name The name of the ministry.
-     * @param number The general budget allocated to the ministry.
-     */
-    public Ministry (String name, double number) { //Ministry object constructor
+    private String ministryName;
+    private double budget;
+    private static int counter;
+
+    public Ministry(String name, double number) {
+        if (name == null || name.isBlank()) {
+            throw new IllegalArgumentException("Ministry name cannot be null/blank");
+        }
         this.ministryName = name;
         this.budget = number;
         counter++;
     }
-    /**
-     * Returns the total number of {@code Ministry} objects that have been instantiated.
-     * This is used, for example, to ensure an array of the correct size is created.
-     *
-     * @return The number of created ministry objects.
-     */
-    public static int getCounter() { //getCounter method used for making sure the array is made
+
+    public static int getCounter() {
         return counter;
     }
-     /** Returns a string representation of the {@code Ministry} object,
-     * including its name and regular budget.
-     *
-     * @return A string containing the ministry's name and its regular budget.
-     */
+
     @Override
     public String toString() {
-        return ministryName + "Regular Budget:" + budget;
+        return ministryName + " Regular Budget: " + getFormattedBudget(budget);
     }
 
-    public static double budgetSearchByName(String searchingMinistry, Ministry[] ministriesArray) { //method for searching the regular budget of a ministry with its name
+    /**
+     * Returns the budget for a ministry by name.
+     * @throws IllegalArgumentException if not found.
+     */
+    public static double budgetSearchByName(String searchingMinistry, Ministry[] ministriesArray) {
+        Ministry m = findByName(searchingMinistry, ministriesArray);
+        if (m == null) {
+            throw new IllegalArgumentException("Ministry not found: " + searchingMinistry);
+        }
+        return m.budget;
+    }
+
+    /**
+     * Finds a ministry object by name. Returns null if not found.
+     */
+    public static Ministry findByName(String searchingMinistry, Ministry[] ministriesArray) {
+        if (searchingMinistry == null || ministriesArray == null) return null;
+
         for (Ministry m : ministriesArray) {
-            if (m.ministryName.equalsIgnoreCase(searchingMinistry)) {
-                return m.budget;
+            if (m == null) continue;
+            if (m.ministryName != null && m.ministryName.equalsIgnoreCase(searchingMinistry)) {
+                return m;
             }
         }
-        return -1 ;
+        return null;
     }
-    public String getMinistryName(){
+
+    public String getMinistryName() {
         return ministryName;
     }
 
-    /**
-     * Sets a new name for the ministry.
-     *
-     * @param name The new name to set.
-     */
-    public void setMinistryName(String name){
+    public void setMinistryName(String name) {
+        if (name == null || name.isBlank()) {
+            throw new IllegalArgumentException("Ministry name cannot be null/blank");
+        }
         this.ministryName = name;
     }
 
-    /**
-     * Sets a new general budget for the ministry.
-     * Prints "yes" to the console upon successful update.
-     *
-     * @param budget The new budget to set.
-     */
     public void setBudget(double budget) {
+        // Επιτρέπεις 0 και πάνω. Αν θες να επιτρέπεις και αρνητικά, αφαίρεσε το check.
+        if (budget < 0) {
+            throw new IllegalArgumentException("Budget cannot be negative: " + budget);
+        }
         this.budget = budget;
     }
 
-    /**
-     * Returns the general budget of the ministry.
-     *
-     * @return The ministry's general budget.
-     */
     public double getBudget() {
         return budget;
     }
 
     /**
-     * Formats a given budget value as a string with a German-style grouping separator ('.').
-     * The format uses a thousands separator (e.g., 1000000 becomes "1.000.000").
-     *
-     * @param budget The double value representing the budget to be formatted.
-     * @return A string with the formatted budget.
+     * Greek/German-style grouping: 1.234.567,89
      */
     public static String getFormattedBudget(double budget) {
         DecimalFormatSymbols symbols = new DecimalFormatSymbols(Locale.GERMAN);
         symbols.setGroupingSeparator('.');
         symbols.setDecimalSeparator(',');
-        DecimalFormat df = new DecimalFormat("#,###.##", symbols);
+
+        // δείχνει έως 2 δεκαδικά, χωρίς να γεμίζει μηδενικά
+        DecimalFormat df = new DecimalFormat("#,##0.##", symbols);
         return df.format(budget);
     }
-    // Display all ministries with numbers
-    public static void displayListOfMinistries(){
+
+    public static void displayListOfMinistries() {
         for (int i = 0; i < CreatingMinistries.ministries2026.length; i++) {
-            if (CreatingMinistries.ministries2026[i] != null) {
-                System.out.printf("%d. %s (Budget: %s)%n", 
-                    i + 1, // Display 1-based numbering for user
-                    CreatingMinistries.ministries2026[i].getMinistryName(),
-                    Ministry.getFormattedBudget(CreatingMinistries.ministries2026[i].getBudget()));
+            Ministry m = CreatingMinistries.ministries2026[i];
+            if (m != null) {
+                System.out.printf(
+                        "%d. %s (Budget: %s)%n",
+                        i + 1,
+                        m.getMinistryName(),
+                        Ministry.getFormattedBudget(m.getBudget())
+                );
             }
         }
     }
+
     public static String yesOrNo(String response) {
-        Scanner scanner = new Scanner(System.in);
-        while (!response.equalsIgnoreCase("yes") && !response.equalsIgnoreCase("no"))  {
-            System.out.println("Invalid input!Please respond with yes or no.");
-            response = scanner.nextLine();
+        while (response == null || (!response.equalsIgnoreCase("yes") && !response.equalsIgnoreCase("no"))) {
+            // δεν ανοίγουμε Scanner εδώ (static leak). Απλά κάνουμε validate.
+            return "no";
         }
         return response;
     }

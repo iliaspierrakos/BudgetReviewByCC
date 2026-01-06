@@ -3,11 +3,14 @@ package UserFeatures;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 /**
  * Propose
  *
- * GUI-friendly backend (backward compatible with CLI usage).
+ * Supports both:
+ * 1) CLI/legacy flow: collect edits (Edit.history) and write them + reasoning.
+ * 2) GUI-friendly flow: submit plain proposal text and read proposals back.
  */
 public class Propose {
 
@@ -16,39 +19,81 @@ public class Propose {
 
     private String ministryName;
 
+    // proposal-only balance (does not affect global app balance permanently)
+    public static double sharedBalance = 0;
+
+    // used only for CLI legacy flow (reasoning prompt)
+    private final Scanner s = new Scanner(System.in);
+
     /* =========================
        CONSTRUCTORS
        ========================= */
 
-    // ✔ Default constructor (for existing code)
+    // Default constructor (backward compatible)
     public Propose() {
         createDirectories();
     }
 
-    // ✔ New constructor (for GUI usage)
+    // GUI usage
     public Propose(String ministryName) {
         this.ministryName = ministryName;
         createDirectories();
     }
 
     /* =========================
-       BACKWARD COMPATIBILITY
+       LEGACY / CLI FLOW (edits-based)
        ========================= */
 
     /**
-     * Old method used by ViewEditBudget
+     * Legacy method: creates a proposal for a given ministry by collecting edits
+     * (proposal mode), saving them to a file and storing reasoning.
      */
-    public void editProposal(String proposalText) {
-        if (ministryName == null || ministryName.isBlank()) {
-            throw new IllegalStateException(
-                    "Ministry name not set. Use Propose(String ministryName)."
-            );
+    public void editProposal(String ministryname) {
+        createDirectories();
+
+        // Backup the application's real balance
+        double appBalanceBackup = Edit.balance;
+
+        // For proposal mode, work on sharedBalance
+        Edit.balance = sharedBalance;
+
+        String safe = safeName(ministryname);
+        File file = new File(BASE_DIR + "MinisterOf" + safe + ".txt");
+
+        try (FileWriter fw = new FileWriter(file, false);
+             PrintWriter pw = new PrintWriter(fw)) {
+
+            System.out.println("Editing budget...");
+            Edit proposeEdit = new Edit();
+
+            // IMPORTANT: true => proposal mode
+            proposeEdit.collectData(true);
+
+            // store the proposal's remaining balance
+            sharedBalance = Edit.balance;
+
+            // write edits
+            for (Edit e : Edit.history.getEditList()) {
+                pw.println(e.toString());
+            }
+
+            System.out.println("Would you like to add a reasoning for the changes you made?");
+            String reason = s.nextLine();
+            pw.println("Reasoning for changes made: " + reason);
+
+        } catch (IOException e) {
+            System.err.println("Failed to write proposal file: " + e.getMessage());
+        } finally {
+            // restore real app balance
+            Edit.balance = appBalanceBackup;
+
+            // clear history so proposal edits don't mix with normal edits
+            Edit.history.clear();
         }
-        submitProposal(proposalText);
     }
 
     /* =========================
-       GUI-FRIENDLY API
+       GUI-FRIENDLY API (text-based)
        ========================= */
 
     public void setMinistryName(String ministryName) {
@@ -59,31 +104,42 @@ public class Propose {
         return ministryName;
     }
 
+    /**
+     * Backward-compat method name (used by some GUI code):
+     * This version accepts proposal text (not ministry name).
+     */
+    public void editProposal(String proposalText, boolean unused) {
+        // NOTE: kept only if you need an overload; safe to remove if unused.
+        submitProposal(proposalText);
+    }
+
     public void submitProposal(String proposalText) {
         if (proposalText == null || proposalText.trim().isEmpty()) {
             throw new IllegalArgumentException("Proposal text cannot be empty.");
         }
+        createDirectories();
         saveProposalToFile(proposalText.trim());
     }
 
     public File getProposalFile() {
-        return new File(BASE_DIR + "MinisterFor" + ministryName + ".txt");
+        if (ministryName == null || ministryName.isBlank()) {
+            throw new IllegalStateException("Ministry name not set.");
+        }
+        // Use safe file name consistently
+        String safe = safeName(ministryName);
+        return new File(BASE_DIR + "MinisterFor" + safe + ".txt");
     }
 
     public List<String> getAllProposals() {
         File file = getProposalFile();
         List<String> proposals = new ArrayList<>();
 
-        if (!file.exists()) {
-            return proposals;
-        }
+        if (!file.exists()) return proposals;
 
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
             String line;
             while ((line = br.readLine()) != null) {
-                if (!line.isBlank()) {
-                    proposals.add(line);
-                }
+                if (!line.isBlank()) proposals.add(line);
             }
         } catch (IOException e) {
             throw new RuntimeException("Error reading proposals file.", e);
@@ -98,18 +154,21 @@ public class Propose {
 
     private void createDirectories() {
         File dir = new File(BASE_DIR);
-        if (!dir.exists()) {
-            dir.mkdirs();
-        }
+        if (!dir.exists()) dir.mkdirs();
     }
 
     private void saveProposalToFile(String proposal) {
         File file = getProposalFile();
-
         try (PrintWriter pw = new PrintWriter(new FileWriter(file, true))) {
             pw.println(proposal);
         } catch (IOException e) {
             throw new RuntimeException("Failed to save proposal.", e);
         }
+    }
+
+    private static String safeName(String name) {
+        if (name == null) return "";
+        // keep alphanumerics only to avoid weird filenames across OS
+        return name.replaceAll("[^a-zA-Z0-9]", "");
     }
 }

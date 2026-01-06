@@ -12,6 +12,7 @@ import javafx.scene.chart.PieChart;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -39,10 +40,22 @@ public class ViewRecommendationStatisticsScreen {
 
     public void show(Stage stage) {
 
+        // =========================
+        // WINDOW STATE SNAPSHOT (NO JUMP)
+        // =========================
+        final boolean wasMaximized = stage.isMaximized();
+        final boolean wasFullScreen = stage.isFullScreen();
+        final double prevW = stage.getWidth();
+        final double prevH = stage.getHeight();
+        final double prevX = stage.getX();
+        final double prevY = stage.getY();
+
         Label title = new Label("Citizen Recommendations – Statistics");
         title.getStyleClass().add("title");
+        // GOLD accent (inline only)
+        title.setStyle("-fx-text-fill: #f0f2f8; -fx-effect: dropshadow(gaussian, rgba(212,175,55,0.18), 16, 0.20, 0, 0);");
 
-        VBox chartsContainer = new VBox(30);
+        VBox chartsContainer = new VBox(26);
         chartsContainer.setPadding(new Insets(20));
         chartsContainer.setAlignment(Pos.TOP_CENTER);
 
@@ -50,71 +63,71 @@ public class ViewRecommendationStatisticsScreen {
         if (user instanceof MinistryMember) {
             MinistryMember member = (MinistryMember) user;
             String ministryName = member.getMinistryName();
-            
-            // Update title to show specific ministry
+
             title.setText("Citizen Recommendations – Ministry of " + ministryName);
-            
-            // Load only the chart for this ministry
+
             Path targetFile = DATA_DIR.resolve("CitizenForMinistry of " + ministryName + ".txt");
-            
+
             if (Files.exists(targetFile)) {
-                PieChart chart = createChartForFile(targetFile);
+                PieChart chart = createProbabilityChartForFile(targetFile);
                 if (chart != null) {
                     chartsContainer.getChildren().add(chart);
-                    
-                    // Add summary statistics below the chart
+
                     VBox summaryBox = createSummaryBox(targetFile);
                     if (summaryBox != null) {
                         chartsContainer.getChildren().add(summaryBox);
                     }
                 } else {
-                    chartsContainer.getChildren().add(
-                            new Label("No citizen recommendations data available for your ministry yet.")
-                    );
+                    Label msg = new Label("No citizen recommendations data available for your ministry yet.");
+                    msg.getStyleClass().add("subtitle");
+                    chartsContainer.getChildren().add(msg);
                 }
             } else {
-                chartsContainer.getChildren().add(
-                        new Label("No citizen recommendations file found for Ministry of " + ministryName + ".")
-                );
+                Label msg = new Label("No citizen recommendations file found for Ministry of " + ministryName + ".");
+                msg.getStyleClass().add("subtitle");
+                chartsContainer.getChildren().add(msg);
             }
-            
+
         } else {
             // For Governor or other roles - show all charts
             try (Stream<Path> files = Files.list(DATA_DIR)) {
                 files
-                    .filter(f -> f.toString().endsWith(".txt"))
-                    .sorted()
-                    .forEach(file -> {
-                        PieChart chart = createChartForFile(file);
-                        if (chart != null) {
-                            chartsContainer.getChildren().add(chart);
-                            
-                            // Add summary for each ministry
-                            VBox summaryBox = createSummaryBox(file);
-                            if (summaryBox != null) {
-                                chartsContainer.getChildren().add(summaryBox);
+                        .filter(f -> f.toString().endsWith(".txt"))
+                        .sorted()
+                        .forEach(file -> {
+                            PieChart chart = createProbabilityChartForFile(file);
+                            if (chart != null) {
+                                chartsContainer.getChildren().add(chart);
+
+                                VBox summaryBox = createSummaryBox(file);
+                                if (summaryBox != null) {
+                                    chartsContainer.getChildren().add(summaryBox);
+                                }
                             }
-                        }
-                    });
+                        });
             } catch (IOException e) {
-                chartsContainer.getChildren().add(
-                        new Label("Error loading recommendation files.")
-                );
+                Label msg = new Label("Error loading recommendation files.");
+                msg.getStyleClass().add("error");
+                chartsContainer.getChildren().add(msg);
             }
         }
 
         ScrollPane scrollPane = new ScrollPane(chartsContainer);
         scrollPane.setFitToWidth(true);
+        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
 
         Button backButton = new Button("Back");
-        backButton.getStyleClass().add("button");
+        backButton.getStyleClass().addAll("button", "subtle");
+        // GOLD accent
+        backButton.setStyle("-fx-border-color: rgba(212,175,55,0.20);");
+
         backButton.setOnAction(e ->
                 new ViewEditBudgetScreen(user, userManager).show(stage)
         );
 
         VBox bottom = new VBox(backButton);
         bottom.setAlignment(Pos.CENTER_RIGHT);
-        bottom.setPadding(new Insets(10));
+        bottom.setPadding(new Insets(10, 18, 16, 18));
 
         BorderPane root = new BorderPane();
         root.setTop(title);
@@ -123,20 +136,55 @@ public class ViewRecommendationStatisticsScreen {
         root.setCenter(scrollPane);
         root.setBottom(bottom);
 
-        Scene scene = new Scene(root, 1100, 750);
-        scene.getStylesheets().add(
-                getClass().getResource("/css/DarkTheme.css").toExternalForm()
-        );
+        // =========================
+        // SCENE (REUSE + NO JUMP)
+        // =========================
+        Scene scene = stage.getScene();
+        if (scene == null) {
+            scene = new Scene(root);
+            scene.getStylesheets().add(
+                    getClass().getResource("/css/DarkTheme.css").toExternalForm()
+            );
+            stage.setScene(scene);
+        } else {
+            scene.setRoot(root);
+            String css = getClass().getResource("/css/DarkTheme.css").toExternalForm();
+            if (!scene.getStylesheets().contains(css)) {
+                scene.getStylesheets().add(css);
+            }
+        }
 
         stage.setTitle("Recommendation Statistics");
-        stage.setScene(scene);
         stage.show();
+
+        // Restore window state (fullscreen/max/normal) exactly
+        if (wasFullScreen) {
+            stage.setFullScreen(true);
+        } else if (wasMaximized) {
+            stage.setMaximized(true);
+        } else {
+            if (prevW > 0 && prevH > 0) {
+                stage.setWidth(prevW);
+                stage.setHeight(prevH);
+                stage.setX(prevX);
+                stage.setY(prevY);
+            }
+        }
     }
 
-    private PieChart createChartForFile(Path file) {
+    /**
+     * Probability pie chart:
+     * slice value = votes/total (0..1)
+     * labels show: Category (votes, xx.x%)
+     * tooltips show: votes/total (xx.x%)
+     */
+    private PieChart createProbabilityChartForFile(Path file) {
 
         String ministryName = extractMinistryName(file.getFileName().toString());
-        ObservableList<PieChart.Data> pieData = FXCollections.observableArrayList();
+
+        // temp storage
+        class Row { String cat; int votes; Row(String c,int v){cat=c;votes=v;} }
+        List<Row> rows = new ArrayList<>();
 
         int totalVotes = 0;
 
@@ -145,56 +193,84 @@ public class ViewRecommendationStatisticsScreen {
 
             while ((line = br.readLine()) != null) {
 
-                if (line.startsWith("Total Votes")) {
-                    continue;
-                }
+                if (line.startsWith("Total Votes")) continue;
 
                 String[] parts = line.split(", Votes from Citizens:");
                 if (parts.length < 2) continue;
 
                 String category = parts[0].trim();
-                int votes = Integer.parseInt(
-                        parts[1].split(",")[0].trim()
-                );
+                int votes = Integer.parseInt(parts[1].split(",")[0].trim());
 
                 totalVotes += votes;
-
-                if (votes > 0) {
-                    pieData.add(new PieChart.Data(category, votes));
-                }
+                rows.add(new Row(category, votes));
             }
 
         } catch (Exception e) {
             return null;
         }
 
-        if (pieData.isEmpty()) {
-            return null;
+        if (totalVotes <= 0) return null;
+
+        ObservableList<PieChart.Data> pieData = FXCollections.observableArrayList();
+
+        for (Row r : rows) {
+            if (r.votes <= 0) continue;
+
+            double prob = r.votes / (double) totalVotes; // 0..1
+            PieChart.Data d = new PieChart.Data(r.cat, prob);
+            pieData.add(d);
         }
+
+        if (pieData.isEmpty()) return null;
 
         PieChart chart = new PieChart(pieData);
         chart.setTitle("Ministry of " + ministryName + " (Total: " + totalVotes + " votes)");
         chart.setLabelsVisible(true);
         chart.setLegendVisible(true);
 
-        // Calculate percentages and update labels
-        final int finalTotalVotes = totalVotes;
+        final int finalTotal = totalVotes;
+
+        // Update labels + tooltips once nodes exist
         chart.getData().forEach(d -> {
-            int votes = (int) d.getPieValue();
-            double percentage = (votes * 100.0) / finalTotalVotes;
+            // Convert back from probability to votes for display:
+            // votes ≈ prob * total. But we want exact votes from file.
+            // We'll look it up from 'rows' by category name.
+            int votes = rows.stream()
+                    .filter(r -> r.cat.equals(d.getName()))
+                    .map(r -> r.votes)
+                    .findFirst()
+                    .orElse((int) Math.round(d.getPieValue() * finalTotal));
+
+            double pct = (votes * 100.0) / finalTotal;
+
+            // Label text = category (votes, %)
             d.nameProperty().set(
-                    d.getName() + " (" + votes + " votes, " + 
-                    String.format("%.1f%%", percentage) + ")"
+                    d.getName() + " (" + votes + " votes, " + String.format("%.1f%%", pct) + ")"
             );
+
+            // Tooltip on slice
+            d.nodeProperty().addListener((obs, oldNode, newNode) -> {
+                if (newNode != null) {
+                    Tooltip tip = new Tooltip(votes + " / " + finalTotal + "  (" + String.format("%.1f%%", pct) + ")");
+                    Tooltip.install(newNode, tip);
+                }
+            });
         });
+
+        // Optional GOLD accent around chart area (inline only)
+        chart.setStyle(
+                "-fx-background-color: transparent;" +
+                "-fx-border-color: rgba(212,175,55,0.16);" +
+                "-fx-border-radius: 16;" +
+                "-fx-background-radius: 16;"
+        );
 
         return chart;
     }
 
     private VBox createSummaryBox(Path file) {
         String ministryName = extractMinistryName(file.getFileName().toString());
-        
-        List<String> categoryData = new ArrayList<>();
+
         int totalVotes = 0;
         int totalCategories = 0;
         int categoriesWithVotes = 0;
@@ -203,45 +279,41 @@ public class ViewRecommendationStatisticsScreen {
             String line;
 
             while ((line = br.readLine()) != null) {
-                if (line.startsWith("Total Votes")) {
-                    continue;
-                }
+                if (line.startsWith("Total Votes")) continue;
 
                 String[] parts = line.split(", Votes from Citizens:");
                 if (parts.length < 2) continue;
 
-                String category = parts[0].trim();
                 int votes = Integer.parseInt(parts[1].split(",")[0].trim());
-                
+
                 totalCategories++;
                 totalVotes += votes;
-                
-                if (votes > 0) {
-                    categoriesWithVotes++;
-                    categoryData.add(category + ": " + votes + " votes");
-                }
+
+                if (votes > 0) categoriesWithVotes++;
             }
 
         } catch (Exception e) {
             return null;
         }
 
-        if (totalCategories == 0) {
-            return null;
-        }
+        if (totalCategories == 0) return null;
 
         VBox summaryBox = new VBox(8);
         summaryBox.setPadding(new Insets(15));
         summaryBox.getStyleClass().add("card");
-        summaryBox.setMaxWidth(800);
+        summaryBox.setMaxWidth(900);
+
+        // GOLD subtle edge
+        summaryBox.setStyle("-fx-border-color: rgba(212,175,55,0.18);");
 
         Label summaryTitle = new Label("Summary for Ministry of " + ministryName);
         summaryTitle.getStyleClass().add("subtitle");
 
         Label statsLabel = new Label(
-            "Total Votes: " + totalVotes + " | " +
-            "Categories with votes: " + categoriesWithVotes + "/" + totalCategories
+                "Total Votes: " + totalVotes + " | " +
+                        "Categories with votes: " + categoriesWithVotes + "/" + totalCategories
         );
+        statsLabel.getStyleClass().add("subtitle");
 
         summaryBox.getChildren().addAll(summaryTitle, statsLabel);
 
