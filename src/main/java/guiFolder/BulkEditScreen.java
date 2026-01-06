@@ -1,12 +1,10 @@
 package guiFolder;
 
-import UserFeatures.CreatingMinistries;
-import UserFeatures.Edit;
-import UserFeatures.EditHistory;
-import UserFeatures.Ministry;
-import UserFeatures.UserBudgetPersistence;
+import UserFeatures.*;
+import UserManagement.CurrentSession;
 import UserManagement.User;
 import UserManagement.UserManager;
+
 import javafx.animation.FadeTransition;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -14,19 +12,27 @@ import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
-import javafx.scene.control.TableCell;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
-import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.TextFormatter;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.*;
+import javafx.scene.input.KeyCode;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.ColumnConstraints;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -41,7 +47,6 @@ public class BulkEditScreen {
         this.userManager = userManager;
     }
 
-    // ===== Row model preview =====
     public static class PreviewRow {
         private final SimpleStringProperty ministry = new SimpleStringProperty("");
         private final SimpleStringProperty previous = new SimpleStringProperty("");
@@ -61,9 +66,27 @@ public class BulkEditScreen {
         public String getDelta() { return delta.get(); }
     }
 
+    // List row for selecting ministries
+    public static class MinistryPickRow {
+        private final SimpleStringProperty ministry = new SimpleStringProperty("");
+        private final SimpleStringProperty current = new SimpleStringProperty("");
+        private final int index;
+
+        public MinistryPickRow(int index, String ministry, String current) {
+            this.index = index;
+            this.ministry.set(ministry);
+            this.current.set(current);
+        }
+
+        public int getIndex() { return index; }
+        public String getMinistry() { return ministry.get(); }
+        public String getCurrent() { return current.get(); }
+    }
+
     public void show(Stage stage) {
 
-        // TOP BAR
+        CurrentSession.setUser(user);
+
         Label appLogo = new Label("GovBudget");
         appLogo.getStyleClass().add("app-logo");
 
@@ -81,19 +104,18 @@ public class BulkEditScreen {
         topBar.setAlignment(Pos.CENTER_LEFT);
         topBar.setPadding(new Insets(14, 18, 14, 18));
 
-        // HERO
         Label title = new Label("Bulk Edit");
         title.getStyleClass().add("title");
+        // subtle gold glow (inline, no CSS edits)
+        title.setStyle("-fx-effect: dropshadow(gaussian, rgba(212,175,55,0.14), 16, 0.20, 0, 0);");
 
         Label subtitle = new Label("Apply changes to multiple ministries at once.");
         subtitle.getStyleClass().add("subtitle");
 
         Label chip1 = new Label("Edits • 2026");
         chip1.getStyleClass().add("chip");
-
         Label chip2 = new Label("Role: " + user.getRole().name());
         chip2.getStyleClass().add("chip");
-
         Label chip3 = new Label("Balance: " + Ministry.getFormattedBudget(Edit.balance));
         chip3.getStyleClass().add("chip");
 
@@ -103,8 +125,9 @@ public class BulkEditScreen {
         VBox heroCard = new VBox(10, title, subtitle, chips);
         heroCard.getStyleClass().addAll("card", "toolbar-card", "hero-card");
         heroCard.setMaxWidth(Double.MAX_VALUE);
+        // gold edge
+        heroCard.setStyle("-fx-border-color: rgba(212,175,55,0.14);");
 
-        // ACTION GRID
         GridPane grid = new GridPane();
         grid.getStyleClass().add("action-grid");
         grid.setHgap(18);
@@ -120,28 +143,30 @@ public class BulkEditScreen {
         VBox percentAllCard = actionCard(
                 "Percentage Change (All)",
                 "Apply a percentage (+/-) to all ministries with preview.",
-                "/icons/wand.png",
+                "/icons/percent.png",
                 () -> showPercentageAllDialog(stage)
         );
 
         VBox fixedAllCard = actionCard(
                 "Fixed Amount Change (All)",
                 "Apply a fixed amount (+/-) to all ministries with preview.",
-                "/icons/receipt.png",
+                "/icons/exposure.png",
                 () -> showFixedAllDialog(stage)
         );
 
         VBox selectedCard = actionCard(
                 "Change Selected Ministries",
-                "Pick specific ministries and apply changes (coming soon).",
-                "/icons/inbox.png",
-                this::showSelectedMinistriesDialog
+                "Select ministries, preview changes, then apply.",
+                "/icons/selected.png",
+                () -> showSelectedMinistriesDialog(stage)
         );
+        // subtle gold accent on the “selected” card
+        selectedCard.setStyle("-fx-border-color: rgba(212,175,55,0.18);");
 
         VBox backCard = actionCard(
                 "Back",
                 "Return to previous screen.",
-                "/icons/compare.png",
+                "/icons/back.png",
                 () -> {
                     if (user.getRole() == User.Role.CITIZEN) new VirtualEditScreen(user, userManager).show(stage);
                     else new EditBudgetScreen(user, userManager).show(stage);
@@ -169,6 +194,7 @@ public class BulkEditScreen {
 
         Button footerBack = new Button("⟵ Back");
         footerBack.getStyleClass().addAll("button", "subtle");
+        footerBack.setStyle("-fx-border-color: rgba(212,175,55,0.18);"); // gold
         footerBack.setOnAction(e -> {
             if (user.getRole() == User.Role.CITIZEN) new VirtualEditScreen(user, userManager).show(stage);
             else new EditBudgetScreen(user, userManager).show(stage);
@@ -184,13 +210,14 @@ public class BulkEditScreen {
         root.setCenter(mainRow);
         root.setBottom(footer);
 
-        Scene scene = new Scene(root, 1120, 720);
+        Scene scene = new Scene(root,
+                stage.getWidth() > 0 ? stage.getWidth() : 1120,
+                stage.getHeight() > 0 ? stage.getHeight() : 720
+        );
         var css = getClass().getResource("/css/DarkTheme.css");
         if (css != null) scene.getStylesheets().add(css.toExternalForm());
 
-        stage.setScene(scene);
-        stage.setTitle("Bulk Edit");
-        stage.show();
+        applyScenePreserveWindow(stage, scene, "Bulk Edit");
 
         FadeTransition ft = new FadeTransition(Duration.millis(200), root);
         ft.setFromValue(0);
@@ -205,24 +232,30 @@ public class BulkEditScreen {
         Label l1 = new Label("• Preview changes before applying");
         Label l2 = new Label("• Percentage affects each ministry proportionally");
         Label l3 = new Label("• Fixed amount adds/subtracts a constant value");
+        Label l4 = new Label("• Selected Ministries lets you target a subset");
 
         l1.getStyleClass().add("side-text");
         l2.getStyleClass().add("side-text");
         l3.getStyleClass().add("side-text");
+        l4.getStyleClass().add("side-text");
 
-        VBox card1 = new VBox(10, t1, l1, l2, l3);
+        VBox card1 = new VBox(10, t1, l1, l2, l3, l4);
         card1.getStyleClass().addAll("card", "side-card");
+        card1.setStyle("-fx-border-color: rgba(212,175,55,0.12);"); // gold edge
 
         Label t2 = new Label("Tips");
         t2.getStyleClass().add("side-title");
 
         Label t21 = new Label("• Use Percentage for overall policy change");
         Label t22 = new Label("• Use Fixed for targeted reallocation");
+        Label t23 = new Label("• Use Selected to avoid unwanted global edits");
         t21.getStyleClass().add("side-text");
         t22.getStyleClass().add("side-text");
+        t23.getStyleClass().add("side-text");
 
-        VBox card2 = new VBox(10, t2, t21, t22);
+        VBox card2 = new VBox(10, t2, t21, t22, t23);
         card2.getStyleClass().addAll("card", "side-card");
+        card2.setStyle("-fx-border-color: rgba(212,175,55,0.10);"); // gold edge
 
         VBox side = new VBox(14, card1, card2);
         side.setAlignment(Pos.TOP_LEFT);
@@ -230,14 +263,9 @@ public class BulkEditScreen {
     }
 
     private VBox actionCard(String title, String desc, String iconPath, Runnable onClick) {
-        ImageView icon = new ImageView(new Image(
-                BulkEditScreen.class.getResourceAsStream(iconPath)
-        ));
-        icon.setFitWidth(34);
-        icon.setFitHeight(34);
-        icon.getStyleClass().add("action-icon");
+        Node iconNode = safeIcon(iconPath, 34);
 
-        VBox iconBadge = new VBox(icon);
+        VBox iconBadge = new VBox(iconNode);
         iconBadge.setAlignment(Pos.CENTER);
         iconBadge.getStyleClass().add("icon-badge");
 
@@ -253,6 +281,7 @@ public class BulkEditScreen {
 
         Label chevron = new Label("›");
         chevron.getStyleClass().add("chevron");
+        chevron.setStyle("-fx-text-fill: rgba(212,175,55,0.60);"); // gold
 
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
@@ -265,30 +294,43 @@ public class BulkEditScreen {
         card.setMinHeight(118);
         card.setMaxWidth(Double.MAX_VALUE);
 
-        card.setOnMouseEntered(e -> {
-            card.setScaleX(1.02);
-            card.setScaleY(1.02);
-            card.setTranslateY(-2);
-        });
-        card.setOnMouseExited(e -> {
-            card.setScaleX(1.00);
-            card.setScaleY(1.00);
-            card.setTranslateY(0);
-        });
+        card.setFocusTraversable(true);
+        card.setOnMouseEntered(e -> { card.setScaleX(1.02); card.setScaleY(1.02); card.setTranslateY(-2); });
+        card.setOnMouseExited(e -> { card.setScaleX(1.00); card.setScaleY(1.00); card.setTranslateY(0); });
 
         card.setOnMouseClicked(e -> onClick.run());
+        card.setOnKeyPressed(e -> {
+            if (e.getCode() == KeyCode.ENTER || e.getCode() == KeyCode.SPACE) onClick.run();
+        });
+
         return card;
+    }
+
+    private Node safeIcon(String iconPath, double size) {
+        try {
+            var stream = BulkEditScreen.class.getResourceAsStream(iconPath);
+            if (stream == null) throw new IllegalStateException("Missing icon: " + iconPath);
+            ImageView icon = new ImageView(new Image(stream));
+            icon.setFitWidth(size);
+            icon.setFitHeight(size);
+            icon.getStyleClass().add("action-icon");
+            return icon;
+        } catch (Exception ex) {
+            Label fallback = new Label("⬤");
+            fallback.getStyleClass().add("icon-fallback");
+            return fallback;
+        }
     }
 
     // ================== DIALOGS ==================
 
     private void showPercentageAllDialog(Stage parent) {
-
         Stage dialog = baseDialog(parent, "Percentage Change (All)");
 
         VBox card = new VBox(14);
         card.getStyleClass().add("card");
         card.setPadding(new Insets(18));
+        card.setStyle("-fx-border-color: rgba(212,175,55,0.14);"); // gold
 
         Label title = new Label("Apply Percentage Change to ALL Ministries");
         title.getStyleClass().add("title");
@@ -298,6 +340,12 @@ public class BulkEditScreen {
 
         TextField percentField = new TextField();
         percentField.setPromptText("Percentage");
+        percentField.setTextFormatter(new TextFormatter<>(change -> {
+            String t = change.getControlNewText().trim();
+            if (t.isEmpty()) return change;
+            if (t.matches("-?\\d+(\\.\\d{0,2})?")) return change;
+            return null;
+        }));
 
         Label balance = new Label("Available Balance: " + Ministry.getFormattedBudget(Edit.balance));
         balance.getStyleClass().add("subtitle");
@@ -307,6 +355,7 @@ public class BulkEditScreen {
 
         Label error = new Label();
         error.getStyleClass().add("error");
+        error.setWrapText(true);
 
         TableView<PreviewRow> table = buildPreviewTable();
         table.setVisible(false);
@@ -314,6 +363,7 @@ public class BulkEditScreen {
 
         Button previewBtn = new Button("Preview");
         previewBtn.getStyleClass().addAll("button", "subtle");
+        previewBtn.setStyle("-fx-border-color: rgba(212,175,55,0.16);"); // gold
 
         Button applyBtn = new Button("Apply");
         applyBtn.getStyleClass().addAll("button", "primary");
@@ -354,9 +404,9 @@ public class BulkEditScreen {
             table.setVisible(true);
             table.setManaged(true);
             applyBtn.setDisable(false);
+            table.requestFocus();
         });
 
-        //  APPLY (percentage) + balance + save
         applyBtn.setOnAction(e -> {
             error.setText("");
             String txt = percentField.getText().trim();
@@ -370,16 +420,17 @@ public class BulkEditScreen {
                 return;
             }
 
-            // total impact on balance
-            double totalChange = 0;
+            double totalPositive = 0;
             for (Ministry m : CreatingMinistries.ministries2026) {
                 if (m == null) continue;
                 double oldB = m.getBudget();
                 double newB = oldB * (1 + pct / 100.0);
-                totalChange += (newB - oldB);
+                double delta = newB - oldB;
+                if (delta > 0) totalPositive += delta;
+                if (newB < 0) { error.setText("Would create negative budget (unexpected)."); return; }
             }
 
-            if (totalChange > 0 && totalChange > Edit.balance) {
+            if (totalPositive > Edit.balance) {
                 error.setText("Insufficient balance.");
                 return;
             }
@@ -387,31 +438,23 @@ public class BulkEditScreen {
             for (Ministry m : CreatingMinistries.ministries2026) {
                 if (m == null) continue;
 
-                double oldBudget = m.getBudget();
-                double newBudget = oldBudget * (1 + pct / 100.0);
-                m.setBudget(newBudget);
+                double oldB = m.getBudget();
+                double newB = oldB * (1 + pct / 100.0);
+                double delta = newB - oldB;
 
-                EditHistory.historyOfEdit(m.getMinistryName(), oldBudget, newBudget, 0);
+                if (Math.abs(delta) < 1e-9) continue;
 
-                Edit editObj = new Edit(
-                    m.getMinistryName(),
-                    pct >= 0 ? "Increase" : "Decrease",
-                    Math.abs(pct),
-                    "percentage"
-                );
+                String change = (delta > 0) ? "Increase" : "Decrease";
+                double amt = Math.abs(delta);
+
+                Edit editObj = new Edit(m.getMinistryName(), change, amt, "fixed");
                 Edit.history.addEdit(editObj);
+                Edit.applyEdit(editObj, false, false);
             }
 
-            // update balance: spend if positive, refund if negative
-            Edit.balance -= totalChange;
+            UserBudgetPersistence.saveUserBudgets(user, CreatingMinistries.ministries2026, 2026);
 
-            // persist
-            try {
-                UserBudgetFileUtil.saveUserBudget(user, 2026);
-            } catch (Exception ex) {
-                System.err.println("Failed to save budgets: " + ex.getMessage());
-            }
-
+            balance.setText("Available Balance: " + Ministry.getFormattedBudget(Edit.balance));
             dialog.close();
             new EditHistoryScreen(user, userManager).show(parent);
         });
@@ -426,6 +469,7 @@ public class BulkEditScreen {
         if (css != null) s.getStylesheets().add(css.toExternalForm());
 
         dialog.setScene(s);
+        dialog.centerOnScreen();
         dialog.show();
     }
 
@@ -436,6 +480,7 @@ public class BulkEditScreen {
         VBox card = new VBox(14);
         card.getStyleClass().add("card");
         card.setPadding(new Insets(18));
+        card.setStyle("-fx-border-color: rgba(212,175,55,0.14);"); // gold
 
         Label title = new Label("Apply Fixed Amount to ALL Ministries");
         title.getStyleClass().add("title");
@@ -445,6 +490,12 @@ public class BulkEditScreen {
 
         TextField amountField = new TextField();
         amountField.setPromptText("Amount");
+        amountField.setTextFormatter(new TextFormatter<>(change -> {
+            String t = change.getControlNewText().trim();
+            if (t.isEmpty()) return change;
+            if (t.matches("-?\\d+(\\.\\d{0,2})?")) return change;
+            return null;
+        }));
 
         Label balance = new Label("Available Balance: " + Ministry.getFormattedBudget(Edit.balance));
         balance.getStyleClass().add("subtitle");
@@ -454,6 +505,7 @@ public class BulkEditScreen {
 
         Label error = new Label();
         error.getStyleClass().add("error");
+        error.setWrapText(true);
 
         TableView<PreviewRow> table = buildPreviewTable();
         table.setVisible(false);
@@ -461,6 +513,7 @@ public class BulkEditScreen {
 
         Button previewBtn = new Button("Preview");
         previewBtn.getStyleClass().addAll("button", "subtle");
+        previewBtn.setStyle("-fx-border-color: rgba(212,175,55,0.16);"); // gold
 
         Button applyBtn = new Button("Apply");
         applyBtn.getStyleClass().addAll("button", "primary");
@@ -503,22 +556,17 @@ public class BulkEditScreen {
             table.setVisible(true);
             table.setManaged(true);
             applyBtn.setDisable(false);
+            table.requestFocus();
         });
 
-        //  APPLY (fixed amount) + balance + save
         applyBtn.setOnAction(e -> {
             error.setText("");
             String txt = amountField.getText().trim();
 
             double amount;
-            try {
-                amount = Double.parseDouble(txt);
-            } catch (Exception ex) {
-                error.setText("Invalid amount.");
-                return;
-            }
+            try { amount = Double.parseDouble(txt); }
+            catch (Exception ex) { error.setText("Invalid amount."); return; }
 
-            // prevent negative budgets
             for (Ministry m : CreatingMinistries.ministries2026) {
                 if (m == null) continue;
                 if (m.getBudget() + amount < 0) {
@@ -527,57 +575,31 @@ public class BulkEditScreen {
                 }
             }
 
-            // total impact on balance
-            int count = 0;
-            for (Ministry m : CreatingMinistries.ministries2026) if (m != null) count++;
-            double totalChange = amount * count;
-
-            if (totalChange > 0 && totalChange > Edit.balance) {
-                error.setText("Insufficient balance.");
-                return;
+            if (amount > 0) {
+                int count = 0;
+                for (Ministry m : CreatingMinistries.ministries2026) if (m != null) count++;
+                double totalPositive = amount * count;
+                if (totalPositive > Edit.balance) {
+                    error.setText("Insufficient balance.");
+                    return;
+                }
             }
 
-            // Count ministries for total change
-            int ministryCount = 0;
-            for (Ministry m : CreatingMinistries.ministries2026) {
-                if (m != null) ministryCount++;
-            }
-            double totalChange = amount * ministryCount;
-
-            // Update balance BEFORE applying changes
-            if (amount >= 0) {
-                Edit.balance -= totalChange;
-            } else {
-                Edit.balance += Math.abs(totalChange);
-            }
-
-            // Apply changes to ministries
             for (Ministry m : CreatingMinistries.ministries2026) {
                 if (m == null) continue;
+                if (Math.abs(amount) < 1e-9) continue;
 
-                double oldBudget = m.getBudget();
-                double newBudget = oldBudget + amount;
-                m.setBudget(newBudget);
+                String change = (amount > 0) ? "Increase" : "Decrease";
+                double amt = Math.abs(amount);
 
-                EditHistory.historyOfEdit(m.getMinistryName(), oldBudget, newBudget, 0);
-
-                Edit editObj = new Edit(
-                        m.getMinistryName(),
-                        amount >= 0 ? "Increase" : "Decrease",
-                        Math.abs(amount),
-                        "fixed"
-                );
+                Edit editObj = new Edit(m.getMinistryName(), change, amt, "fixed");
                 Edit.history.addEdit(editObj);
+                Edit.applyEdit(editObj, false, false);
             }
 
-            Edit.balance -= totalChange;
+            UserBudgetPersistence.saveUserBudgets(user, CreatingMinistries.ministries2026, 2026);
 
-            try {
-                UserBudgetFileUtil.saveUserBudget(user, 2026);
-            } catch (Exception ex) {
-                System.err.println("Failed to save budgets: " + ex.getMessage());
-            }
-
+            balance.setText("Available Balance: " + Ministry.getFormattedBudget(Edit.balance));
             dialog.close();
             new EditHistoryScreen(user, userManager).show(parent);
         });
@@ -592,18 +614,351 @@ public class BulkEditScreen {
         if (css != null) s.getStylesheets().add(css.toExternalForm());
 
         dialog.setScene(s);
+        dialog.centerOnScreen();
         dialog.show();
     }
 
-    private void showSelectedMinistriesDialog() {
-        Alert a = new Alert(Alert.AlertType.INFORMATION);
-        a.setTitle("Coming soon");
-        a.setHeaderText("Selected ministries");
-        a.setContentText("Will be implemented next.");
-        a.showAndWait();
-    }
+    // ================== SELECTED MINISTRIES (IMPLEMENTED) ==================
 
-    // ================== HELPERS ==================
+    private void showSelectedMinistriesDialog(Stage parent) {
+
+        Stage dialog = baseDialog(parent, "Selected Ministries Edit");
+
+        BorderPane root = new BorderPane();
+        root.setPadding(new Insets(18));
+
+        // ---------- Header ----------
+        Label title = new Label("Change Selected Ministries");
+        title.getStyleClass().add("title");
+        title.setStyle("-fx-effect: dropshadow(gaussian, rgba(212,175,55,0.16), 14, 0.22, 0, 0);");
+
+        Label subtitle = new Label("Select ministries, choose mode, preview, then apply.");
+        subtitle.getStyleClass().add("subtitle");
+
+        Label balance = new Label("Available Balance: " + Ministry.getFormattedBudget(Edit.balance));
+        balance.getStyleClass().add("subtitle");
+        balance.setStyle("-fx-text-fill: rgba(212,175,55,0.85);"); // gold text
+
+        VBox header = new VBox(6, title, subtitle, balance);
+        header.getStyleClass().addAll("card", "toolbar-card");
+        header.setPadding(new Insets(14));
+        header.setStyle("-fx-border-color: rgba(212,175,55,0.14);");
+
+        root.setTop(header);
+
+        // ---------- Left: Ministry picker table ----------
+        TableView<MinistryPickRow> pickTable = new TableView<>();
+        pickTable.getStyleClass().addAll("budget-table");
+        pickTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        pickTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        pickTable.setPrefHeight(420);
+
+        TableColumn<MinistryPickRow, String> cMin = new TableColumn<>("Ministry");
+        cMin.setCellValueFactory(cd -> new SimpleStringProperty(cd.getValue().getMinistry()));
+
+        TableColumn<MinistryPickRow, String> cCur = new TableColumn<>("Current Budget");
+        cCur.setCellValueFactory(cd -> new SimpleStringProperty(cd.getValue().getCurrent()));
+        cCur.setStyle("-fx-alignment: CENTER-RIGHT;");
+
+        pickTable.getColumns().addAll(cMin, cCur);
+
+        ObservableList<MinistryPickRow> pickRows = FXCollections.observableArrayList();
+        for (int i = 0; i < CreatingMinistries.ministries2026.length; i++) {
+            Ministry m = CreatingMinistries.ministries2026[i];
+            if (m == null) continue;
+            pickRows.add(new MinistryPickRow(i, m.getMinistryName(), Ministry.getFormattedBudget(m.getBudget())));
+        }
+        pickTable.setItems(pickRows);
+
+        Label pickHint = new Label("Tip: Ctrl / Shift for multi-select.");
+        pickHint.getStyleClass().add("subtitle");
+        pickHint.setStyle("-fx-opacity: 0.80;");
+
+        VBox pickCard = new VBox(10, new Label("Pick ministries"), pickHint, pickTable);
+        ((Label) pickCard.getChildren().get(0)).getStyleClass().add("section-title");
+        pickCard.getStyleClass().addAll("card", "table-card");
+        pickCard.setPadding(new Insets(14));
+        pickCard.setStyle("-fx-border-color: rgba(212,175,55,0.10);");
+
+        // ---------- Right: Controls + Preview ----------
+        ToggleGroup modeGroup = new ToggleGroup();
+        ToggleButton percentBtn = new ToggleButton("Percentage");
+        ToggleButton fixedBtn = new ToggleButton("Fixed Amount");
+        percentBtn.setToggleGroup(modeGroup);
+        fixedBtn.setToggleGroup(modeGroup);
+        percentBtn.setSelected(true);
+
+        percentBtn.getStyleClass().addAll("role-toggle");
+        fixedBtn.getStyleClass().addAll("role-toggle");
+
+        HBox modeRow = new HBox(10, percentBtn, fixedBtn);
+        modeRow.setAlignment(Pos.CENTER_LEFT);
+
+        ToggleGroup typeGroup = new ToggleGroup();
+        ToggleButton incBtn = new ToggleButton("Increase");
+        ToggleButton decBtn = new ToggleButton("Decrease");
+        incBtn.setToggleGroup(typeGroup);
+        decBtn.setToggleGroup(typeGroup);
+        incBtn.setSelected(true);
+
+        incBtn.getStyleClass().addAll("role-toggle");
+        decBtn.getStyleClass().addAll("role-toggle");
+
+        decBtn.selectedProperty().addListener((o, a, b) -> {
+            if (b) {
+                decBtn.setStyle("-fx-border-color: rgba(212,175,55,0.45); -fx-background-color: rgba(212,175,55,0.10);");
+            } else {
+                decBtn.setStyle("");
+            }
+        });
+
+        HBox typeRow = new HBox(10, incBtn, decBtn);
+        typeRow.setAlignment(Pos.CENTER_LEFT);
+
+        TextField valueField = new TextField();
+        valueField.setPromptText("Value (e.g. 5  or  100000)");
+        valueField.setTextFormatter(new TextFormatter<>(change -> {
+            String t = change.getControlNewText().trim();
+            if (t.isEmpty()) return change;
+            if (t.matches("\\d+(\\.\\d{0,2})?")) return change;
+            return null;
+        }));
+
+        Label valueHint = new Label("Use the toggle to choose Increase/Decrease (value stays positive).");
+        valueHint.getStyleClass().add("subtitle");
+        valueHint.setStyle("-fx-opacity: 0.82;");
+
+        Label error = new Label();
+        error.getStyleClass().add("error");
+        error.setWrapText(true);
+
+        TableView<PreviewRow> previewTable = buildPreviewTable();
+        previewTable.setPrefHeight(320);
+
+        VBox previewCard = new VBox(10, new Label("Preview (selected)"), previewTable);
+        ((Label) previewCard.getChildren().get(0)).getStyleClass().add("section-title");
+        previewCard.getStyleClass().addAll("card", "table-card");
+        previewCard.setPadding(new Insets(14));
+        previewCard.setStyle("-fx-border-color: rgba(212,175,55,0.10);");
+        VBox.setVgrow(previewTable, Priority.ALWAYS);
+
+        Button previewBtn = new Button("Preview");
+        previewBtn.getStyleClass().addAll("button", "subtle");
+        previewBtn.setStyle("-fx-border-color: rgba(212,175,55,0.18);");
+
+        Button applyBtn = new Button("Apply Selected");
+        applyBtn.getStyleClass().addAll("button", "primary");
+        applyBtn.setDisable(true);
+
+        Button cancelBtn = new Button("Cancel");
+        cancelBtn.getStyleClass().addAll("button", "subtle");
+        cancelBtn.setOnAction(e -> dialog.close());
+
+        final boolean[] previewOk = {false};
+
+        Runnable doPreview = () -> {
+            error.setText("");
+            previewOk[0] = false;
+            applyBtn.setDisable(true);
+
+            var selected = pickTable.getSelectionModel().getSelectedItems();
+            if (selected == null || selected.isEmpty()) {
+                error.setText("Please select at least one ministry.");
+                return;
+            }
+
+            String txt = valueField.getText().trim();
+            if (txt.isEmpty()) {
+                error.setText("Please enter a value.");
+                return;
+            }
+
+            double value;
+            try { value = Double.parseDouble(txt); }
+            catch (Exception ex) { error.setText("Invalid value."); return; }
+
+            if (value <= 0) { error.setText("Value must be positive."); return; }
+
+            boolean isPercent = modeGroup.getSelectedToggle() == percentBtn;
+            boolean isIncrease = typeGroup.getSelectedToggle() == incBtn;
+
+            double signed = isIncrease ? value : -value;
+
+            if (isPercent && signed <= -100) {
+                error.setText("Cannot decrease by 100% or more.");
+                return;
+            }
+
+            ObservableList<PreviewRow> rows = FXCollections.observableArrayList();
+            double totalPositive = 0;
+
+            for (MinistryPickRow r : selected) {
+                Ministry m = CreatingMinistries.ministries2026[r.getIndex()];
+                if (m == null) continue;
+
+                double oldB = m.getBudget();
+                double newB = isPercent
+                        ? oldB * (1 + signed / 100.0)
+                        : oldB + signed;
+
+                if (newB < 0) {
+                    error.setText("Would create negative budget for: " + m.getMinistryName());
+                    return;
+                }
+
+                double delta = newB - oldB;
+                if (delta > 0) totalPositive += delta;
+
+                rows.add(new PreviewRow(
+                        m.getMinistryName(),
+                        Ministry.getFormattedBudget(oldB),
+                        Ministry.getFormattedBudget(newB),
+                        formatDelta(delta)
+                ));
+            }
+
+            if (totalPositive > Edit.balance) {
+                error.setText("Insufficient balance for this increase.");
+                return;
+            }
+
+            previewTable.setItems(rows);
+            previewOk[0] = true;
+            applyBtn.setDisable(false);
+        };
+
+        previewBtn.setOnAction(e -> doPreview.run());
+
+        applyBtn.setOnAction(e -> {
+            error.setText("");
+            if (!previewOk[0]) {
+                error.setText("Please preview first.");
+                return;
+            }
+
+            var selected = pickTable.getSelectionModel().getSelectedItems();
+            if (selected == null || selected.isEmpty()) {
+                error.setText("Please select at least one ministry.");
+                return;
+            }
+
+            String txt = valueField.getText().trim();
+            if (txt.isEmpty()) { error.setText("Please enter a value."); return; }
+
+            double value;
+            try { value = Double.parseDouble(txt); }
+            catch (Exception ex) { error.setText("Invalid value."); return; }
+
+            if (value <= 0) { error.setText("Value must be positive."); return; }
+
+            boolean isPercent = modeGroup.getSelectedToggle() == percentBtn;
+            boolean isIncrease = typeGroup.getSelectedToggle() == incBtn;
+
+            double signed = isIncrease ? value : -value;
+
+            if (isPercent && signed <= -100) {
+                error.setText("Cannot decrease by 100% or more.");
+                return;
+            }
+
+            double totalPositive = 0;
+            for (MinistryPickRow r : selected) {
+                Ministry m = CreatingMinistries.ministries2026[r.getIndex()];
+                if (m == null) continue;
+
+                double oldB = m.getBudget();
+                double newB = isPercent
+                        ? oldB * (1 + signed / 100.0)
+                        : oldB + signed;
+
+                if (newB < 0) {
+                    error.setText("Would create negative budget for: " + m.getMinistryName());
+                    return;
+                }
+
+                double delta = newB - oldB;
+                if (delta > 0) totalPositive += delta;
+            }
+
+            if (totalPositive > Edit.balance) {
+                error.setText("Insufficient balance for this increase.");
+                return;
+            }
+
+            for (MinistryPickRow r : selected) {
+                Ministry m = CreatingMinistries.ministries2026[r.getIndex()];
+                if (m == null) continue;
+
+                double oldB = m.getBudget();
+                double newB = isPercent
+                        ? oldB * (1 + signed / 100.0)
+                        : oldB + signed;
+
+                double delta = newB - oldB;
+                if (Math.abs(delta) < 1e-9) continue;
+
+                String change = (delta > 0) ? "Increase" : "Decrease";
+                double amt = Math.abs(delta);
+
+                Edit editObj = new Edit(m.getMinistryName(), change, amt, "fixed");
+                Edit.history.addEdit(editObj);
+                Edit.applyEdit(editObj, false, false);
+            }
+
+            UserBudgetPersistence.saveUserBudgets(user, CreatingMinistries.ministries2026, 2026);
+
+            dialog.close();
+            new EditHistoryScreen(user, userManager).show(parent);
+        });
+
+        HBox actions = new HBox(10, previewBtn, applyBtn, cancelBtn);
+        actions.setAlignment(Pos.CENTER_RIGHT);
+
+        VBox controlsCard = new VBox(
+                12,
+                new Label("Controls"),
+                new Separator(),
+                new Label("Mode"), modeRow,
+                new Label("Type"), typeRow,
+                new Label("Value"), valueField,
+                valueHint,
+                error,
+                actions
+        );
+        ((Label) controlsCard.getChildren().get(0)).getStyleClass().add("section-title");
+        controlsCard.getStyleClass().addAll("card", "toolbar-card");
+        controlsCard.setPadding(new Insets(14));
+        controlsCard.setStyle("-fx-border-color: rgba(212,175,55,0.12);");
+
+        for (Node n : controlsCard.getChildren()) {
+            if (n instanceof Label l && !l.getStyleClass().contains("title") && !l.getStyleClass().contains("section-title")) {
+                l.getStyleClass().add("subtitle");
+            }
+        }
+
+        VBox right = new VBox(14, controlsCard, previewCard);
+        VBox.setVgrow(previewCard, Priority.ALWAYS);
+
+        HBox center = new HBox(16, pickCard, right);
+        HBox.setHgrow(pickCard, Priority.ALWAYS);
+        HBox.setHgrow(right, Priority.ALWAYS);
+
+        root.setCenter(center);
+
+        Scene s = new Scene(root, 1180, 760);
+        var css = getClass().getResource("/css/DarkTheme.css");
+        if (css != null) s.getStylesheets().add(css.toExternalForm());
+
+        dialog.setScene(s);
+        dialog.centerOnScreen();
+
+        FadeTransition ft = new FadeTransition(Duration.millis(180), root);
+        ft.setFromValue(0);
+        ft.setToValue(1);
+        ft.play();
+
+        dialog.show();
+    }
 
     private Stage baseDialog(Stage parent, String title) {
         Stage d = new Stage();
@@ -621,51 +976,26 @@ public class BulkEditScreen {
         table.setPrefHeight(380);
 
         TableColumn<PreviewRow, String> colMin = new TableColumn<>("Ministry");
-        colMin.setCellValueFactory(new PropertyValueFactory<>("ministry"));
+        colMin.setCellValueFactory(cd -> new SimpleStringProperty(cd.getValue().getMinistry()));
         colMin.setPrefWidth(420);
 
         TableColumn<PreviewRow, String> colPrev = new TableColumn<>("Previous");
-        colPrev.setCellValueFactory(new PropertyValueFactory<>("previous"));
+        colPrev.setCellValueFactory(cd -> new SimpleStringProperty(cd.getValue().getPrevious()));
         colPrev.setPrefWidth(170);
 
         TableColumn<PreviewRow, String> colNew = new TableColumn<>("New");
-        colNew.setCellValueFactory(new PropertyValueFactory<>("now"));
+        colNew.setCellValueFactory(cd -> new SimpleStringProperty(cd.getValue().getNow()));
         colNew.setPrefWidth(170);
 
         TableColumn<PreviewRow, String> colDelta = new TableColumn<>("Change");
-        colDelta.setCellValueFactory(new PropertyValueFactory<>("delta"));
+        colDelta.setCellValueFactory(cd -> new SimpleStringProperty(cd.getValue().getDelta()));
         colDelta.setPrefWidth(140);
 
-        colDelta.setCellFactory(tc -> new TableCell<>() {
-            @Override
-            protected void updateItem(String item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty || item == null) { setText(null); setStyle(""); return; }
-                setText(item);
-                if (item.startsWith("+")) setStyle("-fx-text-fill: #2ecc71; -fx-alignment: CENTER-RIGHT;");
-                else if (item.startsWith("-")) setStyle("-fx-text-fill: #ff6b6b; -fx-alignment: CENTER-RIGHT;");
-                else setStyle("-fx-text-fill: #e7eaf0; -fx-alignment: CENTER-RIGHT;");
-            }
-        });
-
+        colDelta.setStyle("-fx-alignment: CENTER-RIGHT;");
         colPrev.setStyle("-fx-alignment: CENTER-RIGHT;");
         colNew.setStyle("-fx-alignment: CENTER-RIGHT;");
-        colDelta.setStyle("-fx-alignment: CENTER-RIGHT;");
 
         table.getColumns().addAll(colMin, colPrev, colNew, colDelta);
-
-        table.setRowFactory(tv -> new TableRow<>() {
-            @Override
-            protected void updateItem(PreviewRow row, boolean empty) {
-                super.updateItem(row, empty);
-                if (row == null || empty) { setStyle(""); return; }
-                String d = row.getDelta();
-                if (d != null && d.startsWith("+")) setStyle("-fx-background-color: rgba(46,204,113,0.12);");
-                else if (d != null && d.startsWith("-")) setStyle("-fx-background-color: rgba(255,107,107,0.12);");
-                else setStyle("");
-            }
-        });
-
         return table;
     }
 
@@ -674,5 +1004,34 @@ public class BulkEditScreen {
         if (delta > 0) return "+" + s;
         if (delta < 0) return "-" + s;
         return "0";
+    }
+
+    private static void applyScenePreserveWindow(Stage stage, Scene scene, String title) {
+        boolean wasShowing = stage.isShowing();
+        double x = stage.getX();
+        double y = stage.getY();
+        double w = stage.getWidth();
+        double h = stage.getHeight();
+        boolean max = stage.isMaximized();
+        boolean fs = stage.isFullScreen();
+
+        stage.setScene(scene);
+        stage.setTitle(title);
+
+        if (!wasShowing) {
+            stage.show();
+            stage.centerOnScreen();
+            return;
+        }
+
+        stage.setMaximized(max);
+        stage.setFullScreen(fs);
+
+        if (!max && !fs && w > 0 && h > 0) {
+            stage.setWidth(w);
+            stage.setHeight(h);
+            stage.setX(x);
+            stage.setY(y);
+        }
     }
 }
