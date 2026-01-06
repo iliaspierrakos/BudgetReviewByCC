@@ -113,19 +113,6 @@ public class Propose {
         submitProposal(proposalText);
     }
 
-    /**
-     * Old signature expected by origin/main GUI code: editProposal(String proposalText)
-     * We keep it, but it requires ministryName to be set (constructor or setter).
-     */
-    public void editProposal(String proposalText) {
-        if (ministryName == null || ministryName.isBlank()) {
-            throw new IllegalStateException(
-                    "Ministry name not set. Use Propose(String ministryName) or setMinistryName()."
-            );
-        }
-        submitProposal(proposalText);
-    }
-
     public void submitProposal(String proposalText) {
         if (proposalText == null || proposalText.trim().isEmpty()) {
             throw new IllegalArgumentException("Proposal text cannot be empty.");
