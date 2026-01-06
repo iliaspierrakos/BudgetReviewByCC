@@ -9,6 +9,7 @@ import java.io.PrintWriter;
 
 import UserFeatures.CreatingMinistries;
 import UserManagement.User;
+import UserManagement.UserManager;
 import javafx.animation.FadeTransition;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -46,16 +47,31 @@ import javax.imageio.ImageIO;
  *
  * Governor-only statistics screen.
  * Table + Chart with tooltips, animation and export.
+ *
+ * FIXES:
+ * - Keeps old constructor (User) so your project compiles
+ * - Also supports new constructor (User, UserManager)
+ * - No window jumping (reuse Scene root + preserve stage state)
+ * - Gold accents (inline only, no CSS edits)
  */
 public class ViewStatisticsScreen {
 
     private final User user;
+    private final UserManager userManager;
+
     private static final String VOTES_CSV_FILE =
             "src/main/resources/NecessaryFilesAndData/ProposalsFromCitizens/VotesData.csv";
     private static int[][] allVotes = new int[20][6];
 
+    /** Backward-compatible constructor (keeps your existing calls working). */
     public ViewStatisticsScreen(User user) {
+        this(user, null);
+    }
+
+    /** Preferred constructor (use when you have userManager). */
+    public ViewStatisticsScreen(User user, UserManager userManager) {
         this.user = user;
+        this.userManager = userManager;
     }
 
     public void show(Stage stage) {
@@ -64,9 +80,22 @@ public class ViewStatisticsScreen {
         if (user.getRole() != User.Role.GOVERNOR) {
             Alert alert = new Alert(Alert.AlertType.ERROR,
                     "Access denied. Governor only.");
+            var css = getClass().getResource("/css/DarkTheme.css");
+            if (css != null) alert.getDialogPane().getStylesheets().add(css.toExternalForm());
+            alert.getDialogPane().setStyle("-fx-border-color: rgba(212,175,55,0.22); -fx-border-radius: 16; -fx-background-radius: 16;");
             alert.showAndWait();
             return;
         }
+
+        // =========================
+        // WINDOW STATE SNAPSHOT (NO JUMP)
+        // =========================
+        final boolean wasMaximized = stage.isMaximized();
+        final boolean wasFullScreen = stage.isFullScreen();
+        final double prevW = stage.getWidth();
+        final double prevH = stage.getHeight();
+        final double prevX = stage.getX();
+        final double prevY = stage.getY();
 
         initializeCSV();
         loadVotesFromCSV();
@@ -74,10 +103,12 @@ public class ViewStatisticsScreen {
         /* ================= TITLE ================= */
         Label title = new Label("CITIZEN RECOMMENDATION STATISTICS");
         title.getStyleClass().add("title");
+        // GOLD subtle glow
+        title.setStyle("-fx-effect: dropshadow(gaussian, rgba(212,175,55,0.18), 16, 0.20, 0, 0);");
 
         /* ================= TABLE ================= */
         TableView<StatsRow> table = new TableView<>();
-        table.getStyleClass().add("budget-table");
+        table.getStyleClass().addAll("budget-table");
         table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
         TableColumn<StatsRow, String> ministryCol =
@@ -133,10 +164,7 @@ public class ViewStatisticsScreen {
                 if (node != null) {
                     Tooltip.install(
                             node,
-                            new Tooltip(
-                                    bar.getXValue() + " – " +
-                                    bar.getYValue() + " votes"
-                            )
+                            new Tooltip(bar.getXValue() + " – " + bar.getYValue() + " votes")
                     );
                 }
             }
@@ -146,14 +174,17 @@ public class ViewStatisticsScreen {
 
         /* ================= CARDS ================= */
         VBox tableCard = new VBox(table);
-        tableCard.getStyleClass().add("card");
+        tableCard.getStyleClass().addAll("card", "table-card");
         tableCard.setPadding(new Insets(12));
         VBox.setVgrow(table, Priority.ALWAYS);
 
         VBox chartCard = new VBox(chart);
-        chartCard.getStyleClass().add("card");
+        chartCard.getStyleClass().addAll("card", "table-card");
         chartCard.setPadding(new Insets(12));
         VBox.setVgrow(chartCard, Priority.ALWAYS);
+
+        // GOLD subtle outline for chart card (only when visible)
+        chartCard.setStyle("-fx-border-color: rgba(212,175,55,0.18);");
 
         chartCard.setVisible(false);
         chartCard.setManaged(false);
@@ -161,13 +192,16 @@ public class ViewStatisticsScreen {
         /* ================= BUTTONS ================= */
         Button toggleBtn = new Button("Show Chart");
         toggleBtn.getStyleClass().addAll("button", "primary");
+        toggleBtn.setStyle("-fx-effect: dropshadow(gaussian, rgba(212,175,55,0.16), 18, 0.22, 0, 8);");
 
         Button exportBtn = new Button("Export Chart");
-        exportBtn.getStyleClass().add("button");
+        exportBtn.getStyleClass().addAll("button", "subtle");
         exportBtn.setDisable(true);
+        exportBtn.setStyle("-fx-border-color: rgba(212,175,55,0.20);");
 
         Button backBtn = new Button("Back");
-        backBtn.getStyleClass().add("button");
+        backBtn.getStyleClass().addAll("button", "subtle");
+        backBtn.setStyle("-fx-border-color: rgba(212,175,55,0.18);");
 
         toggleBtn.setOnAction(e -> {
             boolean showChart = !chartCard.isVisible();
@@ -187,16 +221,22 @@ public class ViewStatisticsScreen {
 
         exportBtn.setOnAction(e -> exportChart(chart, stage));
 
-        backBtn.setOnAction(e ->
-                new ViewEditBudgetScreen(user, null).show(stage)
-        );
+        backBtn.setOnAction(e -> {
+            if (userManager != null) {
+                new ViewEditBudgetScreen(user, userManager).show(stage);
+            } else {
+                // Fallback: still avoid crash if someone used the old constructor
+                stage.close();
+            }
+        });
 
         HBox actions = new HBox(12, toggleBtn, exportBtn, backBtn);
         actions.setAlignment(Pos.CENTER_RIGHT);
 
         VBox headerCard = new VBox(12, title, actions);
-        headerCard.getStyleClass().add("card");
+        headerCard.getStyleClass().addAll("card", "toolbar-card");
         headerCard.setPadding(new Insets(18));
+        headerCard.setStyle("-fx-border-color: rgba(212,175,55,0.14);");
 
         /* ================= ROOT ================= */
         VBox content = new VBox(18, headerCard, tableCard, chartCard);
@@ -207,16 +247,36 @@ public class ViewStatisticsScreen {
 
         BorderPane root = new BorderPane(content);
 
-        Scene scene = new Scene(root, 1200, 720);
-        scene.getStylesheets().add(
-                getClass().getResource("/css/DarkTheme.css").toExternalForm()
-        );
+        /* ================= SCENE (REUSE + NO JUMP) ================= */
+        Scene scene = stage.getScene();
+        if (scene == null) {
+            scene = new Scene(root);
+            scene.getStylesheets().add(
+                    getClass().getResource("/css/DarkTheme.css").toExternalForm()
+            );
+            stage.setScene(scene);
+        } else {
+            scene.setRoot(root);
+            String css = getClass().getResource("/css/DarkTheme.css").toExternalForm();
+            if (!scene.getStylesheets().contains(css)) scene.getStylesheets().add(css);
+        }
 
         stage.setTitle("View Statistics");
-        stage.setScene(scene);
         stage.show();
-        stage.centerOnScreen();
 
+        // Restore window state (fullscreen/max/normal) exactly
+        if (wasFullScreen) {
+            stage.setFullScreen(true);
+        } else if (wasMaximized) {
+            stage.setMaximized(true);
+        } else {
+            if (prevW > 0 && prevH > 0) {
+                stage.setWidth(prevW);
+                stage.setHeight(prevH);
+                stage.setX(prevX);
+                stage.setY(prevY);
+            }
+        }
     }
 
     /* ================= ANIMATION ================= */
@@ -239,18 +299,17 @@ public class ViewStatisticsScreen {
         if (file == null) return;
 
         try {
-            WritableImage image =
-                    chart.snapshot(new SnapshotParameters(), null);
+            WritableImage image = chart.snapshot(new SnapshotParameters(), null);
             ImageIO.write(
                     SwingFXUtils.fromFXImage(image, null),
                     "png",
                     file
             );
         } catch (IOException ex) {
-            Alert alert = new Alert(
-                    Alert.AlertType.ERROR,
-                    "Failed to export chart."
-            );
+            Alert alert = new Alert(Alert.AlertType.ERROR, "Failed to export chart.");
+            var css = getClass().getResource("/css/DarkTheme.css");
+            if (css != null) alert.getDialogPane().getStylesheets().add(css.toExternalForm());
+            alert.getDialogPane().setStyle("-fx-border-color: rgba(212,175,55,0.22); -fx-border-radius: 16; -fx-background-radius: 16;");
             alert.showAndWait();
         }
     }
@@ -280,8 +339,7 @@ public class ViewStatisticsScreen {
             while ((line = br.readLine()) != null && row < 20) {
                 String[] values = line.split(",");
                 for (int col = 0; col < 6 && col < values.length; col++) {
-                    allVotes[row][col] =
-                            Integer.parseInt(values[col].trim());
+                    allVotes[row][col] = Integer.parseInt(values[col].trim());
                 }
                 row++;
             }
@@ -300,12 +358,7 @@ public class ViewStatisticsScreen {
             this.totalVotes = totalVotes;
         }
 
-        public String getMinistry() {
-            return ministry;
-        }
-
-        public int getTotalVotes() {
-            return totalVotes;
-        }
+        public String getMinistry() { return ministry; }
+        public int getTotalVotes() { return totalVotes; }
     }
 }
