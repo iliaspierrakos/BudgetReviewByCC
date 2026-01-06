@@ -1,6 +1,10 @@
 package guiFolder;
 
-import UserFeatures.*;
+import UserFeatures.CreatingMinistries;
+import UserFeatures.Edit;
+import UserFeatures.EditHistory;
+import UserFeatures.Ministry;
+import UserFeatures.UserBudgetPersistence;
 import UserManagement.User;
 import UserManagement.UserManager;
 import javafx.animation.FadeTransition;
@@ -10,7 +14,15 @@ import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.Separator;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -29,7 +41,7 @@ public class BulkEditScreen {
         this.userManager = userManager;
     }
 
-    // ===== Row model για preview =====
+    // ===== Row model preview =====
     public static class PreviewRow {
         private final SimpleStringProperty ministry = new SimpleStringProperty("");
         private final SimpleStringProperty previous = new SimpleStringProperty("");
@@ -344,7 +356,7 @@ public class BulkEditScreen {
             applyBtn.setDisable(false);
         });
 
-        // ✅ APPLY (percentage) + balance + save
+        //  APPLY (percentage) + balance + save
         applyBtn.setOnAction(e -> {
             error.setText("");
             String txt = percentField.getText().trim();
@@ -382,10 +394,10 @@ public class BulkEditScreen {
                 EditHistory.historyOfEdit(m.getMinistryName(), oldBudget, newBudget, 0);
 
                 Edit editObj = new Edit(
-                        m.getMinistryName(),
-                        pct >= 0 ? "Increase" : "Decrease",
-                        Math.abs(pct),
-                        "percentage"
+                    m.getMinistryName(),
+                    pct >= 0 ? "Increase" : "Decrease",
+                    Math.abs(pct),
+                    "percentage"
                 );
                 Edit.history.addEdit(editObj);
             }
@@ -525,6 +537,21 @@ public class BulkEditScreen {
                 return;
             }
 
+            // Count ministries for total change
+            int ministryCount = 0;
+            for (Ministry m : CreatingMinistries.ministries2026) {
+                if (m != null) ministryCount++;
+            }
+            double totalChange = amount * ministryCount;
+
+            // Update balance BEFORE applying changes
+            if (amount >= 0) {
+                Edit.balance -= totalChange;
+            } else {
+                Edit.balance += Math.abs(totalChange);
+            }
+
+            // Apply changes to ministries
             for (Ministry m : CreatingMinistries.ministries2026) {
                 if (m == null) continue;
 

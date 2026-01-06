@@ -682,3 +682,547 @@
     -fx-faint-focus-color: transparent;
     -fx-focus-color: #5a5a5a;
 }
+
+.icon-toggle {
+    -fx-background-radius: 10;
+    -fx-padding: 8 10;
+}
+
+.hint {
+    -fx-opacity: 0.85;
+    -fx-font-size: 12px;
+}
+.icon-fallback {
+    -fx-font-size: 18px;
+    -fx-opacity: 0.7;
+}
+.action-card:focused {
+    -fx-effect: dropshadow(gaussian, rgba(255,255,255,0.18), 14, 0, 0, 0);
+}
+/* =========================
+   START MENU (SCOPED)
+   ========================= */
+
+.start-root{
+    /* πιο cinematic background από το απλό gradient */
+    -fx-background-color:
+        radial-gradient(center 50% 25%, radius 70%, rgba(255,255,255,0.10), rgba(255,255,255,0.00)),
+        radial-gradient(center 50% 95%, radius 85%, rgba(0,0,0,0.55), rgba(0,0,0,0.00)),
+        linear-gradient(to bottom right, #070A12, #12172A 55%, #070A12);
+}
+
+/* πιο premium card, λίγο πιο “glass”, με highlight */
+.start-card{
+    -fx-background-radius: 22;
+    -fx-border-radius: 22;
+    -fx-border-color: rgba(255,255,255,0.10);
+    -fx-border-width: 1;
+
+    -fx-background-color:
+        linear-gradient(to bottom, rgba(255,255,255,0.10), rgba(255,255,255,0.04)),
+        rgba(16, 20, 36, 0.82);
+
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.65), 30, 0.22, 0, 12);
+}
+/* =========================
+   START MENU WOW (SCOPED)
+   ========================= */
+
+.start-root{
+    -fx-background-color:
+        radial-gradient(center 50% 20%, radius 70%, rgba(255,255,255,0.12), rgba(255,255,255,0.00)),
+        radial-gradient(center 50% 95%, radius 80%, rgba(0,0,0,0.55), rgba(0,0,0,0.00)),
+        linear-gradient(to bottom right, #070A12, #12172A 55%, #070A12);
+}
+
+/* vignette layer (gives cinematic depth) */
+.start-vignette{
+    -fx-fill: radial-gradient(center 50% 55%, radius 85%,
+        rgba(0,0,0,0.00),
+        rgba(0,0,0,0.55));
+}
+
+/* subtle premium grid/pattern */
+.start-grid{
+    -fx-fill: linear-gradient(to bottom, rgba(255,255,255,0.05), rgba(255,255,255,0.00));
+    -fx-opacity: 0.22;
+}
+
+/* moving light sweep */
+.start-sweep{
+    -fx-fill: linear-gradient(to right,
+        rgba(0,0,0,0.00),
+        rgba(212,175,55,0.12),
+        rgba(0,0,0,0.00));
+    -fx-rotate: -12;
+    -fx-opacity: 0.55;
+}
+
+/* card: πιο glossy από το default card */
+.start-card{
+    -fx-background-radius: 22;
+    -fx-border-radius: 22;
+    -fx-border-color: rgba(255,255,255,0.10);
+    -fx-border-width: 1;
+
+    -fx-background-color:
+        linear-gradient(to bottom, rgba(255,255,255,0.12), rgba(255,255,255,0.05)),
+        rgba(16, 20, 36, 0.86);
+}
+
+/* logo frame σαν “plaque” */
+.start-logo-frame{
+    -fx-padding: 18;
+    -fx-background-radius: 18;
+    -fx-border-radius: 18;
+    -fx-border-color: rgba(255,255,255,0.10);
+    -fx-border-width: 1;
+
+    -fx-background-color:
+        radial-gradient(center 50% 40%, radius 80%, rgba(212,175,55,0.10), rgba(212,175,55,0.00)),
+        rgba(255,255,255,0.03);
+
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.55), 18, 0.18, 0, 8);
+}
+
+.start-logo{
+    -fx-effect:
+        dropshadow(gaussian, rgba(212,175,55,0.22), 24, 0.30, 0, 0),
+        dropshadow(gaussian, rgba(0,0,0,0.45), 18, 0.25, 0, 8);
+}
+
+/* typography upgrade only here */
+.start-title{
+    -fx-font-size: 28px;
+    -fx-font-weight: 900;
+}
+.start-subtitle{
+    -fx-font-size: 13px;
+    -fx-text-fill: rgba(231,234,240,0.80);
+}
+
+/* separator */
+.start-sep .line{
+    -fx-border-color: rgba(255,255,255,0.10);
+}
+
+/* make buttons more pill + spacious only on start menu */
+.start-btn{
+    -fx-background-radius: 16;
+    -fx-border-radius: 16;
+    -fx-padding: 12 14;
+    -fx-font-weight: 900;
+}
+
+/* GOLD primary only inside start menu (override your purple primary) */
+.start-root .button.primary{
+    -fx-text-fill: #0b0d12;
+    -fx-border-color: transparent;
+    -fx-background-color:
+        linear-gradient(to bottom, #F5DEA8, #D7B15D 55%, #B8892F);
+    -fx-effect: dropshadow(gaussian, rgba(212,175,55,0.22), 22, 0.28, 0, 10);
+}
+.start-root .button.primary:hover{
+    -fx-background-color:
+        linear-gradient(to bottom, #FFE7B3, #E2BF70 55%, #C59335);
+}
+.start-root .button.primary:pressed{
+    -fx-background-color: linear-gradient(to bottom, #D9B25D, #B7852C);
+}
+/* =========================
+   AUTH SCREENS (Register/Login) GOLD ACCENTS
+   Scoped so it won't affect other screens
+   ========================= */
+
+.auth-root{
+    -fx-background-color:
+        radial-gradient(center 50% 20%, radius 75%, rgba(255,255,255,0.08), rgba(255,255,255,0.00)),
+        linear-gradient(to bottom right, #0b0d12, #141824);
+}
+
+/* card with a subtle gold edge */
+.auth-card{
+    -fx-background-color:
+        linear-gradient(to bottom, rgba(255,255,255,0.10), rgba(255,255,255,0.04)),
+        rgba(20, 24, 36, 0.92);
+
+    -fx-background-radius: 18;
+    -fx-border-radius: 18;
+    -fx-border-width: 1;
+    -fx-border-color: rgba(212,175,55,0.16);
+
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.60), 22, 0.18, 0, 10);
+}
+
+/* logo plaque */
+.auth-logo-frame{
+    -fx-padding: 16;
+    -fx-background-radius: 16;
+    -fx-border-radius: 16;
+    -fx-border-width: 1;
+    -fx-border-color: rgba(255,255,255,0.10);
+
+    -fx-background-color:
+        radial-gradient(center 50% 40%, radius 80%, rgba(212,175,55,0.10), rgba(212,175,55,0.00)),
+        rgba(255,255,255,0.03);
+
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.55), 18, 0.18, 0, 8);
+}
+
+.auth-logo{
+    -fx-effect:
+        dropshadow(gaussian, rgba(212,175,55,0.22), 22, 0.30, 0, 0),
+        dropshadow(gaussian, rgba(0,0,0,0.45), 18, 0.25, 0, 8);
+}
+
+/* titles slightly bolder on auth pages */
+.auth-title{
+    -fx-font-size: 24px;
+    -fx-font-weight: 900;
+}
+.auth-subtitle{
+    -fx-text-fill: rgba(231,234,240,0.78);
+}
+
+/* inputs: gold focus ring only inside auth pages */
+.auth-root .text-field:focused,
+.auth-root .password-field:focused,
+.auth-root .combo-box:focused{
+    -fx-border-color: rgba(212,175,55,0.55);
+    -fx-effect: dropshadow(gaussian, rgba(212,175,55,0.18), 14, 0.25, 0, 0);
+}
+
+/* role toggles: keep your design but with gold selected accent */
+.auth-root .auth-role-toggle:selected{
+    -fx-background-color: rgba(212,175,55,0.16);
+    -fx-border-color: rgba(212,175,55,0.55);
+    -fx-effect: dropshadow(gaussian, rgba(212,175,55,0.18), 14, 0.25, 0, 0);
+}
+
+/* Register button: GOLD primary only here (override purple) */
+.auth-root .auth-primary{
+    -fx-text-fill: #0b0d12;
+    -fx-border-color: transparent;
+    -fx-font-weight: 900;
+
+    -fx-background-color:
+        linear-gradient(to bottom, #F5DEA8, #D7B15D 55%, #B8892F);
+
+    -fx-effect: dropshadow(gaussian, rgba(212,175,55,0.22), 22, 0.28, 0, 10);
+}
+
+.auth-root .auth-primary:hover{
+    -fx-background-color:
+        linear-gradient(to bottom, #FFE7B3, #E2BF70 55%, #C59335);
+}
+
+.auth-root .auth-primary:pressed{
+    -fx-background-color:
+        linear-gradient(to bottom, #D9B25D, #B7852C);
+}
+
+/* separator a bit cleaner */
+.auth-root .separator .line{
+    -fx-border-color: rgba(255,255,255,0.10);
+}
+/* =========================
+   ViewEditBudgetScreen (scoped polish)
+   ========================= */
+
+.viewedit-root{
+    /* nothing required, but acts as a scope hook */
+}
+
+.viewedit-root .topbar{
+    -fx-background-color: rgba(10, 12, 18, 0.72);
+    -fx-border-color: rgba(255,255,255,0.08);
+    -fx-border-width: 0 0 1 0;
+}
+
+/* helpers */
+.badge-gold-border{
+    -fx-border-color: rgba(212,175,55,0.45);
+}
+
+.gold-halo{
+    -fx-border-color: rgba(212,175,55,0.28);
+    -fx-effect: dropshadow(gaussian, rgba(212,175,55,0.12), 26, 0.22, 0, 10);
+}
+
+.featured-card{
+    -fx-border-color: rgba(212,175,55,0.40);
+    -fx-effect: dropshadow(gaussian, rgba(212,175,55,0.16), 28, 0.25, 0, 12);
+}
+
+.chevron-gold{
+    -fx-text-fill: rgba(212,175,55,0.60);
+}
+
+.icon-badge-gold{
+    -fx-background-color: rgba(212,175,55,0.14);
+    -fx-border-color: rgba(212,175,55,0.22);
+}
+
+/* premium hover without scale jump */
+.viewedit-root .action-card{
+    -fx-border-color: rgba(255,255,255,0.10);
+}
+.viewedit-root .action-card:hover{
+    -fx-translate-y: -2;
+    -fx-border-color: rgba(124,92,255,0.30);
+    -fx-effect: dropshadow(gaussian, rgba(124,92,255,0.35), 30, 0.25, 0, 10);
+}
+
+/* featured hover stays gold */
+.viewedit-root .featured-card:hover{
+    -fx-translate-y: -2;
+    -fx-border-color: rgba(212,175,55,0.55);
+    -fx-effect: dropshadow(gaussian, rgba(212,175,55,0.22), 34, 0.28, 0, 12);
+}
+/* =========================
+   VIRTUAL EDIT (WOW / SCOPED)
+   ========================= */
+
+.virtual-edit-root{
+    -fx-background-color:
+        radial-gradient(center 50% 18%, radius 78%, rgba(124,92,255,0.22), rgba(0,0,0,0.00)),
+        radial-gradient(center 50% 95%, radius 85%, rgba(0,0,0,0.55), rgba(0,0,0,0.00)),
+        linear-gradient(to bottom right, #070A12, #12172A 55%, #070A12);
+}
+
+/* tighten content feel (less “empty right”) */
+.virtual-edit-root .virtual-content{
+    -fx-max-width: 980;
+    -fx-alignment: TOP_CENTER;
+}
+
+/* hero: more premium */
+.virtual-hero{
+    -fx-background-color:
+        linear-gradient(to right, rgba(124,92,255,0.30), rgba(56,189,248,0.14)),
+        rgba(16,20,36,0.88);
+    -fx-border-color: rgba(124,92,255,0.55);
+    -fx-effect: dropshadow(gaussian, rgba(124,92,255,0.30), 40, 0.35, 0, 18);
+}
+
+
+
+/* Primary action (Bulk) */
+.primary-action{
+    -fx-background-color:
+        linear-gradient(to right, rgba(124,92,255,0.28), rgba(56,189,248,0.12)),
+        rgba(16,20,36,0.86);
+    -fx-border-color: rgba(124,92,255,0.60);
+    -fx-effect: dropshadow(gaussian, rgba(124,92,255,0.42), 42, 0.40, 0, 16);
+}
+.primary-action:hover{
+    -fx-border-color: rgba(124,92,255,0.75);
+    -fx-effect: dropshadow(gaussian, rgba(124,92,255,0.60), 52, 0.44, 0, 20);
+}
+.primary-action .action-title{
+    -fx-font-size: 17px;
+    -fx-font-weight: 900;
+}
+
+/* Secondary cards */
+.secondary-action{
+    -fx-background-color: rgba(16,20,36,0.78);
+}
+.secondary-action:hover{
+    -fx-border-color: rgba(255,255,255,0.16);
+}
+
+/* Danger (Reset) */
+.danger-action{
+    -fx-background-color:
+        linear-gradient(to right, rgba(255,107,107,0.16), rgba(0,0,0,0.00)),
+        rgba(16,20,36,0.84);
+    -fx-border-color: rgba(255,107,107,0.55);
+}
+.danger-action:hover{
+    -fx-border-color: rgba(255,107,107,0.75);
+    -fx-effect: dropshadow(gaussian, rgba(255,107,107,0.45), 36, 0.36, 0, 14);
+}
+
+/* Icons: slightly bigger + glow */
+.virtual-edit-root .action-icon{
+    -fx-opacity: 0.95;
+    -fx-scale-x: 1.12;
+    -fx-scale-y: 1.12;
+}
+.primary-action:hover .action-icon{
+    -fx-effect: dropshadow(gaussian, rgba(124,92,255,0.55), 14, 0.35, 0, 0);
+}
+.danger-action:hover .action-icon{
+    -fx-effect: dropshadow(gaussian, rgba(255,107,107,0.55), 14, 0.35, 0, 0);
+}
+
+/* Chevron drama */
+.virtual-edit-root .virtual-action:hover .chevron{
+    -fx-text-fill: rgba(255,255,255,0.92);
+    -fx-effect: dropshadow(gaussian, rgba(255,255,255,0.35), 10, 0.30, 0, 0);
+}
+
+/* Dialog (Simple Virtual Edit) polish */
+.virtual-dialog-root{
+    -fx-background-color:
+        radial-gradient(center 50% 15%, radius 75%, rgba(124,92,255,0.18), rgba(0,0,0,0.00)),
+        rgba(11, 13, 18, 0.92);
+}
+.virtual-dialog-card{
+    -fx-border-color: rgba(124,92,255,0.22);
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.55), 26, 0.20, 0, 12);
+}
+
+/* =========================
+   SUBMIT RECOMMENDATION (Citizen) – WOW / SCOPED
+   ========================= */
+
+.rec-root{
+    -fx-background-color:
+        radial-gradient(center 50% 18%, radius 78%, rgba(124,92,255,0.18), rgba(0,0,0,0.00)),
+        linear-gradient(to bottom right, #070A12, #12172A 55%, #070A12);
+}
+
+/* constrain content to look “designed” */
+.rec-content{
+    -fx-max-width: 980;
+}
+
+/* hero card */
+.rec-hero{
+    -fx-background-color:
+        linear-gradient(to right, rgba(124,92,255,0.26), rgba(56,189,248,0.12)),
+        rgba(16,20,36,0.86);
+    -fx-border-color: rgba(124,92,255,0.45);
+    -fx-effect: dropshadow(gaussian, rgba(124,92,255,0.30), 36, 0.35, 0, 16);
+}
+
+/* form cards */
+.form-card{
+    -fx-padding: 18;
+    -fx-border-color: rgba(255,255,255,0.10);
+}
+
+/* label */
+.field-label{
+    -fx-text-fill: #cfd6e6;
+    -fx-font-weight: 900;
+}
+
+/* option list spacing */
+.option-list{
+    -fx-padding: 6 0 0 0;
+}
+
+/* RadioButton -> tile look */
+.option-tile{
+    -fx-padding: 12 12;
+    -fx-background-radius: 14;
+    -fx-border-radius: 14;
+    -fx-background-color: rgba(255,255,255,0.04);
+    -fx-border-color: rgba(255,255,255,0.10);
+    -fx-text-fill: #e7eaf0;
+    -fx-font-weight: 700;
+}
+
+.option-tile:hover{
+    -fx-background-color: rgba(124,92,255,0.10);
+    -fx-border-color: rgba(124,92,255,0.30);
+}
+
+/* selected: make it clear */
+.option-tile:selected{
+    -fx-background-color: rgba(124,92,255,0.22);
+    -fx-border-color: rgba(124,92,255,0.60);
+    -fx-effect: dropshadow(gaussian, rgba(124,92,255,0.25), 14, 0.25, 0, 0);
+}
+
+/* make the radio circle subtle */
+.option-tile .radio{
+    -fx-background-color: rgba(255,255,255,0.10);
+    -fx-border-color: rgba(255,255,255,0.14);
+}
+
+/* CTA bar */
+.cta-bar{
+    -fx-padding: 14 0 0 0;
+}
+
+/* inline alert */
+.inline-alert{
+    -fx-padding: 10 12;
+    -fx-background-radius: 14;
+    -fx-border-radius: 14;
+    -fx-background-color: rgba(255,107,107,0.10);
+    -fx-border-color: rgba(255,107,107,0.28);
+    -fx-text-fill: #ffb4b4;
+    -fx-font-weight: 700;
+}
+/* =========================
+   COMPARE SCREEN – WOW / SCOPED
+   ========================= */
+
+.compare-root{
+    -fx-background-color:
+        radial-gradient(center 50% 18%, radius 78%, rgba(56,189,248,0.12), rgba(0,0,0,0.00)),
+        radial-gradient(center 50% 15%, radius 75%, rgba(124,92,255,0.14), rgba(0,0,0,0.00)),
+        linear-gradient(to bottom right, #070A12, #12172A 55%, #070A12);
+}
+
+.compare-content{
+    -fx-max-width: 1200;
+}
+
+/* hero */
+.compare-hero{
+    -fx-background-color:
+        linear-gradient(to right, rgba(124,92,255,0.24), rgba(56,189,248,0.12)),
+        rgba(16,20,36,0.86);
+    -fx-border-color: rgba(124,92,255,0.42);
+    -fx-effect: dropshadow(gaussian, rgba(124,92,255,0.28), 34, 0.35, 0, 14);
+}
+
+/* controls */
+.compare-controls-card{
+    -fx-border-color: rgba(255,255,255,0.10);
+}
+.compare-controls-grid .label{
+    -fx-text-fill: #cfd6e6;
+}
+
+/* Make combo boxes look aligned */
+.compare-controls-card .combo-box{
+    -fx-max-width: 220;
+}
+
+/* Table card */
+.compare-table-card{
+    -fx-border-color: rgba(255,255,255,0.10);
+}
+
+/* Table header cleaner */
+.compare-table .column-header-background{
+    -fx-background-color: rgba(255,255,255,0.04);
+    -fx-border-color: rgba(255,255,255,0.08);
+    -fx-border-width: 0 0 1 0;
+}
+
+/* Slightly tighter rows */
+.compare-table .table-cell{
+    -fx-padding: 10 12;
+}
+
+/* Delta badges */
+.compare-table .table-cell.delta-pos{
+    -fx-text-fill: #bdf7d2;
+    -fx-font-weight: 900;
+}
+.compare-table .table-cell.delta-neg{
+    -fx-text-fill: #ffb4b4;
+    -fx-font-weight: 900;
+}
+.compare-table .table-cell.delta-zero{
+    -fx-text-fill: #9aa3b8;
+    -fx-font-weight: 900;
+}
