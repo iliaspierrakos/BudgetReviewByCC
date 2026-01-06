@@ -6,9 +6,9 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
+import UserFeatures.CreatingMinistries;
 import UserFeatures.Edit;
-import UserFeatures.Ministry;
-import UserFeatures.UserBudgetFileUtil;
+import UserFeatures.UserBudgetPersistence;
 import UserManagement.User;
 import UserManagement.UserManager;
 
@@ -59,7 +59,6 @@ public class EditHistoryScreen {
 
     public void show(Stage stage) {
 
-        // TOP APP BAR
         Label appLogo = new Label("GovBudget");
         appLogo.getStyleClass().add("app-logo");
 
@@ -77,7 +76,6 @@ public class EditHistoryScreen {
         topBar.setAlignment(Pos.CENTER_LEFT);
         topBar.setPadding(new Insets(14, 18, 14, 18));
 
-        // HERO
         Label title = new Label("Edit History");
         title.getStyleClass().add("title");
 
@@ -97,7 +95,6 @@ public class EditHistoryScreen {
         VBox heroCard = new VBox(10, title, subtitle, chips);
         heroCard.getStyleClass().addAll("card", "toolbar-card", "hero-card");
 
-        // TABLE
         TableView<HistoryRow> table = new TableView<>();
         table.getStyleClass().add("budget-table");
         table.setPlaceholder(new Label("No changes yet."));
@@ -135,7 +132,6 @@ public class EditHistoryScreen {
         tableCard.getStyleClass().addAll("card", "table-card");
         VBox.setVgrow(table, Priority.ALWAYS);
 
-        // UNDO
         int maxUndo = Math.max(0, Edit.history.getIndex() + 1);
         Spinner<Integer> undoSpinner = new Spinner<>(0, maxUndo, 0);
         undoSpinner.setEditable(true);
@@ -170,20 +166,16 @@ public class EditHistoryScreen {
             confirm.setTitle("Confirm Undo");
             confirm.setHeaderText("Undo " + num + " changes?");
             confirm.setContentText("This will reverse the last " + num + " budget changes.");
-            confirm.getDialogPane().getStylesheets().add(
-                    getClass().getResource("/css/DarkTheme.css").toExternalForm()
-            );
+
+            var css = getClass().getResource("/css/DarkTheme.css");
+            if (css != null) confirm.getDialogPane().getStylesheets().add(css.toExternalForm());
 
             confirm.showAndWait().ifPresent(btn -> {
                 if (btn == ButtonType.OK) {
                     for (int i = 0; i < num; i++) Edit.history.undo();
 
-                    // persist after undo
-                    try {
-                        UserBudgetFileUtil.saveUserBudget(user, 2026);
-                    } catch (Exception ex) {
-                        System.err.println("Failed to save budgets: " + ex.getMessage());
-                    }
+                    // ✅ persist budgets+balance after undo
+                    UserBudgetPersistence.saveUserBudgets(user, CreatingMinistries.ministries2026, 2026);
 
                     show(stage);
                 }
@@ -199,7 +191,6 @@ public class EditHistoryScreen {
         );
         undoCard.getStyleClass().addAll("card", "glass-card");
 
-        // SIDE
         VBox sidePanel = buildSidePanel(maxUndo);
         sidePanel.setMinWidth(280);
         sidePanel.setMaxWidth(280);
@@ -213,7 +204,6 @@ public class EditHistoryScreen {
         mainRow.setAlignment(Pos.TOP_CENTER);
         mainRow.setPadding(new Insets(18));
 
-        // FOOTER
         Button clearBtn = new Button("Clear History");
         clearBtn.getStyleClass().addAll("button", "danger");
         clearBtn.setOnAction(e -> {
@@ -222,18 +212,14 @@ public class EditHistoryScreen {
             confirm.initModality(Modality.WINDOW_MODAL);
             confirm.setTitle("Clear History");
             confirm.setHeaderText("Delete edit history?");
-            confirm.setContentText("This will permanently remove the history file AND reset undo stack.");
-            confirm.getDialogPane().getStylesheets().add(
-                    getClass().getResource("/css/DarkTheme.css").toExternalForm()
-            );
+            confirm.setContentText("This will permanently remove the history file.");
+
+            var css = getClass().getResource("/css/DarkTheme.css");
+            if (css != null) confirm.getDialogPane().getStylesheets().add(css.toExternalForm());
 
             confirm.showAndWait().ifPresent(btn -> {
                 if (btn == ButtonType.OK) {
                     try { Files.deleteIfExists(HISTORY_PATH); } catch (IOException ignored) {}
-
-                    // ✅ ΚΡΙΣΙΜΟ: καθάρισε και το in-memory history
-                    Edit.history.clear();
-
                     show(stage);
                 }
             });
@@ -256,13 +242,14 @@ public class EditHistoryScreen {
         root.setCenter(mainRow);
         root.setBottom(footer);
 
-        Scene scene = new Scene(root, 1180, 760);
+        Scene scene = new Scene(root,
+                stage.getWidth() > 0 ? stage.getWidth() : 1180,
+                stage.getHeight() > 0 ? stage.getHeight() : 760
+        );
         var css = getClass().getResource("/css/DarkTheme.css");
         if (css != null) scene.getStylesheets().add(css.toExternalForm());
 
-        stage.setScene(scene);
-        stage.setTitle("Edit History");
-        stage.show();
+        applyScenePreserveWindow(stage, scene, "Edit History");
 
         FadeTransition ft = new FadeTransition(Duration.millis(200), root);
         ft.setFromValue(0);
@@ -289,7 +276,7 @@ public class EditHistoryScreen {
         t2.getStyleClass().add("side-title");
 
         Label k1 = new Label("• Undo reverses the most recent edits first");
-        Label k2 = new Label("• Clear history deletes the file & resets undo stack");
+        Label k2 = new Label("• Clear history deletes the file permanently");
         k1.getStyleClass().add("side-text");
         k2.getStyleClass().add("side-text");
 
@@ -327,23 +314,63 @@ public class EditHistoryScreen {
         return out;
     }
 
-    // ✅σωστό parse για "1.234.567,89"
-    private double parseBudget(String s) {
-        String clean = s.trim().replace(".", "").replace(",", ".");
-        return Double.parseDouble(clean);
-    }
-
     private String calcDelta(String prev, String now) {
         try {
-            double a = parseBudget(prev);
-            double b = parseBudget(now);
-            double d = b - a;
+            long a = parseGreekNumber(prev);
+            long b = parseGreekNumber(now);
+            long d = b - a;
 
-            if (d > 0) return "+" + Ministry.getFormattedBudget(d);
-            if (d < 0) return "-" + Ministry.getFormattedBudget(Math.abs(d));
+            if (d > 0) return "+" + formatGreekNumber(d);
+            if (d < 0) return "-" + formatGreekNumber(Math.abs(d));
             return "0";
         } catch (Exception e) {
             return "";
+        }
+    }
+
+    private long parseGreekNumber(String s) {
+        String digits = s.replace(".", "").replace(",", "").trim();
+        return Long.parseLong(digits);
+    }
+
+    private String formatGreekNumber(long n) {
+        String s = Long.toString(n);
+        StringBuilder sb = new StringBuilder();
+        int c = 0;
+        for (int i = s.length() - 1; i >= 0; i--) {
+            sb.append(s.charAt(i));
+            c++;
+            if (c == 3 && i != 0) { sb.append('.'); c = 0; }
+        }
+        return sb.reverse().toString();
+    }
+
+    private static void applyScenePreserveWindow(Stage stage, Scene scene, String title) {
+        boolean wasShowing = stage.isShowing();
+        double x = stage.getX();
+        double y = stage.getY();
+        double w = stage.getWidth();
+        double h = stage.getHeight();
+        boolean max = stage.isMaximized();
+        boolean fs = stage.isFullScreen();
+
+        stage.setScene(scene);
+        stage.setTitle(title);
+
+        if (!wasShowing) {
+            stage.show();
+            stage.centerOnScreen();
+            return;
+        }
+
+        stage.setMaximized(max);
+        stage.setFullScreen(fs);
+
+        if (!max && !fs && w > 0 && h > 0) {
+            stage.setWidth(w);
+            stage.setHeight(h);
+            stage.setX(x);
+            stage.setY(y);
         }
     }
 }
