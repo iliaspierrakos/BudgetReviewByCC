@@ -165,4 +165,10 @@ public class UserManager {
                 .filter(u -> u.getRole() == User.Role.MINISTRYMEMBER)
                 .count();
     }
+
+    public void logout() {
+    currentUser = null;
 }
+
+}
+
