@@ -12,6 +12,7 @@ import java.util.List;
 import UserFeatures.CreatingMinistries;
 import UserFeatures.Ministry;
 import UserManagement.User;
+import UserManagement.UserManager;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -25,6 +26,7 @@ import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
@@ -39,56 +41,85 @@ import javafx.stage.Stage;
 public class SubmitRecommendationScreen {
 
     private final User user;
+    private final UserManager userManager;
+
 
     private static final String VOTES_CSV_FILE =
             "src/main/resources/NecessaryFilesAndData/ProposalsFromCitizens/VotesData.csv";
     private static final String MINISTRIES_REC =
             "src/main/resources/NecessaryFilesAndData/ProposalsFromCitizens/MinistryVotes.txt";
 
-    // All voting data (20 ministries x 6 values)
     private static int[][] allVotes = new int[20][6];
 
-    public SubmitRecommendationScreen(User user) {
-        this.user = user;
+    public SubmitRecommendationScreen(User user, UserManager userManager) {
+    this.user = user;
+    this.userManager = userManager;
     }
+
 
     public void show(Stage stage) {
 
-        // Initialize and load votes (UNCHANGED)
         initializeCSV();
         loadVotesFromCSV();
 
-        /* ================= TITLE ================= */
-        Label title = new Label("SUBMIT RECOMMENDATION");
+        /* ================= TOP BAR ================= */
+        Label appLogo = new Label("GovBudget");
+        appLogo.getStyleClass().add("app-logo");
+
+        Region topSpacer = new Region();
+        HBox.setHgrow(topSpacer, Priority.ALWAYS);
+
+        HBox topBar = new HBox(14, appLogo, topSpacer);
+        topBar.getStyleClass().add("topbar");
+        topBar.setPadding(new Insets(14, 18, 14, 18));
+
+        /* ================= HERO ================= */
+        Label title = new Label("Submit Recommendation");
         title.getStyleClass().add("title");
 
-        /* ================= MINISTRY SELECT ================= */
+        Label subtitle = new Label("Choose a ministry and vote for one investment category.");
+        subtitle.getStyleClass().add("subtitle");
+
+        Label chip = new Label("Citizen • One vote per submit");
+        chip.getStyleClass().add("chip");
+
+        VBox hero = new VBox(10, title, subtitle, chip);
+        hero.getStyleClass().addAll("card", "toolbar-card", "hero-card", "rec-hero");
+        hero.setMaxWidth(Double.MAX_VALUE);
+
+        /* ================= FORM: MINISTRY ================= */
         Label ministryLabel = new Label("Ministry");
+        ministryLabel.getStyleClass().add("field-label");
+
         ComboBox<String> ministryBox = new ComboBox<>();
         ministryBox.getItems().addAll(getAvailableMinistries());
         ministryBox.setPromptText("Select a Ministry");
         ministryBox.setMaxWidth(Double.MAX_VALUE);
 
-        VBox ministryCard = new VBox(8, ministryLabel, ministryBox);
-        ministryCard.getStyleClass().add("card");
-        ministryCard.setPadding(new Insets(16));
+        VBox ministryCard = new VBox(10, ministryLabel, ministryBox);
+        ministryCard.getStyleClass().addAll("card", "form-card");
 
         /* ================= OPTIONS ================= */
         Label optionsTitle = new Label("Investment Category");
-        optionsTitle.setStyle("-fx-font-weight: bold;");
+        optionsTitle.getStyleClass().add("section-title");
 
         ToggleGroup optionsGroup = new ToggleGroup();
-        VBox optionsBox = new VBox(10);
-        optionsBox.setPadding(new Insets(6));
 
-        VBox optionsCard = new VBox(12, optionsTitle, optionsBox);
-        optionsCard.getStyleClass().add("card");
-        optionsCard.setPadding(new Insets(16));
+        Label helper = new Label("Select one investment category:");
+        helper.getStyleClass().add("subtitle");
+
+        VBox optionsBox = new VBox(10);
+        optionsBox.getStyleClass().add("option-list");
+
+        VBox optionsCard = new VBox(12, optionsTitle, helper, optionsBox);
+        optionsCard.getStyleClass().addAll("card", "form-card");
         VBox.setVgrow(optionsCard, Priority.ALWAYS);
 
         /* ================= STATUS ================= */
         Label statusLabel = new Label();
-        statusLabel.getStyleClass().add("error");
+        statusLabel.getStyleClass().addAll("inline-alert");
+        statusLabel.setVisible(false);
+        statusLabel.setManaged(false);
 
         /* ================= BUTTONS ================= */
         Button submitButton = new Button("Submit");
@@ -96,19 +127,21 @@ public class SubmitRecommendationScreen {
         submitButton.setDisable(true);
 
         Button backButton = new Button("Back");
-        backButton.getStyleClass().add("button");
+        backButton.getStyleClass().addAll("button", "subtle");
 
-        HBox actions = new HBox(12, submitButton, backButton);
+        HBox actions = new HBox(12, backButton, submitButton);
+        actions.getStyleClass().add("cta-bar");
         actions.setAlignment(Pos.CENTER_RIGHT);
 
-        /* ================= OPTIONS REBUILD (UNCHANGED LOGIC) ================= */
+        /* ================= OPTIONS REBUILD (LOGIC SAME) ================= */
         Runnable rebuildOptions = () -> {
             optionsBox.getChildren().clear();
-            optionsBox.getChildren().add(new Label("Select one investment category:"));
 
             String selectedMinistry = ministryBox.getValue();
             if (selectedMinistry == null) {
                 submitButton.setDisable(true);
+                statusLabel.setVisible(false);
+                statusLabel.setManaged(false);
                 return;
             }
 
@@ -116,6 +149,7 @@ public class SubmitRecommendationScreen {
             if (opts.length == 0) {
                 submitButton.setDisable(true);
                 Label noOptions = new Label("No options available for this ministry.");
+                noOptions.getStyleClass().add("subtitle");
                 optionsBox.getChildren().add(noOptions);
                 return;
             }
@@ -123,12 +157,16 @@ public class SubmitRecommendationScreen {
             for (int i = 0; i < opts.length; i++) {
                 RadioButton rb = new RadioButton((i + 1) + ". " + opts[i]);
                 rb.setToggleGroup(optionsGroup);
-                rb.setUserData(i); // store optionIndex (0..4)
+                rb.setUserData(i);
+                rb.getStyleClass().add("option-tile");
+                rb.setWrapText(true);
+                rb.setMaxWidth(Double.MAX_VALUE);
                 optionsBox.getChildren().add(rb);
             }
 
             submitButton.setDisable(true);
-            statusLabel.setText("");
+            statusLabel.setVisible(false);
+            statusLabel.setManaged(false);
         };
 
         ministryBox.valueProperty().addListener((obs, oldV, newV) -> {
@@ -137,7 +175,8 @@ public class SubmitRecommendationScreen {
         });
 
         optionsGroup.selectedToggleProperty().addListener((obs, oldT, newT) -> {
-            statusLabel.setText("");
+            statusLabel.setVisible(false);
+            statusLabel.setManaged(false);
             submitButton.setDisable(newT == null || ministryBox.getValue() == null);
         });
 
@@ -146,11 +185,11 @@ public class SubmitRecommendationScreen {
             Toggle selected = optionsGroup.getSelectedToggle();
 
             if (ministry == null) {
-                statusLabel.setText("Please select a ministry.");
+                showInline(statusLabel, "Please select a ministry.");
                 return;
             }
             if (selected == null) {
-                statusLabel.setText("Please select one category.");
+                showInline(statusLabel, "Please select one category.");
                 return;
             }
 
@@ -160,35 +199,37 @@ public class SubmitRecommendationScreen {
                 submitRecommendation(ministry, optionIndex);
 
                 Alert ok = new Alert(Alert.AlertType.INFORMATION);
-                    ok.setHeaderText("Thank you!");
-                    ok.setContentText("Your recommendation was submitted successfully.");
+                ok.setHeaderText("Thank you!");
+                ok.setContentText("Your recommendation was submitted successfully.");
+                ok.getDialogPane().getStylesheets().add(
+                        getClass().getResource("/css/DarkTheme.css").toExternalForm()
+                );
+                ok.showAndWait();
 
-                    ok.getDialogPane().getStylesheets().add(
-                            getClass().getResource("/css/DarkTheme.css").toExternalForm()
-                    );
-                    ok.getDialogPane().getStyleClass().add("dark-dialog");
-
-                    ok.showAndWait();
-
-                // Reset UI after submission
                 optionsGroup.selectToggle(null);
                 submitButton.setDisable(true);
-                statusLabel.setText("");
+                statusLabel.setVisible(false);
+                statusLabel.setManaged(false);
 
             } catch (RuntimeException ex) {
-                statusLabel.setText("Error saving recommendation: " + ex.getMessage());
+                showInline(statusLabel, "Error saving recommendation: " + ex.getMessage());
             }
         });
 
-        backButton.setOnAction(e -> new ViewEditBudgetScreen(user, null).show(stage));
+        backButton.setOnAction(e -> new ViewEditBudgetScreen(user, userManager).show(stage));
 
-        /* ================= ROOT LAYOUT (FULL WIDTH) ================= */
-        VBox content = new VBox(18, title, ministryCard, optionsCard, statusLabel, actions);
-        content.setPadding(new Insets(26));
-        content.setAlignment(Pos.TOP_LEFT);
-        VBox.setVgrow(optionsCard, Priority.ALWAYS);
 
-        BorderPane root = new BorderPane(content);
+        /* ================= ROOT LAYOUT ================= */
+        VBox content = new VBox(16, hero, ministryCard, optionsCard, statusLabel, actions);
+        content.getStyleClass().add("rec-content");
+        content.setPadding(new Insets(18));
+        content.setAlignment(Pos.TOP_CENTER);
+        content.setMaxWidth(980);
+
+        BorderPane root = new BorderPane();
+        root.getStyleClass().add("rec-root");
+        root.setTop(topBar);
+        root.setCenter(content);
 
         Scene scene = new Scene(root, 1100, 700);
         scene.getStylesheets().add(
@@ -199,15 +240,17 @@ public class SubmitRecommendationScreen {
         stage.setScene(scene);
         stage.show();
 
-        // Initial setup
         rebuildOptions.run();
+    }
+
+    private static void showInline(Label statusLabel, String msg) {
+        statusLabel.setText(msg);
+        statusLabel.setVisible(true);
+        statusLabel.setManaged(true);
     }
 
     // ===== BACKEND HELPER METHODS (UNCHANGED) =====
 
-    /**
-     * Returns list of all ministry names
-     */
     private List<String> getAvailableMinistries() {
         List<String> ministries = new ArrayList<>();
         for (Ministry m : CreatingMinistries.ministries2026) {
@@ -218,11 +261,7 @@ public class SubmitRecommendationScreen {
         return ministries;
     }
 
-    /**
-     * Returns the options array for a given ministry
-     */
     private String[] getOptionsForMinistry(String ministryName) {
-        // These are copied from RecommendationSystem
         String[] interiorOptions = {"Digital public services", "Training of public employees", "Municipality infrastructure", "Faster citizen services", "Transparency systems"};
         String[] foreignAffairsOptions = {"Embassies modernization", "Support for exports", "International cooperation", "Digital consular services", "Cultural promotion abroad"};
         String[] nationalDefenseOptions = {"New military equipment", "Soldier training", "Military bases upgrades", "Cyber defense", "Defense research"};
@@ -244,53 +283,29 @@ public class SubmitRecommendationScreen {
         String[] citizenProtectionOptions = {"More police officers", "Police equipment", "Emergency response", "Crime prevention", "Public safety training"};
         String[] climateOptions = {"Firefighting equipment", "Flood protection", "Early warning systems", "Climate adaptation", "Emergency training"};
 
-        if (ministryName.equalsIgnoreCase("Ministry of Interior")) {
-            return interiorOptions;
-        } else if (ministryName.equalsIgnoreCase("Ministry of Foreign Affairs")) {
-            return foreignAffairsOptions;
-        } else if (ministryName.equalsIgnoreCase("Ministry of National Defense")) {
-            return nationalDefenseOptions;
-        } else if (ministryName.equalsIgnoreCase("Ministry of Health")) {
-            return healthOptions;
-        } else if (ministryName.equalsIgnoreCase("Ministry of Justice")) {
-            return justiceOptions;
-        } else if (ministryName.equalsIgnoreCase("Ministry of Education, Religious Affairs, and Sports")) {
-            return educationOptions;
-        } else if (ministryName.equalsIgnoreCase("Ministry of Culture")) {
-            return cultureOptions;
-        } else if (ministryName.equalsIgnoreCase("Ministry of National Economy and Finance")) {
-            return economyOptions;
-        } else if (ministryName.equalsIgnoreCase("Ministry of Rural Development and Food")) {
-            return ruralOptions;
-        } else if (ministryName.equalsIgnoreCase("Ministry of Environment and Energy")) {
-            return environmentOptions;
-        } else if (ministryName.equalsIgnoreCase("Ministry of Labor and Social Security")) {
-            return laborOptions;
-        } else if (ministryName.equalsIgnoreCase("Ministry of Social Cohesion and Family")) {
-            return socialCohesionOptions;
-        } else if (ministryName.equalsIgnoreCase("Ministry of Development")) {
-            return developmentOptions;
-        } else if (ministryName.equalsIgnoreCase("Ministry of Infrastructure and Transport")) {
-            return infrastructureOptions;
-        } else if (ministryName.equalsIgnoreCase("Ministry of Shipping and Island Policy")) {
-            return shippingOptions;
-        } else if (ministryName.equalsIgnoreCase("Ministry of Tourism")) {
-            return tourismOptions;
-        } else if (ministryName.equalsIgnoreCase("Ministry of Digital Governance")) {
-            return digitalGovOptions;
-        } else if (ministryName.equalsIgnoreCase("Ministry of Migration and Asylum")) {
-            return migrationOptions;
-        } else if (ministryName.equalsIgnoreCase("Ministry of Citizen Protection")) {
-            return citizenProtectionOptions;
-        } else if (ministryName.equalsIgnoreCase("Ministry of Climate Crisis and Civil Protection")) {
-            return climateOptions;
-        }
+        if (ministryName.equalsIgnoreCase("Ministry of Interior")) return interiorOptions;
+        if (ministryName.equalsIgnoreCase("Ministry of Foreign Affairs")) return foreignAffairsOptions;
+        if (ministryName.equalsIgnoreCase("Ministry of National Defense")) return nationalDefenseOptions;
+        if (ministryName.equalsIgnoreCase("Ministry of Health")) return healthOptions;
+        if (ministryName.equalsIgnoreCase("Ministry of Justice")) return justiceOptions;
+        if (ministryName.equalsIgnoreCase("Ministry of Education, Religious Affairs, and Sports")) return educationOptions;
+        if (ministryName.equalsIgnoreCase("Ministry of Culture")) return cultureOptions;
+        if (ministryName.equalsIgnoreCase("Ministry of National Economy and Finance")) return economyOptions;
+        if (ministryName.equalsIgnoreCase("Ministry of Rural Development and Food")) return ruralOptions;
+        if (ministryName.equalsIgnoreCase("Ministry of Environment and Energy")) return environmentOptions;
+        if (ministryName.equalsIgnoreCase("Ministry of Labor and Social Security")) return laborOptions;
+        if (ministryName.equalsIgnoreCase("Ministry of Social Cohesion and Family")) return socialCohesionOptions;
+        if (ministryName.equalsIgnoreCase("Ministry of Development")) return developmentOptions;
+        if (ministryName.equalsIgnoreCase("Ministry of Infrastructure and Transport")) return infrastructureOptions;
+        if (ministryName.equalsIgnoreCase("Ministry of Shipping and Island Policy")) return shippingOptions;
+        if (ministryName.equalsIgnoreCase("Ministry of Tourism")) return tourismOptions;
+        if (ministryName.equalsIgnoreCase("Ministry of Digital Governance")) return digitalGovOptions;
+        if (ministryName.equalsIgnoreCase("Ministry of Migration and Asylum")) return migrationOptions;
+        if (ministryName.equalsIgnoreCase("Ministry of Citizen Protection")) return citizenProtectionOptions;
+        if (ministryName.equalsIgnoreCase("Ministry of Climate Crisis and Civil Protection")) return climateOptions;
         return new String[0];
     }
 
-    /**
-     * Returns ministry index for array access
-     */
     private int getMinistryIndex(String ministryName) {
         String[] ministryNames = {
                 "Ministry of Interior",
@@ -316,55 +331,36 @@ public class SubmitRecommendationScreen {
         };
 
         for (int i = 0; i < ministryNames.length; i++) {
-            if (ministryNames[i].equalsIgnoreCase(ministryName)) {
-                return i;
-            }
+            if (ministryNames[i].equalsIgnoreCase(ministryName)) return i;
         }
         return -1;
     }
 
-    /**
-     * Submits a recommendation (mimics backend logic)
-     */
     private void submitRecommendation(String ministryName, int optionIndex) {
         int ministryIdx = getMinistryIndex(ministryName);
-        if (ministryIdx == -1) {
-            throw new RuntimeException("Invalid ministry name");
-        }
+        if (ministryIdx == -1) throw new RuntimeException("Invalid ministry name");
 
-        // Increment total votes
         allVotes[ministryIdx][0]++;
-        // Increment specific option votes
         allVotes[ministryIdx][optionIndex + 1]++;
 
         saveVotesToCSV();
         updateMinistryFiles();
     }
 
-    /**
-     * Initializes CSV file if it doesn't exist
-     */
     private void initializeCSV() {
         File csvFile = new File(VOTES_CSV_FILE);
-        if (csvFile.exists()) {
-            return;
-        }
+        if (csvFile.exists()) return;
 
         try {
             csvFile.getParentFile().mkdirs();
             try (PrintWriter pw = new PrintWriter(new FileWriter(csvFile))) {
-                for (int i = 0; i < 20; i++) {
-                    pw.println("0,0,0,0,0,0");
-                }
+                for (int i = 0; i < 20; i++) pw.println("0,0,0,0,0,0");
             }
         } catch (IOException e) {
             System.err.println("Error creating CSV file");
         }
     }
 
-    /**
-     * Loads votes from CSV into memory
-     */
     private void loadVotesFromCSV() {
         try (BufferedReader br = new BufferedReader(new FileReader(VOTES_CSV_FILE))) {
             String line;
@@ -381,9 +377,6 @@ public class SubmitRecommendationScreen {
         }
     }
 
-    /**
-     * Saves votes from memory to CSV
-     */
     private void saveVotesToCSV() {
         try (PrintWriter pw = new PrintWriter(new FileWriter(VOTES_CSV_FILE))) {
             for (int i = 0; i < 20; i++) {
@@ -395,10 +388,8 @@ public class SubmitRecommendationScreen {
         }
     }
 
-    /**
-     * Updates individual ministry text files with vote statistics
-     */
     private void updateMinistryFiles() {
+        // (UNCHANGED) — kept as in your original
         for (int i = 0; i < CreatingMinistries.ministries2026.length; i++) {
             if (CreatingMinistries.ministries2026[i] == null) continue;
 
@@ -425,16 +416,13 @@ public class SubmitRecommendationScreen {
             }
         }
 
-        // Update summary file
         try {
             new File(MINISTRIES_REC).getParentFile().mkdirs();
             try (FileWriter fw = new FileWriter(MINISTRIES_REC, false);
                  PrintWriter pw = new PrintWriter(fw)) {
 
                 int totalVotes = 0;
-                for (int i = 0; i < 20; i++) {
-                    totalVotes += allVotes[i][0];
-                }
+                for (int i = 0; i < 20; i++) totalVotes += allVotes[i][0];
                 pw.println("Total Votes: " + totalVotes);
 
                 for (int i = 0; i < CreatingMinistries.ministries2026.length; i++) {
