@@ -1,8 +1,7 @@
 package UserFeatures;
 
-import java.lang.Math;
-import java.util.Scanner;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 /**
  * The BulkEdit class handles bulk operations on ministry budgets.
@@ -638,6 +637,166 @@ public class BulkEdit {
             System.out.println("Operation cancelled.");
         }
     }
+
+    // ===================== GUI API (no Scanner / no console) =====================
+
+public enum ChangeMode { PERCENTAGE, FIXED }
+public enum ChangeType { INCREASE, DECREASE }
+
+public static class BulkEditResult {
+    public final boolean ok;
+    public final String message;
+    public final double totalChange; // (+) increase cost, (-) decrease returns money
+
+    public BulkEditResult(boolean ok, String message, double totalChange) {
+        this.ok = ok;
+        this.message = message;
+        this.totalChange = totalChange;
+    }
+}
+
+/**
+ * GUI: Apply change to SELECTED ministries.
+ * - No prompts
+ * - Validates balance + negative budgets
+ * - Updates Edit.balance
+ * - Records history (same as your apply* methods)
+ */
+public BulkEditResult applySelectedGui(
+        ArrayList<Integer> selectedIndices,
+        ChangeMode mode,
+        double value,
+        ChangeType type
+) {
+    if (selectedIndices == null || selectedIndices.isEmpty()) {
+        return new BulkEditResult(false, "No ministries selected.", 0);
+    }
+
+    // Normalize sign based on ChangeType
+    // percentage: increase = +p, decrease = -p
+    // fixed: increase = +amount, decrease = -amount
+    double signedValue = value;
+    if (type == ChangeType.DECREASE) signedValue = -Math.abs(value);
+    else signedValue = Math.abs(value);
+
+    if (mode == ChangeMode.PERCENTAGE) {
+        if (signedValue <= -100) {
+            return new BulkEditResult(false, "Cannot decrease by 100% or more.", 0);
+        }
+
+        double totalChange = calculateTotalChange(signedValue, selectedIndices);
+
+        // If increase, must be <= balance
+        if (totalChange > 0 && totalChange > Edit.balance) {
+            return new BulkEditResult(false, "Insufficient balance for this increase.", totalChange);
+        }
+
+        // Apply change
+        applyPercentageChange(signedValue, selectedIndices);
+
+        // Update balance
+        if (totalChange < 0) Edit.balance += Math.abs(totalChange);
+        else Edit.balance -= totalChange;
+
+        return new BulkEditResult(true, "Selected ministries updated (percentage).", totalChange);
+    }
+
+    // FIXED mode
+    if (mode == ChangeMode.FIXED) {
+
+        // Validate no ministry becomes negative
+        for (int idx : selectedIndices) {
+            Ministry m = CreatingMinistries.ministries2026[idx];
+            if (m != null && m.getBudget() + signedValue < 0) {
+                return new BulkEditResult(
+                        false,
+                        "This change would make budget negative for: " + m.getMinistryName(),
+                        0
+                );
+            }
+        }
+
+        double totalChange = signedValue * selectedIndices.size();
+
+        // If increase, must be <= balance
+        if (totalChange > 0 && totalChange > Edit.balance) {
+            return new BulkEditResult(false, "Insufficient balance for this increase.", totalChange);
+        }
+
+        applyFixedAmountChange(signedValue, selectedIndices);
+
+        if (totalChange < 0) Edit.balance += Math.abs(totalChange);
+        else Edit.balance -= totalChange;
+
+        return new BulkEditResult(true, "Selected ministries updated (fixed).", totalChange);
+    }
+
+    return new BulkEditResult(false, "Unknown mode.", 0);
+}
+
+/**
+ * GUI: Preview rows for selected ministries (before/after), without applying.
+ * Useful to show in a TableView preview.
+ */
+public ArrayList<PreviewRow> previewSelectedGui(
+        ArrayList<Integer> selectedIndices,
+        ChangeMode mode,
+        double value,
+        ChangeType type
+) {
+    ArrayList<PreviewRow> rows = new ArrayList<>();
+    if (selectedIndices == null) return rows;
+
+    double signedValue = value;
+    if (type == ChangeType.DECREASE) signedValue = -Math.abs(value);
+    else signedValue = Math.abs(value);
+
+    for (int idx : selectedIndices) {
+        Ministry m = CreatingMinistries.ministries2026[idx];
+        if (m == null) continue;
+
+        double oldB = m.getBudget();
+        double newB;
+
+        if (mode == ChangeMode.PERCENTAGE) {
+            newB = oldB * (1 + signedValue / 100.0);
+        } else {
+            newB = oldB + signedValue;
+        }
+
+        rows.add(new PreviewRow(
+                m.getMinistryName(),
+                oldB,
+                newB,
+                newB - oldB
+        ));
+    }
+    return rows;
+}
+
+public static class PreviewRow {
+    private final String ministry;
+    private final double currentBudget;
+    private final double newBudget;
+    private final double change;
+
+    public PreviewRow(String ministry, double currentBudget, double newBudget, double change) {
+        this.ministry = ministry;
+        this.currentBudget = currentBudget;
+        this.newBudget = newBudget;
+        this.change = change;
+    }
+
+    public String getMinistry() { return ministry; }
+    public String getCurrentBudgetText() { return Ministry.getFormattedBudget(currentBudget); }
+    public String getNewBudgetText() { return Ministry.getFormattedBudget(newBudget); }
+    public String getChangeText() { return Ministry.getFormattedBudget(change); }
+
+    public double getCurrentBudget() { return currentBudget; }
+    public double getNewBudget() { return newBudget; }
+    public double getChange() { return change; }
+}
+
 
 }
 
