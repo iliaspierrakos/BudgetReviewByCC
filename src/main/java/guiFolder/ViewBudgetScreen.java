@@ -30,8 +30,6 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.ColumnConstraints;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
@@ -50,6 +48,16 @@ public class ViewBudgetScreen {
     }
 
     public void show(Stage stage) {
+
+        // =========================
+        // Window state snapshot (so it doesn't jump/resize)
+        // =========================
+        final boolean wasMaximized = stage.isMaximized();
+        final boolean wasFullScreen = stage.isFullScreen();
+        final double prevW = stage.getWidth();
+        final double prevH = stage.getHeight();
+        final double prevX = stage.getX();
+        final double prevY = stage.getY();
 
         /* =========================
            TOP APP BAR
@@ -247,16 +255,40 @@ public class ViewBudgetScreen {
         root.setTop(topBar);
         root.setCenter(mainRow);
 
-        Scene scene = new Scene(root, 1120, 720);
-        scene.getStylesheets().add(
-                getClass().getResource("/css/DarkTheme.css").toExternalForm()
-        );
+        // =========================
+        // Scene handling WITHOUT jumping
+        // =========================
+        Scene scene = stage.getScene();
+        if (scene == null) {
+            scene = new Scene(root); // no fixed size
+            scene.getStylesheets().add(
+                    getClass().getResource("/css/DarkTheme.css").toExternalForm()
+            );
+            stage.setScene(scene);
+        } else {
+            scene.setRoot(root);
+            String css = getClass().getResource("/css/DarkTheme.css").toExternalForm();
+            if (!scene.getStylesheets().contains(css)) {
+                scene.getStylesheets().add(css);
+            }
+        }
 
-        stage.setScene(scene);
         stage.setTitle("View Government Budget");
         stage.show();
-        stage.centerOnScreen();
 
+        // Restore window state (fullscreen/max/normal) exactly
+        if (wasFullScreen) {
+            stage.setFullScreen(true);
+        } else if (wasMaximized) {
+            stage.setMaximized(true);
+        } else {
+            if (prevW > 0 && prevH > 0) {
+                stage.setWidth(prevW);
+                stage.setHeight(prevH);
+                stage.setX(prevX);
+                stage.setY(prevY);
+            }
+        }
 
         FadeTransition ft = new FadeTransition(Duration.millis(200), root);
         ft.setFromValue(0);
