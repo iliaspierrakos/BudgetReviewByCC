@@ -1,32 +1,103 @@
 package FeaturesTest;
 
-import UserFeatures.*;
+import UserFeatures.Edit;
+import UserFeatures.EditHistoryList;
+import UserFeatures.Ministry;
+import UserFeatures.CreatingMinistries;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TestEditHistoryList {
-    private EditHistoryList history;
 
-    @Before
-    public void setup() {
+    private EditHistoryList history;
+    private Ministry ministry;
+
+    @BeforeEach
+    void setup() {
+        // reset static state
+        Edit.balance = 0;
+        Edit.history = new EditHistoryList();
+
+        // ensure ministry exists
+        CreatingMinistries.ministries2026 = new Ministry[]{
+                new Ministry("Ministry of Health", 1000)
+        };
+
+        ministry = CreatingMinistries.ministries2026[0];
         history = new EditHistoryList();
-        CreatingMinistries.ministries2026 = new Ministry[1];
-        CreatingMinistries.ministries2026[0] = new Ministry("Ministry of Health", 1000.0);
-        Edit.balance = 100.0;
     }
 
     @Test
-    public void testUndoAndBalanceRecovery() {
-        Edit e = new Edit("Ministry of Health", "Increase", 500.0, "Fixed");
+    void testAddEditAndGetEditList() {
+        Edit e = new Edit("Ministry of Health", "Increase", 100);
+
         history.addEdit(e);
-        
-        Edit.balance = Edit.balance - 500.0; 
-        
+
+        List<Edit> list = history.getEditList();
+        assertEquals(1, list.size());
+        assertEquals(0, history.getIndex());
+        assertEquals(e, list.get(0));
+    }
+
+    @Test
+    void testClear() {
+        history.addEdit(new Edit("Ministry of Health", "Increase", 100));
+        history.clear();
+
+        assertTrue(history.getEditList().isEmpty());
+        assertEquals(-1, history.getIndex());
+    }
+
+    @Test
+    void testUndoRemovesLastEditAndRevertsBudget() {
+        double originalBudget = ministry.getBudget();
+
+        Edit e = new Edit("Ministry of Health", "Increase", 200);
+        history.addEdit(e);
+
+        // apply edit
+        Edit.applyEdit(e, false, false);
+
+        assertEquals(originalBudget + 200, ministry.getBudget());
+
         history.undo();
-        
-        Assert.assertEquals("failure - index should be reset", -1, history.getIndex());
-        Assert.assertEquals("failure - balance recovery failed", (Double) 100.0, (Double) Edit.balance);
+
+        assertEquals(originalBudget, ministry.getBudget());
+        assertEquals(0, Edit.balance);
+        assertEquals(-1, history.getIndex());
+    }
+
+    @Test
+    void testReverseEditRevertsBudgetButKeepsHistory() {
+        double originalBudget = ministry.getBudget();
+
+        Edit e = new Edit("Ministry of Health", "Increase", 150);
+        history.addEdit(e);
+
+        Edit.applyEdit(e, false, false);
+        history.reverseEdit(e);
+
+        assertEquals(originalBudget, ministry.getBudget());
+    }
+
+    @Test
+    void testApplyingEditsAppliesAllAndClearsHistory() {
+        double originalBudget = ministry.getBudget();
+
+        Edit e1 = new Edit("Ministry of Health", "Increase", 100);
+        Edit e2 = new Edit("Ministry of Health", "Decrease", 50);
+
+        history.addEdit(e1);
+        history.addEdit(e2);
+
+        history.applyingEdits();
+
+        assertEquals(originalBudget + 50, ministry.getBudget());
+        assertTrue(history.getEditList().isEmpty());
+        assertEquals(-1, history.getIndex());
     }
 }

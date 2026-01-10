@@ -1,34 +1,103 @@
 package FeaturesTest;
 
-import UserFeatures.*;
+import UserFeatures.CreatingMinistries;
+import UserFeatures.Ministry;
+import UserFeatures.ViewEditBudget;
+import UserManagement.User;
+import UserManagement.MinistryMember;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import UserFeatures.*;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TestViewEditBudget {
 
-    @Before
-    public void setup() {
-        CreatingMinistries.ministries2020 = new Ministry[]{ new Ministry("M2020", 100.0) };
-        CreatingMinistries.ministries2026 = new Ministry[]{ new Ministry("M2026", 600.0) };
+    @BeforeEach
+    void setup() {
+        CreatingMinistries.ministries2026 = new Ministry[]{
+                new Ministry("Ministry of Health", 1000)
+        };
+    }
+
+    /* ===============================
+       viewBudget
+       =============================== */
+
+    @Test
+    void testViewBudgetValidYear() {
+        Ministry[] result = ViewEditBudget.viewBudget(2026);
+
+        assertNotNull(result);
+        assertEquals("Ministry of Health", result[0].getMinistryName());
     }
 
     @Test
-    public void testViewBudgetYearSelection() {
-        Ministry[] res2020 = ViewEditBudget.viewBudget(2020);
-        Assert.assertEquals("failure - wrong array for 2020", "M2020", res2020[0].getMinistryName());
+    void testViewBudgetInvalidYearThrows() {
+        assertThrows(IllegalArgumentException.class,
+                () -> ViewEditBudget.viewBudget(2019));
+    }
 
-        Ministry[] res2026 = ViewEditBudget.viewBudget(2026);
-        Assert.assertEquals("failure - wrong array for 2026", "M2026", res2026[0].getMinistryName());
+    /* ===============================
+       edit
+       =============================== */
+
+    @Test
+    void testEditInvalidTypeThrows() {
+        User user = new User("u", "p", User.Role.CITIZEN);
+
+        assertThrows(IllegalArgumentException.class,
+                () -> ViewEditBudget.edit(user, 0));
     }
 
     @Test
-    public void testInvalidYear() {
-        try {
-            ViewEditBudget.viewBudget(1999);
-            Assert.fail("failure - invalid year should throw exception");
-        } catch (IllegalArgumentException e) { }
+    void testEditBulkForMinistryMemberUnsupported() {
+        MinistryMember mm =
+                new MinistryMember("m", "p", "Ministry of Health");
+
+        assertThrows(UnsupportedOperationException.class,
+                () -> ViewEditBudget.edit(mm, 2));
+    }
+
+    /* ===============================
+       recommendations
+       =============================== */
+
+    @Test
+    void testRecommendationsForMinistryMemberUnsupported() {
+        MinistryMember mm =
+                new MinistryMember("m", "p", "Ministry of Health");
+
+        assertThrows(UnsupportedOperationException.class,
+                () -> ViewEditBudget.recommendations(mm));
+    }
+
+    /* ===============================
+       taxReceipt
+       =============================== */
+
+    @Test
+    void testTaxReceiptOnlyCitizenAllowed() {
+        User gov = new User("g", "p", User.Role.GOVERNOR);
+
+        assertThrows(IllegalStateException.class,
+                () -> ViewEditBudget.taxReceipt(gov));
+    }
+
+    @Test
+    void testTaxReceiptCitizenUnsupportedFlow() {
+        User citizen = new User("c", "p", User.Role.CITIZEN);
+
+        assertThrows(UnsupportedOperationException.class,
+                () -> ViewEditBudget.taxReceipt(citizen));
+    }
+
+    /* ===============================
+       initialization
+       =============================== */
+
+    @Test
+    void testEnsureInitializedIdempotent() {
+        assertDoesNotThrow(ViewEditBudget::ensureInitialized);
+        assertDoesNotThrow(ViewEditBudget::ensureInitialized);
     }
 }

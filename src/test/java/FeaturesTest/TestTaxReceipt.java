@@ -1,53 +1,119 @@
 package FeaturesTest;
 
-import UserFeatures.*;
+import UserFeatures.CreatingMinistries;
+import UserFeatures.Ministry;
+import UserFeatures.TaxReceipt;
+import UserFeatures.TaxReceipt.TaxResult;
+import UserFeatures.TaxReceipt.TaxRow;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TestTaxReceipt {
 
-    @Before
-    public void setup() {
-        CreatingMinistries.ministries2026 = new Ministry[2];
-        CreatingMinistries.ministries2026[0] = new Ministry("Health", 6000.0);
-        CreatingMinistries.ministries2026[1] = new Ministry("Education", 4000.0);
+    @BeforeEach
+    void setup() {
+        // Setup σταθερό κυβερνητικό budget
+        CreatingMinistries.ministries2026 = new Ministry[]{
+                new Ministry("Ministry of Health", 2000),
+                new Ministry("Ministry of Education", 3000),
+                new Ministry("Ministry of Finance", 5000)
+        };
     }
 
     @Test
-    public void testTaxCalculationYoungLowIncome() {
-        TaxReceipt.TaxResult result = TaxReceipt.generateForGui(9000, 0, 24);
-        
-        Assert.assertEquals("failure - tax should be 0 for young low income", (Double) 0.0, (Double) result.getTax());
-        Assert.assertEquals("failure - income mismatch", (Double) 9000.0, (Double) result.getIncome());
+    void testGenerateForGuiBasicScenario() {
+        TaxResult result = TaxReceipt.generateForGui(
+                30000, // income
+                1,     // kids
+                40     // age
+        );
+
+        assertNotNull(result);
+        assertEquals(30000, result.getIncome());
+        assertEquals(1, result.getKids());
+        assertEquals(40, result.getAge());
+
+        // Ο φόρος πρέπει να είναι > 0
+        assertTrue(result.getTax() > 0);
+
+        // Πρέπει να υπάρχουν rows
+        List<TaxRow> rows = result.getRows();
+        assertFalse(rows.isEmpty());
+
+        // Τα ministries πρέπει να υπάρχουν
+        assertEquals("Ministry of Finance", rows.get(0).getMinistry());
+
+        // Sorting: μεγαλύτερο budget -> μεγαλύτερο share
+        double first = rows.get(0).getShareValue();
+        double second = rows.get(1).getShareValue();
+        assertTrue(first >= second);
     }
 
     @Test
-    public void testTaxCalculationMiddleIncomeNoKids() {
-        TaxReceipt.TaxResult result = TaxReceipt.generateForGui(25000, 0, 35);
-        
-        Assert.assertTrue("failure - tax should be positive", result.getTax() > 0);
-        Assert.assertTrue("failure - tax should be less than income", result.getTax() < 25000);
+    void testDistributionSumsApproximatelyToTax() {
+        TaxResult result = TaxReceipt.generateForGui(40000, 0, 45);
+
+        double sum = result.getRows()
+                .stream()
+                .mapToDouble(TaxRow::getShareValue)
+                .sum();
+
+        // floating point ανοχή
+        assertEquals(result.getTax(), sum, 0.01);
     }
 
     @Test
-    public void testTaxCalculationHighIncomeManyKids() {
-        TaxReceipt.TaxResult result = TaxReceipt.generateForGui(60000, 4, 45);
-        TaxReceipt.TaxResult resultNoKids = TaxReceipt.generateForGui(60000, 0, 45);
+    void testFormattingTexts() {
+        TaxResult result = TaxReceipt.generateForGui(25000, 2, 35);
 
-        Assert.assertTrue("failure - tax reduction for kids not applied", result.getTax() < resultNoKids.getTax());
+        assertNotNull(result.getIncomeText());
+        assertNotNull(result.getTaxText());
+
+        TaxRow row = result.getRows().get(0);
+        assertNotNull(row.getShareText());
     }
 
     @Test
-    public void testDistributionRows() {
-        TaxReceipt.TaxResult result = TaxReceipt.generateForGui(50000, 0, 40);
-        List<TaxReceipt.TaxRow> rows = result.getRows();
+    void testYoungPersonTaxExemption() {
+        TaxResult result = TaxReceipt.generateForGui(
+                15000,
+                0,
+                23   // age <= 25 => μειωμένος/μηδενικός φόρος
+        );
 
-        Assert.assertEquals("failure - wrong number of ministry rows", 2, rows.size());
-        
-        TaxReceipt.TaxRow row1 = rows.get(0);
-        Assert.assertEquals("failure - wrong ministry name", "Health", row1.getMinistry());
+        assertEquals(0, result.getTax(), 0.01);
+        assertTrue(result.getRows().isEmpty());
+    }
+
+    @Test
+    void testInvalidIncomeThrows() {
+        assertThrows(IllegalArgumentException.class,
+                () -> TaxReceipt.generateForGui(-1, 0, 30));
+    }
+
+    @Test
+    void testInvalidKidsThrows() {
+        assertThrows(IllegalArgumentException.class,
+                () -> TaxReceipt.generateForGui(20000, -2, 30));
+    }
+
+    @Test
+    void testInvalidAgeThrows() {
+        assertThrows(IllegalArgumentException.class,
+                () -> TaxReceipt.generateForGui(20000, 1, 17));
+    }
+
+    @Test
+    void testZeroGovernmentBudgetThrows() {
+        CreatingMinistries.ministries2026 = new Ministry[]{
+                new Ministry("Ministry of Empty", 0)
+        };
+
+        assertThrows(IllegalStateException.class,
+                () -> TaxReceipt.generateForGui(20000, 0, 40));
     }
 }

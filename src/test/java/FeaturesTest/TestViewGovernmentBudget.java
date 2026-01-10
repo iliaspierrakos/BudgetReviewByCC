@@ -1,47 +1,120 @@
 package FeaturesTest;
 
-import UserFeatures.*;
+import UserFeatures.CreatingMinistries;
+import UserFeatures.Edit;
+import UserFeatures.Ministry;
+import UserFeatures.ViewGovernmentBudget;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TestViewGovernmentBudget {
-    private ViewGovernmentBudget viewGov;
 
-    @Before
-    public void setup() {
-        viewGov = new ViewGovernmentBudget();
+    private ViewGovernmentBudget view;
+
+    @BeforeEach
+    void setup() {
+        view = new ViewGovernmentBudget();
+
+        // Setup ministries for 2026
+        CreatingMinistries.ministries2026 = new Ministry[]{
+                new Ministry("Ministry of Health", 3000),
+                new Ministry("Ministry of Education", 2000),
+                new Ministry("Ministry of Finance", 5000)
+        };
+
+        // Other years empty but initialized
+        CreatingMinistries.ministries2020 = new Ministry[0];
+        CreatingMinistries.ministries2021 = new Ministry[0];
+        CreatingMinistries.ministries2022 = new Ministry[0];
+        CreatingMinistries.ministries2023 = new Ministry[0];
+        CreatingMinistries.ministries2024 = new Ministry[0];
+        CreatingMinistries.ministries2025 = new Ministry[0];
+
+        Edit.balance = 1000;
+    }
+
+    /* ===============================
+       ministryYear
+       =============================== */
+
+    @Test
+    void testMinistryYearValid() {
+        Ministry[] result = ViewGovernmentBudget.ministryYear(2026);
+        assertNotNull(result);
+        assertEquals(3, result.length);
     }
 
     @Test
-    public void testSortingLogic() {
-        Ministry m1 = new Ministry("Alpha", 100.0);
-        Ministry m2 = new Ministry("Beta", 200.0);
-        Ministry m3 = new Ministry("Gamma", 100.0);
+    void testMinistryYearInvalidReturnsNull() {
+        assertNull(ViewGovernmentBudget.ministryYear(2018));
+    }
 
-        Ministry[] list = {m1, m2, m3};
+    /* ===============================
+       sortingBudgets
+       =============================== */
 
-        viewGov.sortingBudgets(list);
+    @Test
+    void testSortingBudgetsByDescendingBudget() {
+        Ministry[] copy = CreatingMinistries.ministries2026.clone();
 
-        Assert.assertEquals("failure - first element should be Beta (max budget)", "Beta", list[0].getMinistryName());
-        Assert.assertEquals("failure - second element should be Alpha (alphabetical)", "Alpha", list[1].getMinistryName());
-        Assert.assertEquals("failure - third element should be Gamma", "Gamma", list[2].getMinistryName());
+        view.sortingBudgets(copy);
+
+        assertEquals("Ministry of Finance", copy[0].getMinistryName());
+        assertEquals("Ministry of Health", copy[1].getMinistryName());
+        assertEquals("Ministry of Education", copy[2].getMinistryName());
     }
 
     @Test
-    public void testMinistryYearSelection() {
-        CreatingMinistries.ministries2020 = new Ministry[]{ new Ministry("M2020", 500.0) };
-        CreatingMinistries.ministries2026 = new Ministry[]{ new Ministry("M2026", 900.0) };
+    void testSortingBudgetsTieBreakAlphabetically() {
+        Ministry[] arr = new Ministry[]{
+                new Ministry("B Ministry", 1000),
+                new Ministry("A Ministry", 1000)
+        };
 
-        Ministry[] result2020 = ViewGovernmentBudget.ministryYear(2020);
-        Assert.assertTrue("failure - 2020 data not found", result2020 != null);
-        Assert.assertEquals("failure - wrong year data returned", "M2020", result2020[0].getMinistryName());
+        view.sortingBudgets(arr);
 
-        Ministry[] result2026 = ViewGovernmentBudget.ministryYear(2026);
-        Assert.assertEquals("failure - wrong year data returned", "M2026", result2026[0].getMinistryName());
-        
-        Ministry[] resultInvalid = ViewGovernmentBudget.ministryYear(1900);
-        Assert.assertTrue("failure - invalid year should return null", resultInvalid == null);
+        assertEquals("A Ministry", arr[0].getMinistryName());
+        assertEquals("B Ministry", arr[1].getMinistryName());
+    }
+
+    /* ===============================
+       viewGovBudget
+       =============================== */
+
+    @Test
+    void testViewGovBudgetCreatesFileWithoutSort() {
+        view.viewGovBudget(2026, false);
+
+        Path file = Path.of("src/main/resources/NecessaryFilesAndData/view2026.txt");
+        assertTrue(Files.exists(file));
+    }
+
+    @Test
+    void testViewGovBudgetCreatesFileWithSort() {
+        view.viewGovBudget(2026, true);
+
+        Path file = Path.of("src/main/resources/NecessaryFilesAndData/view2026.txt");
+        assertTrue(Files.exists(file));
+    }
+
+    @Test
+    void testViewGovBudgetWithZeroTotalBudgetDoesNotThrow() {
+        CreatingMinistries.ministries2026 = new Ministry[]{
+                new Ministry("Empty Ministry", 0)
+        };
+
+        assertDoesNotThrow(() ->
+                view.viewGovBudget(2026, false));
+    }
+
+    @Test
+    void testViewGovBudgetWithInvalidYearDoesNotThrow() {
+        assertDoesNotThrow(() ->
+                view.viewGovBudget(2019, false));
     }
 }

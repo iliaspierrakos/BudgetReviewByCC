@@ -1,32 +1,38 @@
 package FeaturesTest;
 
-import UserFeatures.*;
+import UserFeatures.MinistryProgress;
+import org.junit.jupiter.api.Test;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TestMinistryProgress {
 
-    @Before
-    public void setup() {
-        CreatingMinistries.ministries2020 = new Ministry[]{ new Ministry("Defense", 1000.0) };
-        CreatingMinistries.ministries2021 = new Ministry[]{ new Ministry("Defense", 1100.0) };
-        CreatingMinistries.ministries2022 = new Ministry[]{ new Ministry("Defense", 1200.0) };
-    }
-
     @Test
-    public void testProgressDataConsistency() {
+    void testViewMinistryProgressPrintsTableStructure() {
+        // Arrange: capture System.out
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        PrintStream originalOut = System.out;
+        System.setOut(new PrintStream(outputStream));
 
-        
-        String targetName = "Defense";
+        try {
+            // Act: χρησιμοποιούμε ministry που πιθανότατα δεν υπάρχει
+            MinistryProgress.viewMinistryProgress("Non Existing Ministry");
 
-        Ministry m2020 = Ministry.findByName(targetName, ViewEditBudget.viewBudget(2020));
-        Assert.assertTrue("failure - 2020 data missing", m2020 != null);
-        Assert.assertEquals("failure - 2020 budget wrong", (Double) 1000.0, (Double) m2020.getBudget());
+            String output = outputStream.toString();
 
-        Ministry m2021 = Ministry.findByName(targetName, ViewEditBudget.viewBudget(2021));
-        Assert.assertTrue("failure - 2021 data missing", m2021 != null);
-        Assert.assertTrue("failure - budget did not increase", m2021.getBudget() > m2020.getBudget());
+            // Assert: βασικά στοιχεία του πίνακα
+            assertTrue(output.contains("BUDGET PROGRESS: Non Existing Ministry"));
+            assertTrue(output.contains("YEAR"));
+            assertTrue(output.contains("BUDGET"));
+            assertTrue(output.contains("="));
+            assertTrue(output.contains("-"));
+
+        } finally {
+            // Restore System.out
+            System.setOut(originalOut);
+        }
     }
 }

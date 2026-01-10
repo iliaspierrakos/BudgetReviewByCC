@@ -1,49 +1,130 @@
 package FeaturesTest;
 
-import UserFeatures.*;
+import UserFeatures.Ministry;
+import org.junit.jupiter.api.Test;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TestMinistry {
-    private Ministry ministry;
 
-    @Before
-    public void setup() {
-        ministry = new Ministry("Test Ministry", 1000.0);
+    @Test
+    void testConstructorAndGetters() {
+        Ministry m = new Ministry("Health", 1000.50);
+
+        assertEquals("Health", m.getMinistryName());
+        assertEquals(1000.50, m.getBudget());
     }
 
     @Test
-    public void testConstructorAndGetters() {
-        Assert.assertEquals("failure - name mismatch", "Test Ministry", ministry.getMinistryName());
-        Assert.assertEquals("failure - budget mismatch", (Double) 1000.0, (Double) ministry.getBudget());
+    void testConstructorWithInvalidName() {
+        assertThrows(IllegalArgumentException.class,
+                () -> new Ministry("", 1000));
+
+        assertThrows(IllegalArgumentException.class,
+                () -> new Ministry(null, 1000));
     }
 
     @Test
-    public void testSetBudgetValidation() {
+    void testSetMinistryNameValid() {
+        Ministry m = new Ministry("Education", 500);
+        m.setMinistryName("Defense");
 
-        ministry.setBudget(500.0);
-        Assert.assertEquals("failure - valid budget update failed", (Double) 500.0, (Double) ministry.getBudget());
-
-        try {
-            ministry.setBudget(-100.0);
-            Assert.fail("failure - negative budget should throw exception");
-        } catch (IllegalArgumentException e) {
-            // Επιτυχία, πιάσαμε το exception
-            Assert.assertTrue("failure - exception message mismatch", e.getMessage().contains("negative"));
-        }
+        assertEquals("Defense", m.getMinistryName());
     }
 
     @Test
-    public void testFindByName() {
-        Ministry[] list = { ministry, new Ministry("Other", 200.0) };
-        
-        Ministry found = Ministry.findByName("test ministry", list);
-        Assert.assertTrue("failure - ministry not found", found != null);
-        Assert.assertEquals("failure - found wrong ministry", "Test Ministry", found.getMinistryName());
+    void testSetMinistryNameInvalid() {
+        Ministry m = new Ministry("Education", 500);
 
-        Ministry notFound = Ministry.findByName("Ghost Ministry", list);
-        Assert.assertTrue("failure - should return null", notFound == null);
+        assertThrows(IllegalArgumentException.class,
+                () -> m.setMinistryName(""));
+
+        assertThrows(IllegalArgumentException.class,
+                () -> m.setMinistryName(null));
+    }
+
+    @Test
+    void testSetBudgetValid() {
+        Ministry m = new Ministry("Finance", 1000);
+        m.setBudget(2000);
+
+        assertEquals(2000, m.getBudget());
+    }
+
+    @Test
+    void testSetBudgetNegative() {
+        Ministry m = new Ministry("Finance", 1000);
+
+        assertThrows(IllegalArgumentException.class,
+                () -> m.setBudget(-1));
+    }
+
+    @Test
+    void testFindByNameFound() {
+        Ministry m1 = new Ministry("Health", 1000);
+        Ministry m2 = new Ministry("Education", 2000);
+
+        Ministry[] ministries = {m1, m2};
+
+        Ministry result = Ministry.findByName("education", ministries);
+
+        assertNotNull(result);
+        assertEquals("Education", result.getMinistryName());
+    }
+
+    @Test
+    void testFindByNameNotFound() {
+        Ministry m1 = new Ministry("Health", 1000);
+        Ministry[] ministries = {m1};
+
+        Ministry result = Ministry.findByName("Defense", ministries);
+
+        assertNull(result);
+    }
+
+    @Test
+    void testBudgetSearchByNameFound() {
+        Ministry m1 = new Ministry("Health", 1000);
+        Ministry m2 = new Ministry("Education", 2000);
+
+        Ministry[] ministries = {m1, m2};
+
+        double budget = Ministry.budgetSearchByName("Health", ministries);
+
+        assertEquals(1000, budget);
+    }
+
+    @Test
+    void testBudgetSearchByNameNotFound() {
+        Ministry m1 = new Ministry("Health", 1000);
+        Ministry[] ministries = {m1};
+
+        assertThrows(IllegalArgumentException.class,
+                () -> Ministry.budgetSearchByName("Defense", ministries));
+    }
+
+    @Test
+    void testFormattedBudget() {
+        String formatted = Ministry.getFormattedBudget(1234567.89);
+
+        assertEquals("1.234.567,89", formatted);
+    }
+
+    @Test
+    void testYesOrNo() {
+        assertEquals("yes", Ministry.yesOrNo("yes"));
+        assertEquals("no", Ministry.yesOrNo("no"));
+        assertEquals("no", Ministry.yesOrNo("maybe"));
+        assertEquals("no", Ministry.yesOrNo(null));
+    }
+
+    @Test
+    void testToStringContainsNameAndBudget() {
+        Ministry m = new Ministry("Health", 1000);
+
+        String result = m.toString();
+
+        assertTrue(result.contains("Health"));
+        assertTrue(result.contains("1.000"));
     }
 }
