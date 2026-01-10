@@ -4,33 +4,107 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+/**
+ * The {@code TaxReceipt} class is responsible for calculating an individual's tax
+ * based on income, number of children, and age, and for distributing that tax
+ * proportionally across government ministries.
+ *
+ * <p>The generated result is primarily intended for GUI presentation, providing
+ * both numeric values and formatted text suitable for display.</p>
+ *
+ * <p>This class contains two helper data classes ({@link TaxRow} and {@link TaxResult})
+ * as well as utility methods for tax calculation and distribution.</p>
+ *
+ */
 public class TaxReceipt {
 
+    /**
+     * Represents a single row in the tax receipt table.
+     * Each row corresponds to a government ministry and shows
+     * the user's contribution to that ministry.
+     */
     public static class TaxRow {
-        private final String ministry;
-        private final String shareText;   // formatted for table
-        private final double shareValue;  // for sorting if needed
 
+        /** Name of the ministry. */
+        private final String ministry;
+
+        /** Formatted text of the user's contribution (for GUI display). */
+        private final String shareText;
+
+        /** Numeric value of the user's contribution (used for sorting). */
+        private final double shareValue;
+
+        /**
+         * Constructs a {@code TaxRow} for a specific ministry.
+         *
+         * @param ministry   the name of the ministry
+         * @param shareValue the monetary contribution to that ministry
+         */
         public TaxRow(String ministry, double shareValue) {
             this.ministry = ministry;
             this.shareValue = shareValue;
             this.shareText = String.format("%.2f", shareValue);
         }
 
-        public String getMinistry() { return ministry; }
-        public String getShareText() { return shareText; }
-        public double getShareValue() { return shareValue; }
+        /**
+         * @return the ministry name
+         */
+        public String getMinistry() {
+            return ministry;
+        }
+
+        /**
+         * @return the formatted contribution value as text
+         */
+        public String getShareText() {
+            return shareText;
+        }
+
+        /**
+         * @return the numeric contribution value
+         */
+        public double getShareValue() {
+            return shareValue;
+        }
     }
 
+    /**
+     * Encapsulates the complete tax calculation result for a user.
+     * This includes personal data, total tax, formatted values, and
+     * the detailed distribution across ministries.
+     */
     public static class TaxResult {
+
+        /** User's annual income. */
         private final double income;
+
+        /** Number of dependent children. */
         private final int kids;
+
+        /** User's age. */
         private final int age;
+
+        /** Total calculated tax. */
         private final double tax;
+
+        /** Formatted income text for display. */
         private final String incomeText;
+
+        /** Formatted tax text for display. */
         private final String taxText;
+
+        /** List of tax distribution rows per ministry. */
         private final List<TaxRow> rows;
 
+        /**
+         * Constructs a {@code TaxResult} object.
+         *
+         * @param income user's income
+         * @param kids number of children
+         * @param age user's age
+         * @param tax total calculated tax
+         * @param rows list of tax distribution rows
+         */
         public TaxResult(double income, int kids, int age, double tax, List<TaxRow> rows) {
             this.income = income;
             this.kids = kids;
@@ -41,15 +115,43 @@ public class TaxReceipt {
             this.rows = rows;
         }
 
+        /** @return user's income */
         public double getIncome() { return income; }
+
+        /** @return number of children */
         public int getKids() { return kids; }
+
+        /** @return user's age */
         public int getAge() { return age; }
+
+        /** @return total calculated tax */
         public double getTax() { return tax; }
+
+        /** @return formatted income string */
         public String getIncomeText() { return incomeText; }
+
+        /** @return formatted tax string */
         public String getTaxText() { return taxText; }
+
+        /** @return list of tax distribution rows */
         public List<TaxRow> getRows() { return rows; }
     }
 
+    /**
+     * Generates a {@link TaxResult} object for GUI usage.
+     *
+     * <p>The method validates input values, calculates the total tax,
+     * and distributes it proportionally according to each ministry's
+     * budget.</p>
+     *
+     * @param income user's annual income
+     * @param kids number of children
+     * @param age user's age
+     * @return a {@code TaxResult} containing tax and distribution data
+     * @throws IllegalArgumentException if income or kids are negative,
+     *                                  or if age is below 18
+     * @throws IllegalStateException if the total government budget is zero
+     */
     public static TaxResult generateForGui(double income, int kids, int age) {
         if (income < 0) throw new IllegalArgumentException("Income cannot be negative.");
         if (kids < 0) throw new IllegalArgumentException("Kids cannot be negative.");
@@ -61,8 +163,11 @@ public class TaxReceipt {
         for (Ministry m : CreatingMinistries.ministries2026) {
             if (m != null) totalGovBudget += m.getBudget();
         }
+
         if (totalGovBudget <= 0) {
-            throw new IllegalStateException("Total Government Budget is zero. Cannot calculate distribution.");
+            throw new IllegalStateException(
+                "Total Government Budget is zero. Cannot calculate distribution."
+            );
         }
 
         List<TaxRow> rows = new ArrayList<>();
@@ -82,7 +187,18 @@ public class TaxReceipt {
         return new TaxResult(income, kids, age, tax, rows);
     }
 
-    
+    /**
+     * Calculates the tax amount based on progressive tax brackets,
+     * age-related exemptions, and child-related reductions.
+     *
+     * <p>This method implements the tax rules defined for the project
+     * and is not exposed publicly.</p>
+     *
+     * @param income user's income
+     * @param kids number of children
+     * @param age user's age
+     * @return calculated tax amount
+     */
     private static double calculateTax(double income, int kids, int age) {
         double tax = 0;
 

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 /**
- * The BulkEdit class handles bulk operations on ministry budgets.
+ * The {@code BulkEdit} class handles bulk operations on ministry budgets.
  * It allows applying changes to all ministries or selected ones,
  */
 public class BulkEdit {
