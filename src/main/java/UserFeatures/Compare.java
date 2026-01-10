@@ -5,16 +5,37 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Scanner;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
- * Compares ministry budgets between two different years.
- * Console output + file export + GUI support.
+ * The {@code Compare} class provides functionality for comparing
+ * government ministry budgets between two different years.
+ *
+ * <p>The comparison can be:
+ * <ul>
+ *   <li>Displayed in the console</li>
+ *   <li>Exported to a text file</li>
+ *   <li>Consumed by a GUI via structured data objects</li>
+ * </ul>
  */
 public class Compare {
 
+    /** Scanner used for console input. */
     private static final Scanner SCANNER = new Scanner(System.in);
 
+    /**
+     * Initiates an interactive comparison between two selected years.
+     *
+     * <p>The method validates user input, retrieves ministry data
+     * for both years, and outputs a formatted comparison table
+     * both to the console and to a file.</p>
+     */
     public static void comparingMinistries() {
         System.out.println("Please type the first of the two years that you want to compare:");
         int firstYear = validityYear(-1);
@@ -40,15 +61,19 @@ public class Compare {
         StringBuilder sb = new StringBuilder();
 
         TableUtils.appendSeparator(sb, 120, '=');
-        TableUtils.appendTitle(sb,
+        TableUtils.appendTitle(
+                sb,
                 "BUDGET COMPARISON: " + firstYear + " vs " + secondYear,
-                120);
+                120
+        );
         TableUtils.appendSeparator(sb, 120, '=');
 
-        TableUtils.appendTableRow(sb,
+        TableUtils.appendTableRow(
+                sb,
                 "MINISTRY",
                 firstYear + " BUDGET",
-                secondYear + " BUDGET");
+                secondYear + " BUDGET"
+        );
         TableUtils.appendSeparator(sb, 120, '-');
 
         for (String name : ministryNames) {
@@ -75,7 +100,8 @@ public class Compare {
             Files.createDirectories(outDir);
 
             Path outFile = outDir.resolve(
-                    "compare" + firstYear + "with" + secondYear + ".txt");
+                    "compare" + firstYear + "with" + secondYear + ".txt"
+            );
 
             Files.writeString(outFile, output, StandardCharsets.UTF_8);
         } catch (IOException e) {
@@ -83,6 +109,15 @@ public class Compare {
         }
     }
 
+    /**
+     * Validates and returns a year entered by the user.
+     *
+     * <p>The year must be within the range 2020–2026 and must not
+     * match the forbidden year.</p>
+     *
+     * @param forbiddenYear a year that cannot be selected
+     * @return a valid year
+     */
     private static int validityYear(int forbiddenYear) {
         while (true) {
             System.out.println("Please select a year (2020-2026):");
@@ -110,6 +145,12 @@ public class Compare {
         }
     }
 
+    /**
+     * Converts an array of ministries into a map indexed by ministry name.
+     *
+     * @param ministries the array of ministries
+     * @return a map of ministry name to ministry object
+     */
     private static Map<String, Ministry> toMapByName(Ministry[] ministries) {
         Map<String, Ministry> map = new HashMap<>();
         if (ministries == null) return map;
@@ -124,11 +165,22 @@ public class Compare {
 
     /* ===================== GUI SUPPORT ===================== */
 
+    /**
+     * Represents a single comparison row for GUI display.
+     */
     public static class CompareRow {
+
         private final String ministry;
         private final String firstYearBudget;
         private final String secondYearBudget;
 
+        /**
+         * Constructs a comparison row.
+         *
+         * @param ministry the ministry name
+         * @param firstYearBudget formatted budget for the first year
+         * @param secondYearBudget formatted budget for the second year
+         */
         public CompareRow(String ministry,
                           String firstYearBudget,
                           String secondYearBudget) {
@@ -137,19 +189,29 @@ public class Compare {
             this.secondYearBudget = secondYearBudget;
         }
 
+        /** @return ministry name */
         public String getMinistry() {
             return ministry;
         }
 
+        /** @return formatted budget for the first year */
         public String getFirstYearBudget() {
             return firstYearBudget;
         }
 
+        /** @return formatted budget for the second year */
         public String getSecondYearBudget() {
             return secondYearBudget;
         }
     }
 
+    /**
+     * Generates comparison rows suitable for GUI tables.
+     *
+     * @param firstYear the first comparison year
+     * @param secondYear the second comparison year
+     * @return a list of comparison rows
+     */
     public static List<CompareRow> getComparisonRowsForGui(int firstYear, int secondYear) {
         List<CompareRow> rows = new ArrayList<>();
 

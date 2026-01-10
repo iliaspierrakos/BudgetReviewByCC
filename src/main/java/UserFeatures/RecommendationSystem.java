@@ -14,195 +14,52 @@ import java.util.Map;
 /**
  * RecommendationSystem
  *
- * Handles citizen recommendations and voting results.
- * GUI-friendly (no Scanner, no CLI interaction).
+ * <p>Manages citizen recommendations and voting results for government ministries.</p>
  *
- * All runtime files are stored under:
- *   data/recommendation/
+ * <p>This class is designed to be GUI-friendly:
+ * it contains no Scanner usage and no direct console interaction.</p>
+ *
+ * <p>All runtime data files are stored under:
+ * <code>data/recommendation/</code></p>
+ *
+ * <ul>
+ *   <li>VotesData.csv — stores raw vote counts</li>
+ *   <li>MinistryVotes.txt — summary of total votes per ministry</li>
+ *   <li>CitizenFor&lt;Ministry&gt;.txt — detailed results per ministry</li>
+ * </ul>
  */
 public class RecommendationSystem {
 
-    /* =========================
-       PATHS (RUNTIME DATA)
-       ========================= */
+    /** Base directory for all recommendation-related files */
     private static final String BASE_DIR = "data/recommendation/";
+
+    /** Directory for proposal result files */
     private static final String PROPOSALS_DIR = BASE_DIR;
+
+    /** CSV file storing votes per ministry and option */
     private static final String VOTES_FILE = BASE_DIR + "VotesData.csv";
+
+    /** Summary file storing total votes per ministry */
     private static final String SUMMARY_FILE = BASE_DIR + "MinistryVotes.txt";
 
-    /* =========================
-       OPTIONS PER MINISTRY
-       ========================= */
+    /**
+     * Available recommendation options per ministry.
+     * Maintains insertion order for stable indexing.
+     */
     private static final Map<String, String[]> OPTIONS = new LinkedHashMap<>();
 
-    static {
-        OPTIONS.put("Ministry of Interior", new String[]{
-                "Digital public services",
-                "Training of public employees",
-                "Municipality infrastructure",
-                "Faster citizen services",
-                "Transparency systems"
-        });
-
-        OPTIONS.put("Ministry of Foreign Affairs", new String[]{
-                "Embassies modernization",
-                "Support for exports",
-                "International cooperation",
-                "Digital consular services",
-                "Cultural promotion abroad"
-        });
-
-        OPTIONS.put("Ministry of National Defense", new String[]{
-                "New military equipment",
-                "Soldier training",
-                "Military bases upgrades",
-                "Cyber defense",
-                "Defense research"
-        });
-
-        OPTIONS.put("Ministry of Health", new String[]{
-                "More doctors and nurses",
-                "More ambulances",
-                "Hospital upgrades",
-                "Medical equipment",
-                "Prevention programs"
-        });
-
-        OPTIONS.put("Ministry of Justice", new String[]{
-                "Faster courts",
-                "Digital court systems",
-                "More judges",
-                "Prison improvements",
-                "Legal aid"
-        });
-
-        OPTIONS.put("Ministry of Education, Religious Affairs, and Sports", new String[]{
-                "School renovations",
-                "Teacher hiring",
-                "Digital classrooms",
-                "University funding",
-                "Sports facilities"
-        });
-
-        OPTIONS.put("Ministry of Culture", new String[]{
-                "Protection of monuments",
-                "Museum upgrades",
-                "Support for artists",
-                "Cultural events",
-                "Digital culture"
-        });
-
-        OPTIONS.put("Ministry of National Economy and Finance", new String[]{
-                "Tax system improvements",
-                "Support for businesses",
-                "Fight tax evasion",
-                "Digital payments",
-                "Economic data systems"
-        });
-
-        OPTIONS.put("Ministry of Rural Development and Food", new String[]{
-                "Support for farmers",
-                "Modern farming equipment",
-                "Irrigation systems",
-                "Food quality control",
-                "Green farming"
-        });
-
-        OPTIONS.put("Ministry of Environment and Energy", new String[]{
-                "Renewable energy",
-                "Energy saving programs",
-                "Recycling systems",
-                "Nature protection",
-                "Clean energy infrastructure"
-        });
-
-        OPTIONS.put("Ministry of Labor and Social Security", new String[]{
-                "Job creation programs",
-                "Worker training",
-                "Digital social security",
-                "Workplace safety",
-                "Youth employment"
-        });
-
-        OPTIONS.put("Ministry of Social Cohesion and Family", new String[]{
-                "Child support services",
-                "Family benefits",
-                "Social housing",
-                "Elderly care",
-                "Support for vulnerable groups"
-        });
-
-        OPTIONS.put("Ministry of Development", new String[]{
-                "Business investments",
-                "Green parks",
-                "Support for startups",
-                "Regional development",
-                "Innovation funding"
-        });
-
-        OPTIONS.put("Ministry of Infrastructure and Transport", new String[]{
-                "Road construction",
-                "Public transport",
-                "Railway upgrades",
-                "Traffic safety",
-                "Smart transport systems"
-        });
-
-        OPTIONS.put("Ministry of Shipping and Island Policy", new String[]{
-                "Port upgrades",
-                "New ferries",
-                "Island connections",
-                "Maritime safety",
-                "Green shipping"
-        });
-
-        OPTIONS.put("Ministry of Tourism", new String[]{
-                "Hotel infrastructure",
-                "Tourism promotion",
-                "Sustainable tourism",
-                "Digital booking platforms",
-                "Tourism training"
-        });
-
-        OPTIONS.put("Ministry of Digital Governance", new String[]{
-                "Online public services",
-                "Cybersecurity",
-                "Digital IDs",
-                "Government apps",
-                "Data systems"
-        });
-
-        OPTIONS.put("Ministry of Migration and Asylum", new String[]{
-                "Reception centers",
-                "Faster asylum process",
-                "Language courses",
-                "Healthcare access",
-                "Integration programs"
-        });
-
-        OPTIONS.put("Ministry of Citizen Protection", new String[]{
-                "More police officers",
-                "Police equipment",
-                "Emergency response",
-                "Crime prevention",
-                "Public safety training"
-        });
-
-        OPTIONS.put("Ministry of Climate Crisis and Civil Protection", new String[]{
-                "Firefighting equipment",
-                "Flood protection",
-                "Early warning systems",
-                "Climate adaptation",
-                "Emergency training"
-        });
-    }
-
-    /**
-     * votes[row][0] = total votes per ministry
-     * votes[row][1..5] = votes per option
+    /*
+     * votes[row][0]   → total votes for the ministry
+     * votes[row][1-5] → votes per recommendation option
      */
     private final int[][] votes;
 
+    /**
+     * Constructs the recommendation system.
+     *
+     * <p>Creates required directories, initializes vote storage files
+     * if missing, and loads existing vote data.</p>
+     */
     public RecommendationSystem() {
         createDirectories();
         votes = new int[OPTIONS.size()][6];
@@ -214,14 +71,31 @@ public class RecommendationSystem {
        PUBLIC API (USED BY GUI)
        ========================================================== */
 
+    /**
+     * Returns a list of all ministries available for recommendations.
+     *
+     * @return list of ministry names
+     */
     public List<String> getAvailableMinistries() {
         return new ArrayList<>(OPTIONS.keySet());
     }
 
+    /**
+     * Returns the available recommendation options for a given ministry.
+     *
+     * @param ministry the ministry name
+     * @return array of option descriptions (empty if ministry not found)
+     */
     public String[] getOptionsForMinistry(String ministry) {
         return OPTIONS.getOrDefault(ministry, new String[0]);
     }
 
+    /**
+     * Submits a citizen recommendation vote.
+     *
+     * @param ministry the ministry being voted on
+     * @param optionIndex index of the selected option (0–4)
+     */
     public void submitRecommendation(String ministry, int optionIndex) {
         int idx = getMinistryIndex(ministry);
         if (idx == -1 || optionIndex < 0 || optionIndex > 4) return;
@@ -234,6 +108,12 @@ public class RecommendationSystem {
         saveSummaryFile();
     }
 
+    /**
+     * Returns formatted voting results for a specific ministry.
+     *
+     * @param ministry the ministry name
+     * @return list of result strings with vote counts and percentages
+     */
     public List<String> getResultsForMinistry(String ministry) {
         int idx = getMinistryIndex(ministry);
         if (idx == -1) return List.of();
@@ -246,17 +126,29 @@ public class RecommendationSystem {
             int count = votes[idx][i + 1];
             double percent = total == 0 ? 0 : (count * 100.0 / total);
             results.add(
-                    options[i] + " → " + count + " votes (" +
-                    String.format("%.2f", percent) + "%)"
+                options[i] + " → " + count + " votes (" +
+                String.format("%.2f", percent) + "%)"
             );
         }
         return results;
+    }
+
+    /**
+     * Returns the total number of votes submitted for a ministry.
+     *
+     * @param ministry the ministry name
+     * @return total vote count
+     */
+    public int getTotalVotesForMinistry(String ministry) {
+        int idx = getMinistryIndex(ministry);
+        return idx == -1 ? 0 : votes[idx][0];
     }
 
     /* ==========================================================
        INTERNAL HELPERS
        ========================================================== */
 
+    /** Creates the base directory if it does not exist */
     private void createDirectories() {
         File dir = new File(BASE_DIR);
         if (!dir.exists()) {
@@ -264,6 +156,12 @@ public class RecommendationSystem {
         }
     }
 
+    /**
+     * Returns the index of a ministry based on insertion order.
+     *
+     * @param ministry the ministry name
+     * @return index or -1 if not found
+     */
     private int getMinistryIndex(String ministry) {
         int i = 0;
         for (String key : OPTIONS.keySet()) {
@@ -273,6 +171,7 @@ public class RecommendationSystem {
         return -1;
     }
 
+    /** Initializes the votes CSV file if it does not exist */
     private void initializeVotesFile() {
         File file = new File(VOTES_FILE);
         if (file.exists()) return;
@@ -286,6 +185,7 @@ public class RecommendationSystem {
         }
     }
 
+    /** Loads vote data from disk into memory */
     private void loadVotesFromFile() {
         try (BufferedReader br = new BufferedReader(new FileReader(VOTES_FILE))) {
             String line;
@@ -302,12 +202,13 @@ public class RecommendationSystem {
         }
     }
 
+    /** Persists vote data to disk */
     private void saveVotesToFile() {
         try (PrintWriter pw = new PrintWriter(new FileWriter(VOTES_FILE))) {
             for (int[] row : votes) {
                 pw.println(
-                        row[0] + "," + row[1] + "," + row[2] + "," +
-                        row[3] + "," + row[4] + "," + row[5]
+                    row[0] + "," + row[1] + "," + row[2] + "," +
+                    row[3] + "," + row[4] + "," + row[5]
                 );
             }
         } catch (IOException e) {
@@ -315,6 +216,7 @@ public class RecommendationSystem {
         }
     }
 
+    /** Saves a detailed proposal file for a specific ministry */
     private void saveProposalFile(String ministry, int idx) {
         File file = new File(PROPOSALS_DIR + "CitizenFor" + ministry + ".txt");
 
@@ -329,6 +231,7 @@ public class RecommendationSystem {
         }
     }
 
+    /** Saves a summary file containing total votes per ministry */
     private void saveSummaryFile() {
         try (PrintWriter pw = new PrintWriter(new FileWriter(SUMMARY_FILE))) {
             int i = 0;
@@ -340,9 +243,4 @@ public class RecommendationSystem {
             throw new RuntimeException("Cannot save summary file", e);
         }
     }
-    public int getTotalVotesForMinistry(String ministry) {
-    int idx = getMinistryIndex(ministry);
-    return idx == -1 ? 0 : votes[idx][0];
-    }
-
 }
