@@ -58,7 +58,7 @@ public class VirtualEditScreen {
         CurrentSession.setUser(user);
         reloadCitizenBudgets();
 
-        Label appLogo = new Label("GovBudget");
+        Label appLogo = new Label("BudgetReviewByCC");
         appLogo.getStyleClass().add("app-logo");
 
         Region spacer = new Region();

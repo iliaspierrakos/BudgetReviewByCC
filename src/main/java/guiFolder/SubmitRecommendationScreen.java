@@ -63,7 +63,7 @@ public class SubmitRecommendationScreen {
         loadVotesFromCSV();
 
         /* ================= TOP BAR ================= */
-        Label appLogo = new Label("GovBudget");
+        Label appLogo = new Label("BudgetReviewByCC");
         appLogo.getStyleClass().add("app-logo");
 
         Region topSpacer = new Region();

@@ -58,15 +58,15 @@ public class ViewRecommendationsScreen {
         /* ================= ACCESS CONTROL ================= */
         if (!(user instanceof MinistryMember)) {
             Alert a = new Alert(Alert.AlertType.ERROR,
-                    "Access denied: Only Ministry Members can view recommendations.");
+                "Access denied: Only Ministry Members can view recommendations.");
 
             var css = getClass().getResource("/css/DarkTheme.css");
             if (css != null) a.getDialogPane().getStylesheets().add(css.toExternalForm());
 
             a.getDialogPane().setStyle(
-                    "-fx-border-color: rgba(212,175,55,0.22);" +
-                    "-fx-border-radius: 16;" +
-                    "-fx-background-radius: 16;"
+                "-fx-border-color: rgba(212,175,55,0.22);" +
+                "-fx-border-radius: 16;" +
+                "-fx-background-radius: 16;"
             );
 
             a.showAndWait();

@@ -40,137 +40,140 @@ public class ViewRecommendationStatisticsScreen {
 
     public void show(Stage stage) {
 
-        // =========================
-        // WINDOW STATE SNAPSHOT (NO JUMP)
-        // =========================
-        final boolean wasMaximized = stage.isMaximized();
-        final boolean wasFullScreen = stage.isFullScreen();
-        final double prevW = stage.getWidth();
-        final double prevH = stage.getHeight();
-        final double prevX = stage.getX();
-        final double prevY = stage.getY();
+    // =========================
+    // WINDOW STATE SNAPSHOT (NO JUMP)
+    // =========================
+    final boolean wasMaximized = stage.isMaximized();
+    final boolean wasFullScreen = stage.isFullScreen();
+    final double prevW = stage.getWidth();
+    final double prevH = stage.getHeight();
+    final double prevX = stage.getX();
+    final double prevY = stage.getY();
 
-        Label title = new Label("Citizen Recommendations – Statistics");
-        title.getStyleClass().add("title");
-        // GOLD accent (inline only)
-        title.setStyle("-fx-text-fill: #f0f2f8; -fx-effect: dropshadow(gaussian, rgba(212,175,55,0.18), 16, 0.20, 0, 0);");
+    Label title = new Label("Citizen Recommendations – Statistics");
+    title.getStyleClass().add("title");
+    title.setStyle("-fx-text-fill: #f0f2f8; -fx-effect: dropshadow(gaussian, rgba(212,175,55,0.18), 16, 0.20, 0, 0);");
 
-        VBox chartsContainer = new VBox(26);
-        chartsContainer.setPadding(new Insets(20));
-        chartsContainer.setAlignment(Pos.TOP_CENTER);
+    VBox chartsContainer = new VBox(26);
+    chartsContainer.setPadding(new Insets(20));
+    chartsContainer.setAlignment(Pos.TOP_CENTER);
 
-        // Check if user is a ministry member
-        if (user instanceof MinistryMember) {
-            MinistryMember member = (MinistryMember) user;
-            String ministryName = member.getMinistryName();
+    // =========================
+    // CONTENT
+    // =========================
+    if (user instanceof MinistryMember) {
 
-            title.setText("Citizen Recommendations – Ministry of " + ministryName);
+        MinistryMember member = (MinistryMember) user;
+        String ministryName = member.getMinistryName();
 
-            Path targetFile = DATA_DIR.resolve("CitizenForMinistry of " + ministryName + ".txt");
+        title.setText("Citizen Recommendations – Ministry of " + ministryName);
 
-            if (Files.exists(targetFile)) {
-                PieChart chart = createProbabilityChartForFile(targetFile);
-                if (chart != null) {
-                    chartsContainer.getChildren().add(chart);
+        Path targetFile = DATA_DIR.resolve("CitizenForMinistry of " + ministryName + ".txt");
 
-                    VBox summaryBox = createSummaryBox(targetFile);
-                    if (summaryBox != null) {
-                        chartsContainer.getChildren().add(summaryBox);
-                    }
-                } else {
-                    Label msg = new Label("No citizen recommendations data available for your ministry yet.");
-                    msg.getStyleClass().add("subtitle");
-                    chartsContainer.getChildren().add(msg);
+        if (Files.exists(targetFile)) {
+            PieChart chart = createProbabilityChartForFile(targetFile);
+            if (chart != null) {
+                chartsContainer.getChildren().add(chart);
+
+                VBox summaryBox = createSummaryBox(targetFile);
+                if (summaryBox != null) {
+                    chartsContainer.getChildren().add(summaryBox);
                 }
             } else {
-                Label msg = new Label("No citizen recommendations file found for Ministry of " + ministryName + ".");
+                Label msg = new Label("No citizen recommendations data available for your ministry yet.");
                 msg.getStyleClass().add("subtitle");
                 chartsContainer.getChildren().add(msg);
             }
-
         } else {
-            // For Governor or other roles - show all charts
-            try (Stream<Path> files = Files.list(DATA_DIR)) {
-                files
-                        .filter(f -> f.toString().endsWith(".txt"))
-                        .sorted()
-                        .forEach(file -> {
-                            PieChart chart = createProbabilityChartForFile(file);
-                            if (chart != null) {
-                                chartsContainer.getChildren().add(chart);
-
-                                VBox summaryBox = createSummaryBox(file);
-                                if (summaryBox != null) {
-                                    chartsContainer.getChildren().add(summaryBox);
-                                }
-                            }
-                        });
-            } catch (IOException e) {
-                Label msg = new Label("Error loading recommendation files.");
-                msg.getStyleClass().add("error");
-                chartsContainer.getChildren().add(msg);
-            }
+            Label msg = new Label("No citizen recommendations file found for Ministry of " + ministryName + ".");
+            msg.getStyleClass().add("subtitle");
+            chartsContainer.getChildren().add(msg);
         }
 
-        ScrollPane scrollPane = new ScrollPane(chartsContainer);
-        scrollPane.setFitToWidth(true);
-        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+    } else {
+        // Governor or other roles - show all charts
+        try (Stream<Path> files = Files.list(DATA_DIR)) {
+            files
+                .filter(f -> f.toString().endsWith(".txt"))
+                .sorted()
+                .forEach(file -> {
+                    PieChart chart = createProbabilityChartForFile(file);
+                    if (chart != null) {
+                        chartsContainer.getChildren().add(chart);
 
-        Button backButton = new Button("Back");
-        backButton.getStyleClass().addAll("button", "subtle");
-        // GOLD accent
-        backButton.setStyle("-fx-border-color: rgba(212,175,55,0.20);");
+                        VBox summaryBox = createSummaryBox(file);
+                        if (summaryBox != null) {
+                            chartsContainer.getChildren().add(summaryBox);
+                        }
+                    }
+                });
+        } catch (IOException e) {
+            Label msg = new Label("Error loading recommendation files.");
+            msg.getStyleClass().add("error");
+            chartsContainer.getChildren().add(msg);
+        }
+    }
 
-        backButton.setOnAction(e ->
-                new ViewEditBudgetScreen(user, userManager).show(stage)
-        );
+    // =========================
+    // LAYOUT
+    // =========================
+    ScrollPane scrollPane = new ScrollPane(chartsContainer);
+    scrollPane.setFitToWidth(true);
+    scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
 
-        VBox bottom = new VBox(backButton);
-        bottom.setAlignment(Pos.CENTER_RIGHT);
-        bottom.setPadding(new Insets(10, 18, 16, 18));
+    Button backButton = new Button("Back");
+    backButton.getStyleClass().addAll("button", "subtle");
+    backButton.setStyle("-fx-border-color: rgba(212,175,55,0.20);");
+    backButton.setOnAction(e -> new ViewEditBudgetScreen(user, userManager).show(stage));
 
-        BorderPane root = new BorderPane();
-        root.setTop(title);
-        BorderPane.setAlignment(title, Pos.CENTER);
-        BorderPane.setMargin(title, new Insets(20, 0, 0, 0));
-        root.setCenter(scrollPane);
-        root.setBottom(bottom);
+    VBox bottom = new VBox(backButton);
+    bottom.setAlignment(Pos.CENTER_RIGHT);
+    bottom.setPadding(new Insets(10, 18, 16, 18));
 
-        // =========================
-        // SCENE (REUSE + NO JUMP)
-        // =========================
-        Scene scene = stage.getScene();
-        if (scene == null) {
-            scene = new Scene(root);
-            scene.getStylesheets().add(
-                    getClass().getResource("/css/DarkTheme.css").toExternalForm()
-            );
-            stage.setScene(scene);
-        } else {
-            scene.setRoot(root);
-            String css = getClass().getResource("/css/DarkTheme.css").toExternalForm();
+    BorderPane root = new BorderPane();
+    root.setTop(title);
+    BorderPane.setAlignment(title, Pos.CENTER);
+    BorderPane.setMargin(title, new Insets(20, 0, 0, 0));
+    root.setCenter(scrollPane);
+    root.setBottom(bottom);
+
+    // =========================
+    // SCENE (REUSE + NO JUMP)
+    // =========================
+    Scene scene = stage.getScene();
+    if (scene == null) {
+        scene = new Scene(root);
+        var cssUrl = getClass().getResource("/css/DarkTheme.css");
+        if (cssUrl != null) scene.getStylesheets().add(cssUrl.toExternalForm());
+        stage.setScene(scene);
+    } else {
+        scene.setRoot(root);
+        var cssUrl = getClass().getResource("/css/DarkTheme.css");
+        if (cssUrl != null) {
+            String css = cssUrl.toExternalForm();
             if (!scene.getStylesheets().contains(css)) {
                 scene.getStylesheets().add(css);
             }
         }
+    }
 
-        stage.setTitle("Recommendation Statistics");
-        stage.show();
+    stage.setTitle("Recommendation Statistics");
+    stage.show();
 
-        // Restore window state (fullscreen/max/normal) exactly
-        if (wasFullScreen) {
-            stage.setFullScreen(true);
-        } else if (wasMaximized) {
-            stage.setMaximized(true);
-        } else {
-            if (prevW > 0 && prevH > 0) {
-                stage.setWidth(prevW);
-                stage.setHeight(prevH);
-                stage.setX(prevX);
-                stage.setY(prevY);
-            }
+    // Restore window state (fullscreen/max/normal) exactly
+    if (wasFullScreen) {
+        stage.setFullScreen(true);
+    } else if (wasMaximized) {
+        stage.setMaximized(true);
+    } else {
+        if (prevW > 0 && prevH > 0) {
+            stage.setWidth(prevW);
+            stage.setHeight(prevH);
+            stage.setX(prevX);
+            stage.setY(prevY);
         }
     }
+}
 
     /**
      * Probability pie chart:
@@ -215,7 +218,6 @@ public class ViewRecommendationStatisticsScreen {
 
         for (Row r : rows) {
             if (r.votes <= 0) continue;
-
             double prob = r.votes / (double) totalVotes; // 0..1
             PieChart.Data d = new PieChart.Data(r.cat, prob);
             pieData.add(d);
@@ -236,16 +238,15 @@ public class ViewRecommendationStatisticsScreen {
             // votes ≈ prob * total. But we want exact votes from file.
             // We'll look it up from 'rows' by category name.
             int votes = rows.stream()
-                    .filter(r -> r.cat.equals(d.getName()))
-                    .map(r -> r.votes)
-                    .findFirst()
-                    .orElse((int) Math.round(d.getPieValue() * finalTotal));
-
+                .filter(r -> r.cat.equals(d.getName()))
+                .map(r -> r.votes)
+                .findFirst()
+                .orElse((int) Math.round(d.getPieValue() * finalTotal));
             double pct = (votes * 100.0) / finalTotal;
 
             // Label text = category (votes, %)
             d.nameProperty().set(
-                    d.getName() + " (" + votes + " votes, " + String.format("%.1f%%", pct) + ")"
+                d.getName() + " (" + votes + " votes, " + String.format("%.1f%%", pct) + ")"
             );
 
             // Tooltip on slice
@@ -259,10 +260,10 @@ public class ViewRecommendationStatisticsScreen {
 
         // Optional GOLD accent around chart area (inline only)
         chart.setStyle(
-                "-fx-background-color: transparent;" +
-                "-fx-border-color: rgba(212,175,55,0.16);" +
-                "-fx-border-radius: 16;" +
-                "-fx-background-radius: 16;"
+            "-fx-background-color: transparent;" +
+            "-fx-border-color: rgba(212,175,55,0.16);" +
+            "-fx-border-radius: 16;" +
+            "-fx-background-radius: 16;"
         );
 
         return chart;
@@ -310,8 +311,8 @@ public class ViewRecommendationStatisticsScreen {
         summaryTitle.getStyleClass().add("subtitle");
 
         Label statsLabel = new Label(
-                "Total Votes: " + totalVotes + " | " +
-                        "Categories with votes: " + categoriesWithVotes + "/" + totalCategories
+            "Total Votes: " + totalVotes + " | " +
+            "Categories with votes: " + categoriesWithVotes + "/" + totalCategories
         );
         statsLabel.getStyleClass().add("subtitle");
 
@@ -322,7 +323,7 @@ public class ViewRecommendationStatisticsScreen {
 
     private String extractMinistryName(String fileName) {
         return fileName
-                .replace("CitizenForMinistry of ", "")
-                .replace(".txt", "");
+            .replace("CitizenForMinistry of ", "")
+            .replace(".txt", "");
     }
 }

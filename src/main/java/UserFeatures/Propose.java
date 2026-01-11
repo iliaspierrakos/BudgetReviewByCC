@@ -1,174 +1,194 @@
 package UserFeatures;
 
-import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.time.Instant;
 import java.util.Scanner;
 
 /**
- * Propose
+ * Provides proposal creation and persistence for ministry members.
  *
- * Supports both:
- * 1) CLI/legacy flow: collect edits (Edit.history) and write them + reasoning.
- * 2) GUI-friendly flow: submit plain proposal text and read proposals back.
+ * <p>Each ministry is associated with a single proposal file:
+ * <pre>MinistryOf&lt;SafeName&gt;.txt</pre>
+ *
+ * <p>Multiple proposals are stored as blocks:
+ * <pre>
+ * PROPOSAL|&lt;timestamp&gt;
+ * EDIT|&lt;ministryName&gt;|&lt;Increase/Decrease&gt;|&lt;amount&gt;|&lt;changeType&gt;
+ * ...
+ * REASON|...
+ * ENDPROPOSAL
+ * </pre>
+ *
+ * <p>The Governor reviews the latest block and can accept/reject it.
+ * Accepting applies edits to the real budgets (global state).</p>
  */
 public class Propose {
 
+    /** Storage directory for proposal files. */
     private static final String BASE_DIR =
             "src/main/resources/NecessaryFilesAndData/ProposalsFromMinisters/";
 
+    /** Ministry name associated with this proposal handler. */
     private String ministryName;
 
-    // proposal-only balance (does not affect global app balance permanently)
+    /**
+     * Temporary balance used exclusively during proposal mode.
+     * This value is used to validate increases in proposal mode without mutating real budgets.
+     */
     public static double sharedBalance = 0;
 
-    // used only for CLI legacy flow (reasoning prompt)
-    private final Scanner s = new Scanner(System.in);
+    /** Scanner used by legacy CLI code paths that still prompt for reasoning. */
+    private final Scanner scanner = new Scanner(System.in);
 
-    /* =========================
-       CONSTRUCTORS
-       ========================= */
-
-    // Default constructor (backward compatible)
+    /** Creates an instance and ensures the directory exists. */
     public Propose() {
         createDirectories();
     }
 
-    // GUI usage
+    /**
+     * Creates an instance for a specific ministry and ensures the directory exists.
+     *
+     * @param ministryName the ministry name
+     */
     public Propose(String ministryName) {
         this.ministryName = ministryName;
         createDirectories();
     }
 
-    /* =========================
-       LEGACY / CLI FLOW (edits-based)
-       ========================= */
-
     /**
-     * Legacy method: creates a proposal for a given ministry by collecting edits
-     * (proposal mode), saving them to a file and storing reasoning.
+     * Sets the ministry name associated with this instance.
+     *
+     * @param ministryName the ministry name
      */
-    public void editProposal(String ministryname) {
-        createDirectories();
-
-        // Backup the application's real balance
-        double appBalanceBackup = Edit.balance;
-
-        // For proposal mode, work on sharedBalance
-        Edit.balance = sharedBalance;
-
-        String safe = safeName(ministryname);
-        File file = new File(BASE_DIR + "MinisterOf" + safe + ".txt");
-
-        try (FileWriter fw = new FileWriter(file, false);
-             PrintWriter pw = new PrintWriter(fw)) {
-
-            System.out.println("Editing budget...");
-            Edit proposeEdit = new Edit();
-
-            // IMPORTANT: true => proposal mode
-            proposeEdit.collectData(true);
-
-            // store the proposal's remaining balance
-            sharedBalance = Edit.balance;
-
-            // write edits
-            for (Edit e : Edit.history.getEditList()) {
-                pw.println(e.toString());
-            }
-
-            System.out.println("Would you like to add a reasoning for the changes you made?");
-            String reason = s.nextLine();
-            pw.println("Reasoning for changes made: " + reason);
-
-        } catch (IOException e) {
-            System.err.println("Failed to write proposal file: " + e.getMessage());
-        } finally {
-            // restore real app balance
-            Edit.balance = appBalanceBackup;
-
-            // clear history so proposal edits don't mix with normal edits
-            Edit.history.clear();
-        }
-    }
-
-    /* =========================
-       GUI-FRIENDLY API (text-based)
-       ========================= */
-
     public void setMinistryName(String ministryName) {
         this.ministryName = ministryName;
     }
 
+    /**
+     * Returns the associated ministry name.
+     *
+     * @return ministry name
+     */
     public String getMinistryName() {
         return ministryName;
     }
 
     /**
-     * Backward-compat method name (used by some GUI code):
-     * This version accepts proposal text (not ministry name).
+     * Returns the proposal file for the configured ministry.
+     *
+     * @return proposal file
+     * @throws IllegalStateException if ministry name is not set
      */
-    public void editProposal(String proposalText, boolean unused) {
-        // NOTE: kept only if you need an overload; safe to remove if unused.
-        submitProposal(proposalText);
-    }
-
-    public void submitProposal(String proposalText) {
-        if (proposalText == null || proposalText.trim().isEmpty()) {
-            throw new IllegalArgumentException("Proposal text cannot be empty.");
-        }
-        createDirectories();
-        saveProposalToFile(proposalText.trim());
-    }
-
     public File getProposalFile() {
         if (ministryName == null || ministryName.isBlank()) {
             throw new IllegalStateException("Ministry name not set.");
         }
-        // Use safe file name consistently
         String safe = safeName(ministryName);
-        return new File(BASE_DIR + "MinisterFor" + safe + ".txt");
+        return new File(BASE_DIR + "MinistryOf" + safe + ".txt");
     }
 
-    public List<String> getAllProposals() {
-        File file = getProposalFile();
-        List<String> proposals = new ArrayList<>();
+    /* =========================================================
+       Backward-compatible API (required by existing code)
+       ========================================================= */
 
-        if (!file.exists()) return proposals;
+    /**
+     * Legacy entry point retained for compatibility with existing code paths.
+     *
+     * <p>This method collects edits in proposal (sandbox) mode and persists them
+     * as a new proposal block under the ministry proposal file.</p>
+     *
+     * @param ministryName the ministry name
+     */
+    public void editProposal(String ministryName) {
+        createDirectories();
+        this.ministryName = ministryName;
 
-        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                if (!line.isBlank()) proposals.add(line);
-            }
-        } catch (IOException e) {
-            throw new RuntimeException("Error reading proposals file.", e);
+        // Backup real balance and switch to proposal sandbox balance
+        double realBalanceBackup = Edit.balance;
+        Edit.balance = sharedBalance;
+
+        try {
+            // Collect edits in proposal mode (no real budget mutations)
+            Edit editor = new Edit();
+            editor.collectData(true);
+
+            // Persist remaining proposal balance for the next proposal session
+            sharedBalance = Edit.balance;
+
+            // Optional reasoning (legacy flow)
+            System.out.println("Would you like to add a reasoning for the changes?");
+            String reason = scanner.nextLine();
+
+            // Persist as a proposal block
+            submitEditsProposalBlock(reason);
+
+        } finally {
+            // Restore real balance and clear proposal edits from memory
+            Edit.balance = realBalanceBackup;
+            Edit.history.clear();
+        }
+    }
+
+    /* =========================================================
+       Primary persistence API
+       ========================================================= */
+
+    /**
+     * Persists the current in-memory edit history ({@link Edit#history}) as a new proposal block.
+     *
+     * @param reasoning optional reasoning text
+     * @throws IllegalStateException if no edits are available in {@link Edit#history}
+     */
+    public void submitEditsProposalBlock(String reasoning) {
+        createDirectories();
+
+        if (Edit.history.getEditList().isEmpty()) {
+            throw new IllegalStateException("No edits to submit.");
         }
 
-        return proposals;
-    }
-
-    /* =========================
-       INTERNAL HELPERS
-       ========================= */
-
-    private void createDirectories() {
-        File dir = new File(BASE_DIR);
-        if (!dir.exists()) dir.mkdirs();
-    }
-
-    private void saveProposalToFile(String proposal) {
         File file = getProposalFile();
-        try (PrintWriter pw = new PrintWriter(new FileWriter(file, true))) {
-            pw.println(proposal);
+
+        try (FileWriter fw = new FileWriter(file, true);
+             PrintWriter pw = new PrintWriter(fw)) {
+
+            String timestamp = Instant.now().toString();
+
+            pw.println("PROPOSAL|" + timestamp);
+
+            for (Edit e : Edit.history.getEditList()) {
+                pw.println(e.serialize());
+            }
+
+            pw.println("REASON|" + (reasoning == null ? "" : reasoning.trim()));
+            pw.println("ENDPROPOSAL");
+            pw.println();
+
         } catch (IOException e) {
             throw new RuntimeException("Failed to save proposal.", e);
         }
     }
 
+    /* =========================================================
+       Internal helpers
+       ========================================================= */
+
+    /** Ensures the proposals directory exists. */
+    private void createDirectories() {
+        File dir = new File(BASE_DIR);
+        if (!dir.exists()) dir.mkdirs();
+    }
+
+    /**
+     * Produces a filesystem-safe name for proposal filenames.
+     *
+     * @param name original ministry name
+     * @return alphanumeric-only string
+     */
     private static String safeName(String name) {
         if (name == null) return "";
-        // keep alphanumerics only to avoid weird filenames across OS
         return name.replaceAll("[^a-zA-Z0-9]", "");
     }
 }

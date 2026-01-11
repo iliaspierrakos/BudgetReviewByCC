@@ -1,42 +1,75 @@
 package UserFeatures;
 
-import UserManagement.CurrentSession;
-import UserManagement.User;
 import java.util.Scanner;
 
+import UserManagement.CurrentSession;
+import UserManagement.User;
+
 /**
- * Edit - core logic for budget edits (CLI + GUI).
+ * Represents a single budget edit operation and provides logic for applying edits.
  *
- * FIXES:
- * - Single source of truth: applyEdit(...) updates BOTH balance and budgets.
- * - editingbudget(...) kept for backward compatibility and delegates to applyEdit(...).
- * - CLI flow no longer updates balance directly (prevents double counting).
- * - Proposal mode: does NOT change real budgets/balance.
+ * <p>Key behavior:
+ * <ul>
+ *   <li>{@link #applyEdit(Edit, boolean, boolean)} is the single source of truth for applying/undoing edits.</li>
+ *   <li>Proposal mode updates only the temporary balance (sandbox) and does not mutate real budgets.</li>
+ *   <li>Edits can be serialized/deserialized for persistence inside proposal files.</li>
+ * </ul>
  */
 public class Edit {
 
-    // instance fields (one edit)
+    /** Target ministry name (e.g., "Ministry of Health"). */
     private String name;
-    private String change;       // "Increase" / "Decrease"
+
+    /** Change direction: "Increase" or "Decrease". */
+    private String change;
+
+    /** Amount of the change in raw numeric form. */
     private double amount;
-    private String changeType;   // "fixed" / "percentage" (or null)
+
+    /** Change type: e.g. "fixed" / "percentage" (currently treated as informational). */
+    private String changeType;
 
     private final Scanner scanner = new Scanner(System.in);
 
+    /**
+     * Shared balance value used by the application workflow.
+     *
+     * <p>In proposal mode, this is treated as a sandbox balance used to validate
+     * increases against the currently available funds.</p>
+     */
     public static double balance = 0;
+
+    /**
+     * In-memory edit history used for collecting edits before persistence.
+     *
+     * <p>During proposal creation, edits are accumulated here and then written to a proposal file.</p>
+     */
     public static EditHistoryList history = new EditHistoryList();
 
-    /* ===============================
-       Constructors
-       =============================== */
+    /** Default constructor. */
     public Edit() {}
 
+    /**
+     * Constructs an edit.
+     *
+     * @param name ministry name
+     * @param change "Increase" or "Decrease"
+     * @param amount positive amount
+     */
     public Edit(String name, String change, double amount) {
         this.name = name;
         this.change = change;
         this.amount = amount;
     }
 
+    /**
+     * Constructs an edit with an explicit change type.
+     *
+     * @param name ministry name
+     * @param change "Increase" or "Decrease"
+     * @param amount positive amount
+     * @param changeType change type (e.g. "fixed")
+     */
     public Edit(String name, String change, double amount, String changeType) {
         this.name = name;
         this.change = change;
@@ -44,31 +77,27 @@ public class Edit {
         this.changeType = changeType;
     }
 
-    /* ===============================
-       ✅ SINGLE SOURCE OF TRUTH
-       =============================== */
-
     /**
-     * Applies (or undoes) an edit.
-     * - Updates balance
-     * - Updates ministry budget
-     * - Logs history
-     * - Autosaves
+     * Applies or undoes an edit.
      *
-     * @param edit the edit to apply/undo
-     * @param undo if true, reverses the edit's effect
-     * @param isProposal if true, does NOTHING to real budgets/balance
+     * <p>Behavior:
+     * <ul>
+     *   <li>Balance is always updated (including proposal mode), so constraints can be enforced.</li>
+     *   <li>If {@code isProposal == true}, no real budgets are mutated and no persistence occurs.</li>
+     *   <li>If {@code isProposal == false}, the target ministry budget is updated and autosave may occur.</li>
+     * </ul>
+     *
+     * @param edit the edit instance
+     * @param undo if true, reverses the effect of the edit
+     * @param isProposal if true, applies only to temporary proposal state (balance only)
      */
     public static void applyEdit(Edit edit, boolean undo, boolean isProposal) {
         if (edit == null) return;
 
-        // Proposal mode: do not touch real data
-        if (isProposal) return;
-
         boolean increase = "Increase".equalsIgnoreCase(edit.getChange());
         double amt = edit.getAmount();
 
-        // ---------- BALANCE ----------
+        // ---------------- BALANCE (always updated) ----------------
         if (!undo) {
             if (increase) balance -= amt;
             else balance += amt;
@@ -77,7 +106,10 @@ public class Edit {
             else balance -= amt;
         }
 
-        // ---------- BUDGET ----------
+        // Proposal mode: do not mutate real budgets/history/autosave.
+        if (isProposal) return;
+
+        // ---------------- REAL BUDGET MUTATION ----------------
         Ministry m = Ministry.findByName(edit.getName(), CreatingMinistries.ministries2026);
         if (m == null) throw new IllegalArgumentException("Ministry not found: " + edit.getName());
 
@@ -92,10 +124,10 @@ public class Edit {
 
         m.setBudget(newBudget);
 
-        // log
+        // Audit/log
         EditHistory.historyOfEdit(m.getMinistryName(), oldBudget, newBudget, undo ? 1 : 0);
 
-        // autosave (only if CurrentSession has user)
+        // Autosave if a session user exists
         User user = CurrentSession.getUser();
         if (user != null) {
             try {
@@ -105,16 +137,22 @@ public class Edit {
     }
 
     /* ===============================
-       Main entry (CLI)
+       CLI workflow (kept as-is)
        =============================== */
+
+    /** Starts the CLI data collection in normal mode. */
     public void collectData() {
         collectData(false);
     }
 
+    /**
+     * Starts the CLI data collection.
+     *
+     * @param isProposal if true, runs in proposal mode (no real budget mutations)
+     */
     public void collectData(boolean isProposal) {
         System.out.println("*** Ministry Budget Transfer ***");
 
-        // Safer check than balance == 0 with doubles
         if (Math.abs(balance) < 1e-9) {
             zerobalance(isProposal);
         } else {
@@ -123,29 +161,9 @@ public class Edit {
     }
 
     /* ===============================
-       BACKWARD COMPATIBILITY (GUI/old CLI)
+       Validation helpers (CLI)
        =============================== */
 
-    /**
-     * Old API. Kept so existing GUI/CLI calls don't break.
-     * Now delegates to applyEdit(...) to keep balance & budgets consistent.
-     */
-    public void editingbudget(Edit object, boolean undo, boolean isProposal) {
-        applyEdit(object, undo, isProposal);
-
-        // Optional: keep your old console messages (only for CLI)
-        if (!isProposal) {
-            if (!undo) {
-                System.out.println("Budget updated successfully!");
-            } else {
-                System.out.println("Undo completed.");
-            }
-        }
-    }
-
-    /* ===============================
-       VALIDATIONS (CLI)
-       =============================== */
     public String validityCheck(String name) {
         boolean minfound = false;
 
@@ -180,21 +198,14 @@ public class Edit {
     }
 
     public String validityAnswer(String validAnswer) {
-        boolean valid = false;
-        do {
-            if (validAnswer.equalsIgnoreCase("yes") || validAnswer.equalsIgnoreCase("no")) {
-                valid = true;
-            } else {
-                System.out.println("Invalid input. Your answer must be either Yes or No.");
-                validAnswer = scanner.nextLine();
-            }
-        } while (!valid);
-        return validAnswer;
+        while (true) {
+            if (validAnswer.equalsIgnoreCase("yes") || validAnswer.equalsIgnoreCase("no")) return validAnswer;
+            System.out.println("Invalid input. Your answer must be either Yes or No.");
+            validAnswer = scanner.nextLine();
+        }
     }
 
     public double validityAmount(double budgetOrBalance) {
-        double validAmount;
-
         while (true) {
             if (!scanner.hasNextDouble()) {
                 System.out.println("Invalid input! Please enter a numeric value.");
@@ -202,7 +213,7 @@ public class Edit {
                 continue;
             }
 
-            validAmount = scanner.nextDouble();
+            double validAmount = scanner.nextDouble();
             scanner.nextLine();
 
             if (validAmount <= 0) {
@@ -222,12 +233,10 @@ public class Edit {
     }
 
     /* ===============================
-       CLI FLOW (balance rules)
-       IMPORTANT: balance is NOT manually changed here anymore.
-       applyEdit(...) handles balance updates.
+       CLI flows (kept as-is)
        =============================== */
-    public void zerobalance(boolean isProposal) {
 
+    public void zerobalance(boolean isProposal) {
         System.out.println("You have to decrease first a ministry's budget because you do not have available money ");
         System.out.println("Which ministry's budgets do you want to decrease?");
         String fromName = "Ministry of " + scanner.nextLine();
@@ -239,12 +248,8 @@ public class Edit {
         System.out.println("Enter amount to decrease:");
         double amt = validityAmount(Ministry.budgetSearchByName(fromName, CreatingMinistries.ministries2026));
 
-        System.out.println(fromName + " previous budget: "
-                + Ministry.getFormattedBudget(Ministry.budgetSearchByName(fromName, CreatingMinistries.ministries2026)));
-
         Edit obj1 = new Edit(fromName, "Decrease", amt, "fixed");
         history.addEdit(obj1);
-        // This will UPDATE balance + budgets (unless proposal)
         Edit.applyEdit(obj1, false, isProposal);
 
         System.out.println("Available money for Investment : " + Ministry.getFormattedBudget(balance));
@@ -252,13 +257,10 @@ public class Edit {
         System.out.println("Would you like to edit the budget of another ministry? ");
         String answer = validityAnswer(scanner.nextLine());
 
-        if (answer.equalsIgnoreCase("yes")) {
-            nonzerobalance(isProposal);
-        }
+        if (answer.equalsIgnoreCase("yes")) nonzerobalance(isProposal);
     }
 
     public void nonzerobalance(boolean isProposal) {
-
         String again;
         do {
             System.out.println("Which ministry's budgets do you want to edit?");
@@ -270,20 +272,12 @@ public class Edit {
             String ch = validityChange(scanner.nextLine());
 
             System.out.println("By how much?");
-            double amt;
-
-            if (ch.equalsIgnoreCase("Decrease")) {
-                amt = validityAmount(Ministry.budgetSearchByName(toName, CreatingMinistries.ministries2026));
-            } else {
-                amt = validityAmount(balance);
-            }
-
-            System.out.println(toName + " previous budget: "
-                    + Ministry.getFormattedBudget(Ministry.budgetSearchByName(toName, CreatingMinistries.ministries2026)));
+            double amt = ch.equalsIgnoreCase("Decrease")
+                    ? validityAmount(Ministry.budgetSearchByName(toName, CreatingMinistries.ministries2026))
+                    : validityAmount(balance);
 
             Edit obj2 = new Edit(toName, ch, amt, "fixed");
             history.addEdit(obj2);
-            // This will UPDATE balance + budgets (unless proposal)
             Edit.applyEdit(obj2, false, isProposal);
 
             System.out.println("Available money for Investment : " + Ministry.getFormattedBudget(balance));
@@ -300,8 +294,44 @@ public class Edit {
     }
 
     /* ===============================
-       Getters / toString
+       Persistence helpers for proposals
        =============================== */
+
+    /**
+     * Serializes an edit into a machine-readable single line for proposal files.
+     *
+     * @return a line in the form: EDIT|<name>|<change>|<amount>|<changeType>
+     */
+    public String serialize() {
+        return "EDIT|" + (name == null ? "" : name) + "|"
+                + (change == null ? "" : change) + "|"
+                + amount + "|"
+                + (changeType == null ? "" : changeType);
+    }
+
+    /**
+     * Parses a serialized edit line from a proposal file.
+     *
+     * @param line a line starting with "EDIT|"
+     * @return an {@link Edit} instance
+     * @throws IllegalArgumentException if the line is not a valid serialized edit
+     */
+    public static Edit parse(String line) {
+        String[] parts = line.split("\\|", -1);
+        if (parts.length < 5 || !"EDIT".equals(parts[0])) {
+            throw new IllegalArgumentException("Invalid edit line: " + line);
+        }
+        String name = parts[1];
+        String change = parts[2];
+        double amount = Double.parseDouble(parts[3]);
+        String changeType = parts[4].isBlank() ? null : parts[4];
+        return new Edit(name, change, amount, changeType);
+    }
+
+    /* ===============================
+       Getters
+       =============================== */
+
     public String getName() { return name; }
     public String getChange() { return change; }
     public double getAmount() { return amount; }
