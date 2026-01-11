@@ -167,13 +167,13 @@ BudgetReviewByCC/
 
 ## UML Design
 
-The UML diagram describing the system architecture and class relationships is available in the repository:
+The UML class diagram illustrates the high-level design of the application,
+focusing on:
+- User role hierarchy
+- Core budget management logic
+- Key relationships between system components
 
-```
-/docs/uml-diagram.png
-```
-
-(or as a separate UML file)
+The diagram is available at:
 
 ---
 
