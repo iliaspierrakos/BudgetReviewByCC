@@ -177,19 +177,75 @@ The UML diagram describing the system architecture and class relationships is av
 
 ---
 
-## Data Structures & Algorithms
+## Data Structures & Algorithms Overview
 
-* **Data Structures**
+### Data Structures
 
-  * Lists and Maps for budget entries
-  * User-role mappings
-  * Proposal collections per role
-* **Algorithms**
+The application makes extensive use of core Java data structures to manage users, budgets, and proposals efficiently:
 
-  * Budget comparison algorithms (year-to-year)
-  * Sorting algorithms for budget visualization
-  * Tax calculation logic based on user data
-  * Role-based access control checks
+- **Lists (`ArrayList`)**
+  - Used to store collections of budget entries, ministries, proposals, and historical edits.
+  - Widely utilized in classes under `UserFeatures` for budget visualization, comparisons, and statistics.
+
+- **Maps (`HashMap`)**
+  - Used to associate:
+    - Ministries with their corresponding budget values
+    - Users with roles and permissions
+    - Tax distributions per ministry
+  - Enables fast lookup operations during budget edits and calculations.
+
+- **Custom Domain Objects**
+  - Strongly-typed classes such as `User`, `Governor`, `MinistryMember`, `Ministry`, and `Citizen`
+  - Encapsulate application logic and ensure role-based behavior through object-oriented design.
+
+- **File-Based Data Storage**
+  - CSV and TXT files are used for persistent storage:
+    - Budget datasets (2020–2026)
+    - User budgets
+    - Proposals from citizens and ministers
+    - Voting and recommendation data
+  - File handling utilities such as `UserBudgetFileUtil` and `UserBudgetPersistence` manage data consistency.
+
+---
+
+### Algorithms
+
+The system implements multiple algorithms to support decision-making, analysis, and visualization:
+
+- **Budget Comparison Algorithms**
+  - Compare budget data across different years (2020–2026)
+  - Identify increases, decreases, and overall trends
+  - Implemented in comparison-related classes under `UserFeatures`.
+
+- **Sorting Algorithms**
+  - Budgets and ministries are sorted based on user-selected criteria
+  - Used for clearer visualization and analysis of financial data.
+
+- **Tax Calculation Algorithm**
+  - Computes tax obligations based on:
+    - Age
+    - Income
+    - Number of children
+  - Distributes calculated tax amounts proportionally across ministries.
+
+- **Role-Based Access Control Logic**
+  - Determines available features dynamically based on user role
+  - Implemented through conditional checks and polymorphism in `UserManagement` classes.
+
+- **Proposal Aggregation and Analysis**
+  - Collects and analyzes recommendations from citizens and ministers
+  - Generates statistical summaries and visual representations (pie and line charts).
+
+---
+
+### Architectural Considerations
+- Separation of concerns between:
+  - Business logic (`UserFeatures`)
+  - User management (`UserManagement`)
+  - Presentation layer (`guiFolder`)
+- Data validation and processing occur before persistence and visualization.
+- Algorithms are designed for clarity and maintainability rather than raw performance, given the application's domain.
+
 
 ---
 
