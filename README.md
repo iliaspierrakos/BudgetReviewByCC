@@ -46,7 +46,18 @@ Main.BudgetReviewFxMain
 ```
 
 ---
+## Architecture Overview
 
+The application follows a layered architecture that separates responsibilities
+between data management, business logic, and presentation.
+
+- **Presentation Layer**: JavaFX UI screens responsible for user interaction
+- **Business Logic Layer**: Core application logic related to budgets, proposals, and calculations
+- **Data Layer**: File-based persistence for budgets, users, and recommendations
+
+This design improves maintainability, extensibility, and clarity of the system.
+
+---
 ## Application Usage
 
 ### User Registration & Authentication
