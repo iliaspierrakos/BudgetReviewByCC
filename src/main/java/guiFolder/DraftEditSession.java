@@ -220,7 +220,7 @@ public final class DraftEditSession {
         Ministry m = find(ministryName);
         if (m == null) return "Ministry not found in draft session.";
 
-        // ✅ BALANCE RULE: cannot increase unless you have enough available funds
+        //  BALANCE RULE: cannot increase unless you have enough available funds
         if (increase && draftBalance + 1e-9 < amount) {
             return "Insufficient draft balance. Decrease another ministry first.";
         }
@@ -276,7 +276,7 @@ public final class DraftEditSession {
         double delta = newBudget - oldBudget; // positive for increase, negative for decrease
         if (Math.abs(delta) < 1e-9) return null;
 
-        // ✅ BALANCE RULE: increase requires enough funds for the computed delta
+        //  BALANCE RULE: increase requires enough funds for the computed delta
         if (delta > 0 && draftBalance + 1e-9 < delta) {
             return "Insufficient draft balance for this increase. Decrease another ministry first.";
         }
