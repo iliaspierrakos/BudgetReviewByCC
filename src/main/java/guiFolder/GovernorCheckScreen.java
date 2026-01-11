@@ -116,7 +116,7 @@ public class GovernorCheckScreen {
         CurrentSession.setUser(user);
 
         // ---------- Top bar ----------
-        Label appLogo = new Label("GovBudget");
+        Label appLogo = new Label("BudgetReviewByCC");
         appLogo.getStyleClass().add("app-logo");
 
         Region spacer = new Region();
@@ -145,7 +145,7 @@ public class GovernorCheckScreen {
         filesTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         filesTable.setFixedCellSize(44);
 
-        // ✅ critical for good resizing & scroll behaviors in split layouts
+        // good resizing & scroll behaviors in split layouts
         filesTable.setMinHeight(0);
         filesTable.setMaxHeight(Double.MAX_VALUE);
 
@@ -178,7 +178,7 @@ public class GovernorCheckScreen {
         listCard.getStyleClass().addAll("card", "table-card");
         listCard.setPadding(new Insets(14));
 
-        // ✅ must allow VBox to shrink/grow this card
+        //  must allow VBox to shrink/grow this card
         listCard.setMinHeight(0);
         listCard.setMaxHeight(Double.MAX_VALUE);
 
@@ -196,7 +196,7 @@ public class GovernorCheckScreen {
         editsTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         editsTable.setFixedCellSize(42);
 
-        // ✅ THE SCROLL FIX: do NOT pin prefHeight; allow VBox to allocate height
+        //  do NOT pin prefHeight; allow VBox to allocate height
         editsTable.setMinHeight(0);
         editsTable.setMaxHeight(Double.MAX_VALUE);
 
@@ -277,7 +277,7 @@ public class GovernorCheckScreen {
         previewCard.getStyleClass().add("card");
         previewCard.setPadding(new Insets(14));
 
-        // ✅ critical: allow this card to be resized so the table can scroll
+        //  critical: allow this card to be resized so the table can scroll
         previewCard.setMinHeight(0);
         previewCard.setMaxHeight(Double.MAX_VALUE);
 
@@ -299,7 +299,7 @@ public class GovernorCheckScreen {
         HBox.setHgrow(listCard, Priority.ALWAYS);
         HBox.setHgrow(previewCard, Priority.ALWAYS);
 
-        // ✅ critical: centerRow must consume remaining vertical space
+        // critical: centerRow must consume remaining vertical space
         VBox center = new VBox(14, heroCard, centerRow);
         VBox.setVgrow(centerRow, Priority.ALWAYS);
 
