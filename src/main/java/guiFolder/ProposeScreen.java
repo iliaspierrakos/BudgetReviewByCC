@@ -10,12 +10,13 @@ import UserManagement.CurrentSession;
 import UserManagement.MinistryMember;
 import UserManagement.User;
 import UserManagement.UserManager;
+
 import javafx.animation.FadeTransition;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
@@ -44,41 +45,52 @@ import javafx.util.Duration;
 /**
  * ProposeScreen
  *
- * <p>Draft proposal hub for {@link MinistryMember} users. This screen is the single
- * entry point for creating, reviewing and submitting minister draft edits.</p>
+ * <p>Draft proposal workspace for authorized users.</p>
  *
- * <h2>Key rules</h2>
+ * <p>This screen provides an isolated drafting environment where budget changes can be created
+ * and managed as <b>draft edits</b>. Draft edits are applied to an internal draft state and are
+ * not persisted to any official budget sources. The screen exposes a controlled set of actions:
+ * creating draft edits, reviewing draft history, resetting the draft state, and submitting a proposal.</p>
+ *
+ * <h2>Responsibilities</h2>
  * <ul>
- *   <li><b>Draft-only workflow:</b> edits are applied to {@link DraftEditSession} sandbox budgets.</li>
- *   <li><b>No persistence:</b> budgets are not written to official CSVs or user budget files.</li>
- *   <li><b>Single submission point:</b> proposal export/submission happens <b>only</b> from this screen.</li>
- *   <li>Other draft screens (bulk/history/simple dialogs) must never export proposals.</li>
+ *   <li>Validate user eligibility for accessing the draft workflow.</li>
+ *   <li>Initialize a draft editing state from an authoritative baseline for the configured year.</li>
+ *   <li>Provide navigation to draft editing actions (simple edit, bulk edit, history, reset).</li>
+ *   <li>Display draft metadata (draft balance and number of draft edits).</li>
+ *   <li>Submit a draft proposal through an explicit user action.</li>
  * </ul>
  *
- * <h2>Draft initialization</h2>
- * <p>On first entry, this screen initializes the draft session by loading the current baseline
- * (typically Governor 2026 CSV) and then calling {@link DraftEditSession#resetFromCurrent(double)}.</p>
+ * <h2>Safety Guarantees</h2>
+ * <ul>
+ *   <li>Draft operations do not write changes to official budget files.</li>
+ *   <li>Reset is irreversible and requires confirmation.</li>
+ *   <li>Submission is explicit and user-triggered.</li>
+ * </ul>
+ *
+ * <h2>User Experience</h2>
+ * <p>The layout uses a card-based action grid and modal dialogs with validation,
+ * preserving window size/position state across navigation and applying subtle transitions.</p>
  */
 public class ProposeScreen {
 
+    /** The working year for the draft workflow. */
     private static final int YEAR = 2026;
 
     private final User user;
     private final UserManager userManager;
 
     /**
-     * Cached starting balance for this propose session.
-     *
-     * <p>Minister drafts are not constrained by balance, however the UI displays an informational
-     * draft balance. This value is used as the baseline when the draft session is initialized.</p>
+     * Cached starting balance used when initializing the draft environment.
+     * This value is only used for initialization and does not represent persisted state.
      */
     private Double startingBalance = null;
 
     /**
-     * Constructs the ProposeScreen.
+     * Creates a new propose screen.
      *
-     * @param user the current user (must be a {@link MinistryMember})
-     * @param userManager application user manager instance
+     * @param user the active user
+     * @param userManager application user manager
      */
     public ProposeScreen(User user, UserManager userManager) {
         this.user = user;
@@ -86,16 +98,17 @@ public class ProposeScreen {
     }
 
     /**
-     * Builds and shows the screen on the provided stage.
+     * Builds and displays the draft proposal interface on the given stage.
      *
-     * <p>If the user is not a {@link MinistryMember}, access is denied.</p>
+     * <p>This method validates access, ensures the draft state is initialized,
+     * constructs the full UI graph, applies styling, and preserves window state.</p>
      *
-     * @param stage primary window stage
+     * @param stage the primary application window
      */
     public void show(Stage stage) {
 
         if (!(user instanceof MinistryMember)) {
-            Alert a = new Alert(Alert.AlertType.ERROR, "Access denied: Only Ministry Members can create proposals.");
+            Alert a = new Alert(Alert.AlertType.ERROR, "Access denied: Only authorized users can create proposals.");
             applyTheme(a);
             a.showAndWait();
             return;
@@ -103,13 +116,14 @@ public class ProposeScreen {
 
         CurrentSession.setUser(user);
 
-        // Initialize draft session once and keep it alive across navigation.
         if (!DraftEditSession.isInitialized()) {
             initDraftSessionFromOfficial();
         }
 
-        // ---------- Top bar ----------
-        Label appLogo = new Label("GovBudget");
+        // =========================
+        // TOP BAR (Virtual-style)
+        // =========================
+        Label appLogo = new Label("BudgetReviewByCC");
         appLogo.getStyleClass().add("app-logo");
 
         Region spacer = new Region();
@@ -119,11 +133,13 @@ public class ProposeScreen {
         topBar.getStyleClass().add("topbar");
         topBar.setPadding(new Insets(14));
 
-        // ---------- Hero ----------
+        // =========================
+        // HERO (Virtual-style)
+        // =========================
         Label title = new Label("Propose (Draft Edit)");
         title.getStyleClass().add("title");
 
-        Label subtitle = new Label("Draft edits only. Submit to Prime Minister for approval.");
+        Label subtitle = new Label("Draft edits only. Submit for review and approval.");
         subtitle.getStyleClass().add("subtitle");
 
         Label balanceChip = new Label("Draft Balance: " + Ministry.getFormattedBudget(DraftEditSession.getDraftBalance()));
@@ -139,7 +155,9 @@ public class ProposeScreen {
         heroCard.getStyleClass().addAll("card", "toolbar-card", "hero-card", "virtual-hero");
         heroCard.setMaxWidth(860);
 
-        // ---------- Actions grid ----------
+        // =========================
+        // ACTION GRID (Virtual-style)
+        // =========================
         GridPane grid = new GridPane();
         grid.getStyleClass().add("action-grid");
         grid.setHgap(14);
@@ -177,48 +195,73 @@ public class ProposeScreen {
 
         VBox reset = actionCard(
                 "Reset Draft",
-                "Discard all draft edits and restore official baseline.",
+                "Discard all draft edits and restore the baseline.",
                 "/icons/reset.png",
-                () -> resetDraft(stage)
+                () -> resetDraft(stage, balanceChip, countChip)
         );
         reset.getStyleClass().addAll("danger-action");
 
         grid.add(simpleEdit, 0, 0);
-        grid.add(bulkEdit, 1, 0);
-        grid.add(history, 0, 1);
-        grid.add(reset, 1, 1);
+        grid.add(bulkEdit,  1, 0);
+        grid.add(history,   0, 1);
+        grid.add(reset,     1, 1);
 
-        // ---------- Submit (ONLY HERE) ----------
-        Button sendBtn = new Button("Send Proposal to Prime Minister");
-        sendBtn.getStyleClass().addAll("button", "primary");
-        sendBtn.setMaxWidth(Double.MAX_VALUE);
+        Button sendBtn = new Button("Send Proposal");
+sendBtn.getStyleClass().addAll("button", "send-proposal-btn");
+sendBtn.setMaxWidth(Double.MAX_VALUE);
+sendBtn.setFocusTraversable(true);
 
-        // Single source of truth for exporting proposals
-        sendBtn.setOnAction(e -> {
-            DraftProposalExporter.exportAndNotify(stage, user);
-            // After sending, refresh the screen so chips reflect cleared state (if exporter resets session)
-            show(stage);
-        });
+// No hover effects. Click feedback is handled by CSS :pressed.
+// Add sending state + safety.
+sendBtn.setOnAction(e -> {
+    if (sendBtn.isDisabled()) return;
 
-        // ---------- Footer ----------
-        Button backBtn = new Button("Back");
-        backBtn.getStyleClass().addAll("button", "subtle");
-        backBtn.setOnAction(e -> new EditBudgetScreen(user, userManager).show(stage));
+    final String originalText = sendBtn.getText();
+    sendBtn.setDisable(true);
+    sendBtn.setText("Sending…");
 
-        HBox footer = new HBox(12, backBtn);
-        footer.setAlignment(Pos.CENTER_LEFT);
-        footer.setPadding(new Insets(12, 18, 18, 18));
+    try {
+        DraftProposalExporter.exportAndNotify(stage, user);
 
-        // ---------- Layout ----------
+        sendBtn.setText("Proposal sent ✓");
+
+        // Optional: refresh screen so chips update if exporter clears/changes state
+        show(stage);
+
+    } catch (Exception ex) {
+        sendBtn.setDisable(false);
+        sendBtn.setText(originalText);
+
+        Alert a = new Alert(Alert.AlertType.ERROR, "Failed to send proposal:\n" + ex.getMessage());
+        applyTheme(a);
+        a.showAndWait();
+    }
+});
+
+
         VBox content = new VBox(16, heroCard, new Separator(), grid, sendBtn);
         content.setPadding(new Insets(18));
         content.getStyleClass().add("virtual-content");
         content.setMaxWidth(900);
 
+        // =========================
+        // FOOTER (Virtual-style)
+        // =========================
+        Button backBtn = new Button("Back");
+        backBtn.getStyleClass().addAll("button", "subtle");
+        backBtn.setOnAction(e -> new EditBudgetScreen(user, userManager).show(stage));
+
+        HBox footer = new HBox(backBtn);
+        footer.setAlignment(Pos.CENTER_LEFT);
+        footer.setPadding(new Insets(12, 18, 18, 18));
+
+        // =========================
+        // ROOT
+        // =========================
         BorderPane root = new BorderPane();
         root.getStyleClass().add("virtual-edit-root");
         root.setTop(topBar);
-        root.setCenter(new VBox(content));
+        root.setCenter(content);
         root.setBottom(footer);
 
         Scene scene = new Scene(root,
@@ -237,21 +280,11 @@ public class ProposeScreen {
         ft.play();
     }
 
-    /* =========================================================
-       Draft session initialization and reset
-       ========================================================= */
-
     /**
-     * Initializes the minister draft session using the current official baseline.
+     * Initializes the draft state from the current authoritative baseline.
      *
-     * <p>Typical flow:
-     * <ol>
-     *   <li>Load official baseline (Governor draft for the year, if it exists).</li>
-     *   <li>Reset {@link DraftEditSession} from current budgets.</li>
-     *   <li>Point runtime arrays to sandbox so budget lookups match draft.</li>
-     * </ol></p>
-     *
-     * <p>If the baseline file is missing, the current in-memory budgets are used.</p>
+     * <p>The baseline is loaded for the configured year when available. If the baseline file
+     * is missing, the method falls back to the currently loaded in-memory budgets.</p>
      */
     private void initDraftSessionFromOfficial() {
         try {
@@ -266,24 +299,24 @@ public class ProposeScreen {
             CreatingMinistries.ministries2026 = DraftEditSession.getSandbox();
 
         } catch (Exception e) {
-            System.err.println("Failed to init minister draft session: " + e.getMessage());
+            System.err.println("Failed to initialize draft session: " + e.getMessage());
         }
     }
 
     /**
-     * Resets the draft session after user confirmation.
+     * Resets the draft state after explicit confirmation.
      *
-     * <p>This discards all draft edits and restores the official baseline.</p>
-     *
-     * @param stage owner window
+     * @param stage owner window for the confirmation dialog
+     * @param balanceChip UI label that displays the draft balance
+     * @param countChip UI label that displays the number of draft edits
      */
-    private void resetDraft(Stage stage) {
+    private void resetDraft(Stage stage, Label balanceChip, Label countChip) {
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
         confirm.initOwner(stage);
         confirm.initModality(Modality.WINDOW_MODAL);
         confirm.setTitle("Reset Draft");
         confirm.setHeaderText("Discard draft edits?");
-        confirm.setContentText("This will restore the official baseline and clear draft history.");
+        confirm.setContentText("This will restore the baseline and clear draft history.");
 
         applyTheme(confirm);
 
@@ -291,21 +324,18 @@ public class ProposeScreen {
             if (btn != ButtonType.OK) return;
 
             initDraftSessionFromOfficial();
+            balanceChip.setText("Draft Balance: " + Ministry.getFormattedBudget(DraftEditSession.getDraftBalance()));
+            countChip.setText("Draft edits: " + DraftEditSession.getHistory().size());
             show(stage);
         });
     }
 
-    /* =========================================================
-       Simple Draft Edit dialog
-       ========================================================= */
-
     /**
-     * Opens a modal dialog allowing the minister to apply a single fixed edit
-     * into the {@link DraftEditSession} sandbox.
+     * Opens a modal dialog to apply a single fixed draft edit.
      *
-     * @param parentStage owner stage
-     * @param balanceChip UI chip to refresh after apply
-     * @param countChip UI chip to refresh after apply
+     * @param parentStage owner window for the modal dialog
+     * @param balanceChip UI label that displays the draft balance
+     * @param countChip UI label that displays the number of draft edits
      */
     private void openSimpleDraftDialog(Stage parentStage, Label balanceChip, Label countChip) {
 
@@ -317,7 +347,7 @@ public class ProposeScreen {
         Label title = new Label("Edit Single Ministry (Draft)");
         title.getStyleClass().add("title");
 
-        Label subtitle = new Label("Select ministry, choose change type and enter amount.");
+        Label subtitle = new Label("Select a ministry, choose change type and enter amount.");
         subtitle.getStyleClass().add("subtitle");
 
         VBox header = new VBox(6, title, subtitle);
@@ -418,12 +448,19 @@ public class ProposeScreen {
 
             String ministry = ministryBox.getValue();
             String amountStr = amountField.getText().trim();
-            if (ministry == null) { errorLabel.setText("Please select a ministry."); return; }
+
+            if (ministry == null) {
+                errorLabel.setText("Please select a ministry.");
+                return;
+            }
 
             double amount;
             try {
                 amount = Double.parseDouble(amountStr);
-                if (amount <= 0) { errorLabel.setText("Amount must be positive."); return; }
+                if (amount <= 0) {
+                    errorLabel.setText("Amount must be positive.");
+                    return;
+                }
             } catch (NumberFormatException ex) {
                 errorLabel.setText("Invalid amount.");
                 return;
@@ -437,7 +474,6 @@ public class ProposeScreen {
                 return;
             }
 
-            // Refresh chips/labels
             balanceChip.setText("Draft Balance: " + Ministry.getFormattedBudget(DraftEditSession.getDraftBalance()));
             countChip.setText("Draft edits: " + DraftEditSession.getHistory().size());
             balanceLabel.setText("Draft Balance: " + Ministry.getFormattedBudget(DraftEditSession.getDraftBalance()));
@@ -464,10 +500,15 @@ public class ProposeScreen {
         dialog.show();
     }
 
-    /* =========================================================
-       UI helpers
-       ========================================================= */
-
+    /**
+     * Creates a keyboard-accessible action card used as the primary interaction surface.
+     *
+     * @param title primary title text
+     * @param desc secondary descriptive text
+     * @param iconPath icon resource path
+     * @param onClick callback invoked when activated
+     * @return configured action card container
+     */
     private VBox actionCard(String title, String desc, String iconPath, Runnable onClick) {
         Node iconNode = safeIcon(iconPath, 34);
         iconNode.getStyleClass().add("action-icon");
@@ -491,7 +532,8 @@ public class ProposeScreen {
         row.setAlignment(Pos.CENTER_LEFT);
 
         VBox card = new VBox(row);
-        card.getStyleClass().addAll("card", "action-card", "image-card", "virtual-action");
+        card.getStyleClass().addAll("card", "action-card", "image-card");
+        card.getStyleClass().add("virtual-action");
         card.setMinHeight(118);
 
         card.setFocusTraversable(true);
@@ -503,6 +545,13 @@ public class ProposeScreen {
         return card;
     }
 
+    /**
+     * Loads an icon resource safely and returns a suitable node for UI composition.
+     *
+     * @param iconPath classpath icon resource path
+     * @param size requested icon size in pixels
+     * @return an ImageView when available; otherwise a styled fallback Label
+     */
     private Node safeIcon(String iconPath, double size) {
         try {
             var stream = ProposeScreen.class.getResourceAsStream(iconPath);
@@ -518,16 +567,34 @@ public class ProposeScreen {
         }
     }
 
+    /**
+     * Applies the application theme stylesheet to the provided dialog.
+     *
+     * @param dialog the dialog to style
+     */
     private void applyTheme(Dialog<?> dialog) {
         var css = getClass().getResource("/css/DarkTheme.css");
         if (css != null) dialog.getDialogPane().getStylesheets().add(css.toExternalForm());
     }
 
+    /**
+     * Applies the application theme stylesheet to the provided alert.
+     *
+     * @param a the alert to style
+     */
     private void applyTheme(Alert a) {
         var css = getClass().getResource("/css/DarkTheme.css");
         if (css != null) a.getDialogPane().getStylesheets().add(css.toExternalForm());
     }
 
+    /**
+     * Replaces the stage scene while preserving the window's position, size, and
+     * fullscreen/maximized state, preventing visual "jumps" during navigation.
+     *
+     * @param stage application window
+     * @param scene new scene to set
+     * @param title window title
+     */
     private static void applyScenePreserveWindow(Stage stage, Scene scene, String title) {
         boolean wasShowing = stage.isShowing();
         double x = stage.getX();
