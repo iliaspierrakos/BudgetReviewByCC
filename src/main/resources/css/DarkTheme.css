@@ -1226,3 +1226,29 @@
     -fx-text-fill: #9aa3b8;
     -fx-font-weight: 900;
 }
+
+ /* proposal preview table */
+.proposal-table{
+    -fx-border-radius: 14;
+    -fx-background-radius: 14;
+}
+
+/* reasoning textarea themed */
+.proposal-reason {
+    -fx-control-inner-background: #0f1320;
+    -fx-text-fill: #e7eaf0;
+    -fx-background-radius: 12;
+    -fx-border-radius: 12;
+    -fx-border-color: rgba(255,255,255,0.10);
+    -fx-padding: 10;
+}
+
+/* action colors */
+.table-cell.increase {
+    -fx-text-fill: #bdf7d2;
+    -fx-font-weight: 900;
+}
+.table-cell.decrease {
+    -fx-text-fill: #ffb4b4;
+    -fx-font-weight: 900;
+}
