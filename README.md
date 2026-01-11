@@ -255,7 +255,7 @@ The system implements multiple algorithms to support decision-making, analysis, 
 * Test execution:
 
 ```bash
-mvn test
+mvn clean test
 ```
 
 * Code coverage generated using **JaCoCo**
