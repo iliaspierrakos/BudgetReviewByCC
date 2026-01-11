@@ -261,12 +261,54 @@ mvn clean test
 * Code coverage generated using **JaCoCo**
 
 ---
+## JavaDoc Comments and Code Documentation
 
-## Additional Documentation
+The source code of the application is extensively documented using **JavaDoc comments**, following standard Java documentation conventions.
 
-* JavaDoc documentation (generated via Maven)
-* Test reports and coverage results available in:
+JavaDoc comments are used to describe:
 
+* The purpose and responsibility of each class
+* The role of core components within the system architecture
+* The behavior of public methods and their parameters
+* The interaction between user roles, budget management, and proposal mechanisms
+
+Documentation is primarily provided for:
+
+* Core domain classes (e.g., users, ministries, budget handlers)
+* Business logic classes under the `UserFeatures` package
+* User management and authentication classes under the `UserManagement` package
+
+Each documented class includes:
+
+* A high-level description of its responsibility within the system
+* Explanations of key methods and workflows
+* Clear separation between business logic and presentation logic
+
+The use of JavaDoc improves:
+
+* Code readability and maintainability
+* Understanding of the object-oriented design
+* Ease of collaboration and future extension of the system
+
+---
+
+### JavaDoc Generation
+
+The JavaDoc documentation can be generated automatically using Maven:
+
+```bash
+mvn javadoc:javadoc
 ```
-/target/site/
+
+---
+
+### JavaDoc Access
+
+The generated JavaDoc output is included in the repository and can be accessed locally via:
+
+```text
+/docs/index.html
 ```
+
+Opening this file in a web browser provides a complete, navigable view of the application's API documentation, including class hierarchies and package overviews.
+
