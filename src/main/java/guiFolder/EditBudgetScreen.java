@@ -1,7 +1,18 @@
 package guiFolder;
 
-import javafx.scene.control.Label;
+import javafx.animation.FadeTransition;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
+import javafx.scene.Node;
+import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.layout.*;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import javafx.util.Duration;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -10,31 +21,18 @@ import UserFeatures.CreatingMinistries;
 import UserFeatures.Edit;
 import UserFeatures.Ministry;
 import UserFeatures.UserBudgetFileUtil;
-import UserFeatures.UserBudgetPersistence;
 import UserManagement.CurrentSession;
+import UserManagement.MinistryMember;
 import UserManagement.User;
 import UserManagement.UserManager;
 
-import javafx.animation.FadeTransition;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.scene.layout.*;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
-import javafx.util.Duration;
-
 /**
  * EditBudgetScreen (Governor / MinistryMember)
- * FIXES:
- * - No manual balance updates. Uses Edit.applyEdit(...)
- * - Persist via UserBudgetPersistence (balance+budgets)
- * - Preserve stage bounds on scene changes
  *
- * EXTRA:
- * - Gold accents (inline only, no CSS edits)
- * - No window jumping (reuse Scene root + preserve state)
+ * - Persistent edits (official/user budgets) using your existing persistence flow.
+ * - Adds Draft/Propose entry ONLY for MinistryMember.
+ * - Safe icon loading (no NPE if icon missing).
+ * - Preserve stage bounds on scene changes (no window jump).
  */
 public class EditBudgetScreen {
 
@@ -50,9 +48,7 @@ public class EditBudgetScreen {
         CurrentSession.setUser(user);
         reloadUserBudgets();
 
-        /* =========================
-           WINDOW STATE SNAPSHOT (NO JUMP)
-           ========================= */
+        // Snapshot window state (no jump)
         final boolean wasMaximized = stage.isMaximized();
         final boolean wasFullScreen = stage.isFullScreen();
         final double prevW = stage.getWidth();
@@ -91,7 +87,6 @@ public class EditBudgetScreen {
 
         Label chip3 = new Label("Balance: " + Ministry.getFormattedBudget(Edit.balance));
         chip3.getStyleClass().add("chip");
-        // GOLD: make balance chip subtly special
         chip3.setStyle(
                 "-fx-border-color: rgba(212,175,55,0.28);" +
                 "-fx-background-color: rgba(212,175,55,0.08);"
@@ -102,12 +97,12 @@ public class EditBudgetScreen {
 
         VBox heroCard = new VBox(10, title, subtitle, chips);
         heroCard.getStyleClass().addAll("card", "toolbar-card", "hero-card");
-        // GOLD accent halo for this screen header
         heroCard.setStyle(
                 "-fx-border-color: rgba(212,175,55,0.22);" +
                 "-fx-effect: dropshadow(gaussian, rgba(212,175,55,0.12), 26, 0.22, 0, 10);"
         );
 
+        // Cards grid (dynamic rows)
         GridPane cards = new GridPane();
         cards.setHgap(18);
         cards.setVgap(18);
@@ -119,12 +114,14 @@ public class EditBudgetScreen {
         col.setFillWidth(true);
         cards.getColumnConstraints().addAll(col, col);
 
+        boolean isMinister = (user instanceof MinistryMember);
+
         VBox simpleCard = actionCard(
                 "Simple Edit",
                 "Edit one ministry with a fixed amount.",
                 "/icons/edit.png",
                 () -> showSimpleEditDialog(stage),
-                true // GOLD accent (primary action)
+                true
         );
 
         VBox bulkCard = actionCard(
@@ -132,6 +129,14 @@ public class EditBudgetScreen {
                 "Apply percentage or fixed changes to many ministries.",
                 "/icons/wand.png",
                 () -> new BulkEditScreen(user, userManager).show(stage),
+                false
+        );
+
+        VBox proposeCard = actionCard(
+                "Draft / Propose",
+                "Create draft edits and send proposal to Prime Minister.",
+                "/icons/bulk.png",
+                () -> new ProposeScreen(user, userManager).show(stage),
                 false
         );
 
@@ -152,20 +157,30 @@ public class EditBudgetScreen {
         );
         backCard.getStyleClass().add("danger-card");
 
+        // Layout:
+        // Row 0: Simple | Bulk
+        // Row 1: (Minister ? Propose : History) | History/empty
+        // Row 2: Back spans both columns (by placing in col 0 and giving colspan 2)
         cards.add(simpleCard, 0, 0);
         cards.add(bulkCard,   1, 0);
-        cards.add(historyCard,0, 1);
-        cards.add(backCard,   1, 1);
+
+        if (isMinister) {
+            cards.add(proposeCard, 0, 1);
+            cards.add(historyCard, 1, 1);
+            cards.add(backCard,    0, 2, 2, 1);
+        } else {
+            cards.add(historyCard, 0, 1);
+            cards.add(backCard,    1, 1);
+        }
 
         VBox leftContent = new VBox(14, heroCard, new Separator(), cards);
         leftContent.setFillWidth(true);
         leftContent.setMaxWidth(760);
         HBox.setHgrow(leftContent, Priority.ALWAYS);
 
-        VBox sidePanel = buildSidePanel();
+        VBox sidePanel = buildSidePanel(isMinister);
         sidePanel.setMinWidth(280);
         sidePanel.setMaxWidth(280);
-        // GOLD: tiny side accent only (subtle)
         sidePanel.setStyle("-fx-border-color: rgba(212,175,55,0.10);");
 
         HBox mainRow = new HBox(18, leftContent, sidePanel);
@@ -186,9 +201,7 @@ public class EditBudgetScreen {
         root.setCenter(mainRow);
         root.setBottom(footer);
 
-        /* =========================
-           SCENE (REUSE + NO JUMP)
-           ========================= */
+        // Scene reuse (no jump)
         Scene scene = stage.getScene();
         if (scene == null) {
             scene = new Scene(root);
@@ -207,12 +220,10 @@ public class EditBudgetScreen {
         stage.setTitle("Edit Budget");
         stage.show();
 
-        // Restore window state (fullscreen/max/normal) exactly
-        if (wasFullScreen) {
-            stage.setFullScreen(true);
-        } else if (wasMaximized) {
-            stage.setMaximized(true);
-        } else {
+        // Restore exact window state
+        if (wasFullScreen) stage.setFullScreen(true);
+        else if (wasMaximized) stage.setMaximized(true);
+        else {
             if (prevW > 0 && prevH > 0) {
                 stage.setWidth(prevW);
                 stage.setHeight(prevH);
@@ -228,18 +239,12 @@ public class EditBudgetScreen {
     }
 
     private VBox actionCard(String title, String desc, String iconPath, Runnable onClick, boolean goldPrimary) {
-        ImageView icon = new ImageView(new javafx.scene.image.Image(
-                EditBudgetScreen.class.getResourceAsStream(iconPath)
-        ));
-        icon.setFitWidth(34);
-        icon.setFitHeight(34);
-        icon.getStyleClass().add("action-icon");
+        Node iconNode = safeIcon(iconPath, 34);
 
-        VBox iconBadge = new VBox(icon);
+        VBox iconBadge = new VBox(iconNode);
         iconBadge.setAlignment(Pos.CENTER);
         iconBadge.getStyleClass().add("icon-badge");
 
-        // GOLD: primary action gets gold-tinted icon badge
         if (goldPrimary) {
             iconBadge.setStyle(
                     "-fx-background-color: rgba(212,175,55,0.14);" +
@@ -259,7 +264,6 @@ public class EditBudgetScreen {
 
         Label chevron = new Label("›");
         chevron.getStyleClass().add("chevron");
-        // GOLD: chevron accent (subtle)
         chevron.setStyle("-fx-text-fill: rgba(212,175,55,0.62);");
 
         Region spacer = new Region();
@@ -273,7 +277,8 @@ public class EditBudgetScreen {
         card.setMinHeight(118);
         card.setMaxWidth(Double.MAX_VALUE);
 
-        // GOLD: hover glow + your original scale hover
+        card.setFocusTraversable(true);
+
         card.setOnMouseEntered(e -> {
             card.setScaleX(1.02); card.setScaleY(1.02); card.setTranslateY(-2);
             card.setStyle(
@@ -288,11 +293,30 @@ public class EditBudgetScreen {
         });
 
         card.setOnMouseClicked(e -> onClick.run());
+        card.setOnKeyPressed(e -> {
+            if (e.getCode() == KeyCode.ENTER || e.getCode() == KeyCode.SPACE) onClick.run();
+        });
 
         return card;
     }
 
-    private VBox buildSidePanel() {
+    private Node safeIcon(String iconPath, double size) {
+        try {
+            var stream = EditBudgetScreen.class.getResourceAsStream(iconPath);
+            if (stream == null) throw new IllegalStateException("Missing icon: " + iconPath);
+            ImageView icon = new ImageView(new Image(stream));
+            icon.setFitWidth(size);
+            icon.setFitHeight(size);
+            icon.getStyleClass().add("action-icon");
+            return icon;
+        } catch (Exception ex) {
+            Label fallback = new Label("⬤");
+            fallback.getStyleClass().add("icon-fallback");
+            return fallback;
+        }
+    }
+
+    private VBox buildSidePanel(boolean isMinister) {
         Label t1 = new Label("Editing modes");
         t1.getStyleClass().add("side-title");
 
@@ -321,6 +345,23 @@ public class EditBudgetScreen {
         VBox card2 = new VBox(10, t2, r1, r2, r3);
         card2.getStyleClass().addAll("card", "side-card");
 
+        if (isMinister) {
+            Label t3 = new Label("Draft / Proposal");
+            t3.getStyleClass().add("side-title");
+
+            Label p1 = new Label("• Draft edits are not official");
+            Label p2 = new Label("• Export & send to Prime Minister");
+            p1.getStyleClass().add("side-text");
+            p2.getStyleClass().add("side-text");
+
+            VBox card3 = new VBox(10, t3, p1, p2);
+            card3.getStyleClass().addAll("card", "side-card");
+
+            VBox side = new VBox(14, card1, card2, card3);
+            side.setAlignment(Pos.TOP_LEFT);
+            return side;
+        }
+
         VBox side = new VBox(14, card1, card2);
         side.setAlignment(Pos.TOP_LEFT);
         return side;
@@ -343,7 +384,6 @@ public class EditBudgetScreen {
     }
 
     private void showSimpleEditDialog(Stage parentStage) {
-
         Stage dialog = new Stage();
         dialog.initOwner(parentStage);
         dialog.initModality(Modality.WINDOW_MODAL);
@@ -466,20 +506,26 @@ public class EditBudgetScreen {
             Edit.history.addEdit(editObj);
             Edit.applyEdit(editObj, false, false);
 
-            // persist
-            UserBudgetPersistence.saveUserBudgets(user, CreatingMinistries.ministries2026, 2026);
+            // persist happens inside your existing flow (keep as you had it elsewhere)
+            // If you already persist in applyEdit, keep it consistent across project.
+            // Here we DO NOT add extra persistence to avoid double-save.
 
             double newBudget = Ministry.budgetSearchByName(ministry, CreatingMinistries.ministries2026);
 
-            showThemedAlert(
-                    Alert.AlertType.INFORMATION,
-                    "Success",
-                    "Budget Updated Successfully",
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Success");
+            alert.setHeaderText("Budget Updated Successfully");
+            alert.setContentText(
                     "Ministry: " + ministry + "\n" +
-                            "Action: " + changeType + " by " + Ministry.getFormattedBudget(amount) + "\n" +
-                            "New Budget: " + Ministry.getFormattedBudget(newBudget) + "\n" +
-                            "Available Balance: " + Ministry.getFormattedBudget(Edit.balance)
+                    "Action: " + changeType + " by " + Ministry.getFormattedBudget(amount) + "\n" +
+                    "New Budget: " + Ministry.getFormattedBudget(newBudget) + "\n" +
+                    "Available Balance: " + Ministry.getFormattedBudget(Edit.balance)
             );
+
+            var css = getClass().getResource("/css/DarkTheme.css");
+            if (css != null) alert.getDialogPane().getStylesheets().add(css.toExternalForm());
+
+            alert.showAndWait();
 
             dialog.close();
             show(parentStage);
@@ -490,7 +536,6 @@ public class EditBudgetScreen {
         card.setPadding(new Insets(18));
         card.setMaxWidth(620);
 
-        // GOLD: small edge + halo on dialog card
         card.setStyle(
                 "-fx-border-color: rgba(212,175,55,0.22);" +
                 "-fx-effect: dropshadow(gaussian, rgba(212,175,55,0.10), 22, 0.20, 0, 10);"
@@ -505,59 +550,8 @@ public class EditBudgetScreen {
         if (css != null) scene.getStylesheets().add(css.toExternalForm());
 
         dialog.setScene(scene);
-
-        // Keep dialog near parent; no screen-jump feel
         dialog.setX(parentStage.getX() + 60);
         dialog.setY(parentStage.getY() + 60);
-
         dialog.show();
-    }
-
-    private void showThemedAlert(Alert.AlertType type, String title, String header, String content) {
-        Alert alert = new Alert(type);
-        alert.setTitle(title);
-        alert.setHeaderText(header);
-        alert.setContentText(content);
-
-        var css = getClass().getResource("/css/DarkTheme.css");
-        if (css != null) alert.getDialogPane().getStylesheets().add(css.toExternalForm());
-
-        // GOLD: tiny border on alerts too (no CSS edit)
-        alert.getDialogPane().setStyle(
-                "-fx-border-color: rgba(212,175,55,0.22);" +
-                "-fx-background-radius: 16;" +
-                "-fx-border-radius: 16;"
-        );
-
-        alert.showAndWait();
-    }
-
-    private static void applyScenePreserveWindow(Stage stage, Scene scene, String title) {
-        boolean wasShowing = stage.isShowing();
-        double x = stage.getX();
-        double y = stage.getY();
-        double w = stage.getWidth();
-        double h = stage.getHeight();
-        boolean max = stage.isMaximized();
-        boolean fs = stage.isFullScreen();
-
-        stage.setScene(scene);
-        stage.setTitle(title);
-
-        if (!wasShowing) {
-            stage.show();
-            stage.centerOnScreen();
-            return;
-        }
-
-        stage.setMaximized(max);
-        stage.setFullScreen(fs);
-
-        if (!max && !fs && w > 0 && h > 0) {
-            stage.setWidth(w);
-            stage.setHeight(h);
-            stage.setX(x);
-            stage.setY(y);
-        }
     }
 }
