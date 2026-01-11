@@ -90,7 +90,7 @@ public class BulkEditScreen {
 
         CurrentSession.setUser(user);
 
-        Label appLogo = new Label("GovBudget");
+        Label appLogo = new Label("BudgetReviewByCC");
         appLogo.getStyleClass().add("app-logo");
 
         Label bell = new Label("🔔");
