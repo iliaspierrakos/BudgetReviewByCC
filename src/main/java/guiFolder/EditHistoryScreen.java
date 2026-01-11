@@ -11,16 +11,26 @@ import UserFeatures.Edit;
 import UserFeatures.UserBudgetPersistence;
 import UserManagement.User;
 import UserManagement.UserManager;
-
 import javafx.animation.FadeTransition;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Label;
+import javafx.scene.control.Separator;
+import javafx.scene.control.Spinner;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.*;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -193,7 +203,7 @@ public class EditHistoryScreen {
 
         VBox sidePanel = buildSidePanel(maxUndo);
         sidePanel.setMinWidth(280);
-        sidePanel.setMaxWidth(280);
+        sidePanel.setMaxWidth(360);
 
         VBox leftContent = new VBox(14, heroCard, new Separator(), tableCard, undoCard);
         leftContent.setFillWidth(true);
