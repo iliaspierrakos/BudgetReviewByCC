@@ -69,7 +69,7 @@ public class EditHistoryScreen {
 
     public void show(Stage stage) {
 
-        Label appLogo = new Label("GovBudget");
+        Label appLogo = new Label("BudgetReviewByCC");
         appLogo.getStyleClass().add("app-logo");
 
         Label bell = new Label("🔔");
@@ -184,7 +184,7 @@ public class EditHistoryScreen {
                 if (btn == ButtonType.OK) {
                     for (int i = 0; i < num; i++) Edit.history.undo();
 
-                    // ✅ persist budgets+balance after undo
+                    //  persist budgets+balance after undo
                     UserBudgetPersistence.saveUserBudgets(user, CreatingMinistries.ministries2026, 2026);
 
                     show(stage);
