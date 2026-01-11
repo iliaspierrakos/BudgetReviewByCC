@@ -125,20 +125,45 @@ Main.BudgetReviewFxMain
 
 ## Repository Structure
 
+## Repository Structure
+
 ```text
 BudgetReviewByCC/
+├── README.md                     # Project documentation
+├── pom.xml                       # Maven configuration
+│
+├── data/                         # Runtime and persistence data
+│   ├── users.txt                 # Registered users
+│   └── recommendation/           # Citizen and ministry recommendation data
+│
+├── docs/                         # Generated JavaDoc documentation
+│   ├── UserFeatures/             # JavaDoc for user feature classes
+│   ├── UserManagement/           # JavaDoc for user management classes
+│   └── index.html                # JavaDoc entry point
+│
 ├── src/
 │   ├── main/
 │   │   ├── java/
+│   │   │   ├── Main/             # Application entry point
+│   │   │   │   └── BudgetReviewFxMain.java
+│   │   │   ├── UserManagement/   # Authentication, roles, users
+│   │   │   ├── UserFeatures/     # Budget logic, proposals, statistics
+│   │   │   ├── guiFolder/        # JavaFX UI screens
+│   │   │   └── NecessaryFilesAndData/
+│   │   │       └── UserBudgets/  # User-specific budget data
+│   │   │
 │   │   └── resources/
+│   │       ├── NecessaryFilesAndData/   # Budget datasets (2020–2026)
+│   │       ├── css/                     # UI styles
+│   │       ├── icons/                   # UI icons
+│   │       └── guiFolder/               # Images and UI assets
+│   │
 │   └── test/
 │       └── java/
-├── pom.xml
-├── README.md
-└── target/
-```
+│           └── FeaturesTest/            # JUnit test cases
+│
+└── target/                       # Build output and reports
 
----
 
 ## UML Design
 
