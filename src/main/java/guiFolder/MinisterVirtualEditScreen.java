@@ -44,7 +44,7 @@ public class MinisterVirtualEditScreen {
             DraftEditSession.resetFromCurrent(Edit.balance);
         }
 
-        Label appLogo = new Label("GovBudget");
+        Label appLogo = new Label("BudgetReviewByCC");
         appLogo.getStyleClass().add("app-logo");
 
         Region spacer = new Region();
@@ -121,13 +121,13 @@ public class MinisterVirtualEditScreen {
         );
         reset.getStyleClass().addAll("danger-action");
 
-        // Layout: 2 rows, 2 cols (όπως VirtualEdit)
+        // Layout: 2 rows, 2 cols 
         grid.add(simpleEdit, 0, 0);
         grid.add(bulkEdit,   1, 0);
         grid.add(history,    0, 1);
         grid.add(send,       1, 1);
 
-        // extra row for reset (optional)
+        // extra row for reset 
         grid.add(reset, 0, 2);
         GridPane.setColumnSpan(reset, 2);
 
