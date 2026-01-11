@@ -111,7 +111,7 @@ public class BulkEditDraftScreen {
         }
 
         // ---------- Top bar ----------
-        Label appLogo = new Label("GovBudget");
+        Label appLogo = new Label("BudgetReviewByCC");
         appLogo.getStyleClass().add("app-logo");
 
         Label bell = new Label("🔔");
