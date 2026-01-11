@@ -141,7 +141,7 @@ public class CreatingMinistries {
     }
 
     /**
-     * ✅ FIXED CSV parsing:
+     *  FIXED CSV parsing:
      * - ministry names may contain commas
      * - budget is always AFTER the LAST comma
      * - BALANCE,<value> supported
