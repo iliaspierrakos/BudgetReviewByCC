@@ -56,7 +56,7 @@ public class EditBudgetScreen {
         final double prevX = stage.getX();
         final double prevY = stage.getY();
 
-        Label appLogo = new Label("GovBudget");
+        Label appLogo = new Label("BudgetReviewByCC");
         appLogo.getStyleClass().add("app-logo");
 
         Label bell = new Label("🔔");
