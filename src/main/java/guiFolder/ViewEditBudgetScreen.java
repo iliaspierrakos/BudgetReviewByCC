@@ -14,7 +14,6 @@ import UserFeatures.ViewEditBudgetInitializer;
 import UserManagement.CurrentSession;
 import UserManagement.User;
 import UserManagement.UserManager;
-
 import javafx.animation.FadeTransition;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -35,6 +34,17 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
+/**
+ * ViewEditBudgetScreen
+ *
+ * Main menu screen that routes users to features based on their role.
+ *
+ * <p>Important routing:
+ * <ul>
+ *   <li>MINISTRYMEMBER: navigates to {@link ProposeScreen} (EDIT-based proposals).</li>
+ *   <li>GOVERNOR: navigates to {@link GovernorCheckScreen} for proposal review.</li>
+ * </ul>
+ */
 public class ViewEditBudgetScreen {
 
     private final User user;
@@ -51,7 +61,7 @@ public class ViewEditBudgetScreen {
         ViewEditBudgetInitializer.ensureInitialized();
 
         /* =========================
-           WINDOW STATE SNAPSHOT (NO JUMP)
+           WINDOW STATE SNAPSHOT
            ========================= */
         final boolean wasMax = stage.isMaximized();
         final boolean wasFull = stage.isFullScreen();
@@ -113,7 +123,7 @@ public class ViewEditBudgetScreen {
         headerCard.setMaxWidth(Double.MAX_VALUE);
 
         /* =========================
-           FEATURED CARD (FULL WIDTH)
+           FEATURED CARD
            ========================= */
         VBox featured = actionCard(
                 "View Budget",
@@ -141,17 +151,23 @@ public class ViewEditBudgetScreen {
 
         List<VBox> cards = new ArrayList<>();
 
+        // Role-based edit / propose action
         if (user.getRole() != User.Role.CITIZEN) {
+
             String txt = (user.getRole() == User.Role.MINISTRYMEMBER) ? "Propose Edit" : "Edit Budget";
             String desc = (user.getRole() == User.Role.MINISTRYMEMBER)
-                    ? "Submit proposals for your ministry."
+                    ? "Submit budget edit proposals for your ministry."
                     : "Edit budgets with governor permissions.";
+
+            Runnable action = (user.getRole() == User.Role.MINISTRYMEMBER)
+                    ? () -> new ProposeScreen(user, userManager).show(stage)
+                    : () -> new EditBudgetScreen(user, userManager).show(stage);
 
             cards.add(actionCard(
                     txt,
                     desc,
                     "/icons/edit.png",
-                    () -> new EditBudgetScreen(user, userManager).show(stage),
+                    action,
                     false
             ));
         }
@@ -162,6 +178,16 @@ public class ViewEditBudgetScreen {
                     "Simulate changes without affecting official data.",
                     "/icons/wand.png",
                     () -> new VirtualEditScreen(user, userManager).show(stage),
+                    false
+            ));
+        }
+
+        if (user.getRole() == User.Role.GOVERNOR) {
+            cards.add(actionCard(
+                    "Review Minister Proposals",
+                    "Approve or reject ministry budget proposals.",
+                    "/icons/inbox.png",
+                    () -> new GovernorCheckScreen(user, userManager).show(stage),
                     false
             ));
         }
@@ -210,7 +236,7 @@ public class ViewEditBudgetScreen {
             ));
         }
 
-        // Add cards into 2-column grid
+        // Place cards into 2-column grid
         int r = 0, c = 0;
         for (VBox card : cards) {
             grid.add(card, c, r);
@@ -249,29 +275,23 @@ public class ViewEditBudgetScreen {
         javafx.scene.control.Button logoutBtn = new javafx.scene.control.Button(" Logout");
         logoutBtn.getStyleClass().add("logout-pill");
         logoutBtn.setOnAction(e -> {
-    try {
-        cleanupOnLogout(); // μπορεί να αποτύχει (IO), δεν πρέπει να σταματήσει το logout
-    } catch (Exception ex) {
-        System.err.println("cleanupOnLogout failed: " + ex.getMessage());
-        ex.printStackTrace();
-    }
+            try {
+                cleanupOnLogout();
+            } catch (Exception ex) {
+                System.err.println("cleanupOnLogout failed: " + ex.getMessage());
+                ex.printStackTrace();
+            }
 
-    try {
-        // καθάρισε “logged in” state
-        CurrentSession.setUser(null);
+            try {
+                CurrentSession.setUser(null);
+                if (userManager != null) userManager.logout();
+            } catch (Exception ex) {
+                System.err.println("Session/UserManager logout failed: " + ex.getMessage());
+                ex.printStackTrace();
+            }
 
-        if (userManager != null) {
-            userManager.logout(); // θα την προσθέσεις στον UserManager
-        }
-    } catch (Exception ex) {
-        System.err.println("Session/UserManager logout failed: " + ex.getMessage());
-        ex.printStackTrace();
-    }
-
-    // ΠΑΝΤΑ γύρνα StartMenu
-    new StartMenuScreen(userManager).show(stage);
-});
-
+            new StartMenuScreen(userManager).show(stage);
+        });
 
         HBox footer = new HBox(logoutBtn);
         footer.setAlignment(Pos.CENTER_RIGHT);
@@ -282,7 +302,7 @@ public class ViewEditBudgetScreen {
            ROOT
            ========================= */
         BorderPane root = new BorderPane();
-        root.getStyleClass().add("viewedit-root"); // scoped styling hook
+        root.getStyleClass().add("viewedit-root");
         root.setTop(topBar);
         root.setCenter(mainRow);
         root.setBottom(footer);
@@ -294,7 +314,7 @@ public class ViewEditBudgetScreen {
         if (scene == null) {
             scene = new Scene(root);
             scene.getStylesheets().add(
-                getClass().getResource("/css/DarkTheme.css").toExternalForm()
+                    getClass().getResource("/css/DarkTheme.css").toExternalForm()
             );
             stage.setScene(scene);
         } else {
@@ -306,7 +326,7 @@ public class ViewEditBudgetScreen {
         stage.setTitle("Main Menu");
         stage.show();
 
-        // restore window state
+        // Restore window state
         if (wasFull) {
             stage.setFullScreen(true);
         } else if (wasMax) {
@@ -321,7 +341,7 @@ public class ViewEditBudgetScreen {
         }
 
         /* =========================
-           ANIMATIONS (UNCHANGED)
+           ANIMATIONS
            ========================= */
         FadeTransition screenFade = new FadeTransition(Duration.millis(220), root);
         screenFade.setFromValue(0);
@@ -407,9 +427,7 @@ public class ViewEditBudgetScreen {
         VBox iconBadge = new VBox(icon);
         iconBadge.setAlignment(Pos.CENTER);
         iconBadge.getStyleClass().add("icon-badge");
-        if (featured) {
-        iconBadge.getStyleClass().add("icon-badge-gold");
-        }
+        if (featured) iconBadge.getStyleClass().add("icon-badge-gold");
 
         Label t = new Label(title);
         t.getStyleClass().add("action-title");
@@ -432,9 +450,7 @@ public class ViewEditBudgetScreen {
 
         VBox card = new VBox(row);
         card.getStyleClass().addAll("card", "action-card");
-        if (featured) {
-        card.getStyleClass().add("featured-card");
-        }
+        if (featured) card.getStyleClass().add("featured-card");
 
         card.setOnMouseClicked(e -> onClick.run());
         return card;
