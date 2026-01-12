@@ -47,6 +47,32 @@ public class RecommendationSystem {
      * Maintains insertion order for stable indexing.
      */
     private static final Map<String, String[]> OPTIONS = new LinkedHashMap<>();
+    static {
+        OPTIONS.put("Ministry of Finance", new String[]{
+                "Increase budget",
+                "Decrease budget",
+                "Keep same",
+                "Reduce taxes",
+                "Increase taxes"
+        });
+
+        OPTIONS.put("Ministry of Health", new String[]{
+                "Increase hospitals",
+                "Hire staff",
+                "Buy equipment",
+                "Maintain budget",
+                "Reduce spending"
+        });
+
+        OPTIONS.put("Ministry of Education", new String[]{
+                "Hire teachers",
+                "Improve infrastructure",
+                "Digital education",
+                "Maintain budget",
+                "Reduce spending"
+        });
+    }
+
 
     /*
      * votes[row][0]   → total votes for the ministry

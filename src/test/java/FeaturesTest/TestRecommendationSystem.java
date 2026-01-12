@@ -1,61 +1,134 @@
 package FeaturesTest;
 
-import java.lang.reflect.Field;
-import java.util.Map;
+import java.io.File;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import UserFeatures.RecommendationSystem;
 
-public class TestRecommendationSystem {
+class TestRecommendationSystem {
+
+    private RecommendationSystem system;
+
+    private static final String BASE_DIR = "data/recommendation/";
 
     @BeforeEach
-    void initOptions() throws Exception {
-        // Reflection για να γεμίσουμε το OPTIONS map
-        Field optionsField = RecommendationSystem.class.getDeclaredField("OPTIONS");
-        optionsField.setAccessible(true);
-        Map<String, String[]> options = (Map<String, String[]>) optionsField.get(null);
-
-        options.clear();
-        options.put("Ministry of Health", new String[]{"Option 1", "Option 2", "Option 3", "Option 4", "Option 5"});
-        options.put("Ministry of Education", new String[]{"Option A", "Option B", "Option C", "Option D", "Option E"});
+    void setUp() {
+        deleteDirectory(new File(BASE_DIR));
+        system = new RecommendationSystem();
     }
 
     @Test
-    void testAvailableMinistriesNotEmpty() {
-        RecommendationSystem rs = new RecommendationSystem();
-        assertTrue(rs.getAvailableMinistries().contains("Ministry of Health"));
+    void testConstructorCreatesSystem() {
+        assertNotNull(system);
     }
 
     @Test
-    void testOptionsForValidMinistry() {
-        RecommendationSystem rs = new RecommendationSystem();
-        assertEquals(5, rs.getOptionsForMinistry("Ministry of Health").length);
+    void testAvailableMinistriesNotNull() {
+        List<String> ministries = system.getAvailableMinistries();
+        assertNotNull(ministries);
     }
 
     @Test
-    void testOptionsForInvalidMinistry() {
-        RecommendationSystem rs = new RecommendationSystem();
-        assertEquals(0, rs.getOptionsForMinistry("Non Existing Ministry").length);
+    void testGetOptionsForInvalidMinistryReturnsEmptyArray() {
+        String[] options = system.getOptionsForMinistry("InvalidMinistry");
+        assertNotNull(options);
+        assertEquals(0, options.length);
     }
 
     @Test
-    void testSubmitRecommendationIncreasesVotes() {
-        RecommendationSystem rs = new RecommendationSystem();
-        int before = rs.getTotalVotesForMinistry("Ministry of Health");
-        rs.submitRecommendation("Ministry of Health", 0);
-        assertEquals(before + 1, rs.getTotalVotesForMinistry("Ministry of Health"));
+    void testSubmitRecommendationIncreasesVoteCount() {
+        String ministry = system.getAvailableMinistries().get(0);
+
+        system.submitRecommendation(ministry, 0);
+
+        assertEquals(1, system.getTotalVotesForMinistry(ministry));
     }
 
     @Test
-    void testSubmitRecommendationInvalidInputDoesNothing() {
-        RecommendationSystem rs = new RecommendationSystem();
-        int before = rs.getTotalVotesForMinistry("Ministry of Health");
-        rs.submitRecommendation("Invalid Ministry", 0);
-        rs.submitRecommendation("Ministry of Health", 10); // εκτός bounds
-        assertEquals(before, rs.getTotalVotesForMinistry("Ministry of Health"));
+    void testSubmitMultipleVotes() {
+        String ministry = system.getAvailableMinistries().get(0);
+
+        system.submitRecommendation(ministry, 0);
+        system.submitRecommendation(ministry, 1);
+        system.submitRecommendation(ministry, 1);
+
+        assertEquals(3, system.getTotalVotesForMinistry(ministry));
+    }
+
+    @Test
+    void testSubmitRecommendationInvalidMinistryDoesNothing() {
+        system.submitRecommendation("Invalid", 0);
+
+        assertEquals(0, system.getTotalVotesForMinistry("Invalid"));
+    }
+
+    @Test
+    void testSubmitRecommendationInvalidOptionDoesNothing() {
+        String ministry = system.getAvailableMinistries().get(0);
+
+        system.submitRecommendation(ministry, -1);
+        system.submitRecommendation(ministry, 99);
+
+        assertEquals(0, system.getTotalVotesForMinistry(ministry));
+    }
+
+    @Test
+    void testGetResultsForMinistryInitiallyZero() {
+        String ministry = system.getAvailableMinistries().get(0);
+
+        List<String> results = system.getResultsForMinistry(ministry);
+
+        assertNotNull(results);
+        assertFalse(results.isEmpty());
+
+        for (String line : results) {
+            assertTrue(line.contains("0 votes"));
+        }
+    }
+
+    @Test
+    void testGetResultsForInvalidMinistryReturnsEmptyList() {
+        List<String> results = system.getResultsForMinistry("Invalid");
+        assertNotNull(results);
+        assertTrue(results.isEmpty());
+    }
+
+    @Test
+    void testVotesPersistBetweenInstances() {
+        String ministry = system.getAvailableMinistries().get(0);
+
+        system.submitRecommendation(ministry, 0);
+        system.submitRecommendation(ministry, 1);
+
+        RecommendationSystem newSystem = new RecommendationSystem();
+
+        assertEquals(
+                2,
+                newSystem.getTotalVotesForMinistry(ministry),
+                "Votes should persist after reload"
+        );
+    }
+
+    private static void deleteDirectory(File dir) {
+        if (!dir.exists()) return;
+
+        File[] files = dir.listFiles();
+        if (files != null) {
+            for (File f : files) {
+                if (f.isDirectory()) {
+                    deleteDirectory(f);
+                } else {
+                    f.delete();
+                }
+            }
+        }
+        dir.delete();
     }
 }
