@@ -1,101 +1,77 @@
 package UserFeatures;
-
+/**
+ * This class operates the feature of the Governor checking the ministers proposals.
+ * The class includes the viewing of the proposals' files and the governor selecting
+ * which .txt file he will see each time(he will either accept or reject the proposal).
+ * After accepting the proposal,the budget is updated with the changes.
+ * After rejecting the proposal, the file will be deleted from the folder.
+ */
 import java.io.File;
-import java.nio.file.*;
-import java.util.*;
-
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.Scanner;
 public class GovernorCheck {
-
-    // Προσπαθεί 3 πιθανές τοποθεσίες (ανάλογα από που τρέχει το app)
-    private static final Path[] CANDIDATE_DIRS = new Path[] {
-            Path.of("src/main/resources/NecessaryFilesAndData/ProposalsFromMinisters"),
-            Path.of("NecessaryFilesAndData/ProposalsFromMinisters"),
-            Path.of("target/classes/NecessaryFilesAndData/ProposalsFromMinisters")
-    };
-
-    private Path proposalsDirResolved() {
-        for (Path p : CANDIDATE_DIRS) {
-            if (Files.exists(p) && Files.isDirectory(p)) return p;
-        }
-        // αν δεν υπάρχει κανένα, γύρνα το πρώτο (ώστε να δείξουμε debug με απόλυτο path)
-        return CANDIDATE_DIRS[0];
-    }
-
-    private final Scanner scanner = new Scanner(System.in);
-
+    Scanner scanner = new Scanner(System.in);
     public void viewProposalsNames() {
-        Path proposalsDir = proposalsDirResolved();
-
-        // ===== DEBUG =====
-        System.out.println("\n[GovernorCheck DEBUG]");
-        System.out.println("Working dir (user.dir): " + System.getProperty("user.dir"));
-        System.out.println("Resolved proposals dir: " + proposalsDir.toAbsolutePath());
-        System.out.println("Exists? " + Files.exists(proposalsDir) + " | isDir? " + Files.isDirectory(proposalsDir));
-        // ================
-
-        try {
-            Files.createDirectories(proposalsDir);
-        } catch (Exception e) {
-            System.out.println("Cannot create/access proposals folder: " + e.getMessage());
-            return;
-        }
-
-        File folder = proposalsDir.toFile();
-
-        File[] files = folder.listFiles((dir, name) -> name.toLowerCase().endsWith(".txt"));
-
-        // ===== DEBUG =====
-        System.out.println("listFiles() returned: " + (files == null ? "null" : files.length + " files"));
+        File folder = new File("src/main/resources/NecessaryFilesAndData/ProposalsFromMinisters"); //getting access to the folder
+        File[] files = folder.listFiles(); // saving the files name inside the folder
         if (files != null) {
-            for (File f : files) {
-                System.out.println(" - " + f.getName() + " | lastModified=" + new Date(f.lastModified()));
+            int counter = 0;
+            for (File file : files) { //enhanced for used for searching inside the File Array
+                if (file.isFile()) {
+                    System.out.println(file.getName());
+                    counter++;
+                }
             }
-        }
-        System.out.println("[/GovernorCheck DEBUG]\n");
-        // ================
-
-        if (files == null || files.length == 0) {
-            System.out.println("No proposal .txt files found in: " + proposalsDir.toAbsolutePath());
-            return;
-        }
-
-        Arrays.sort(files, (a, b) -> Long.compare(b.lastModified(), a.lastModified()));
-
-        System.out.println("Proposal files (most recently updated first):");
-        for (int i = 0; i < files.length; i++) {
-            System.out.println((i + 1) + ") " + files[i].getName());
-        }
-
-        int choice = readIntInRange("Select a file (1-" + files.length + "): ", 1, files.length);
-        Path filePath = files[choice - 1].toPath();
-
-        showFileContents(filePath);
-    }
-
-    private void showFileContents(Path filePath) {
-        System.out.println("\n--- File: " + filePath.toAbsolutePath() + " ---");
-        try {
-            List<String> lines = Files.readAllLines(filePath);
-            if (lines.isEmpty()) {
-                System.out.println("(empty file)");
+            if (!(counter==0)) {
+                System.out.println("PLease select which minister's budget changes you would like to see?");
+                String ans = scanner.nextLine();
+                viewProposal(ans);
             } else {
-                for (String l : lines) System.out.println(l);
+               System.out.println("Folder empty.");
             }
-        } catch (Exception e) {
-            System.out.println("Could not read file: " + e.getMessage());
+        } else {
+            System.out.println("Folder not found or empty.");
         }
-        System.out.println("--- End ---\n");
     }
 
-    private int readIntInRange(String prompt, int min, int max) {
-        while (true) {
-            System.out.print(prompt);
-            String line = scanner.nextLine().trim();
+    public void viewProposal(String fileName) {
+        //System.out.println(fileName);
+        try {
+            List <String> lines = Files.readAllLines(Paths.get("src/main/resources/NecessaryFilesAndData/ProposalsFromMinisters/" + fileName + ".txt"));
+            for (String line : lines) {
+                System.out.println(line);
+            }
+        } catch (Exception e) {}
+        fileManagement(budgetChecking(), fileName);
+    }
+    public boolean budgetChecking() {
+        System.out.println("Would you like to accept the changes?");
+        String ans = scanner.nextLine();
+        while (!(ans.equalsIgnoreCase("yes") || ans.equalsIgnoreCase("no"))) {
+            System.out.println("Please type yes or no:");
+            ans = scanner.nextLine();
+        }
+        if (ans.equalsIgnoreCase("yes")) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    public void fileManagement(boolean accepted, String fileName) {
+        if (accepted == true) {
+            EditHistoryList history = new EditHistoryList();
+            history.applyingEdits();
+        } else {
+            Path filePath = Paths.get("src/main/resources/NecessaryFilesAndData/ProposalsFromMinisters/" + fileName + ".txt");
             try {
-                int n = Integer.parseInt(line);
-                if (n >= min && n <= max) return n;
-            } catch (NumberFormatException ignored) {}
-            System.out.println("Invalid input. Please type a number between " + min + " and " + max + ".");
+                Files.deleteIfExists(filePath);
+                System.out.println("File deleted successfully.");
+            } catch (Exception e) {
+                System.out.println("Could not delete file.");
+            }
         }
     }
 }
