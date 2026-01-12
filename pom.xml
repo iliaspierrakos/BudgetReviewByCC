@@ -13,7 +13,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
     <!-- Java -->
-    <maven.compiler.release>25</maven.compiler.release>
+    <maven.compiler.release>21</maven.compiler.release>
 
     <!-- JavaFX (one version for all javafx artifacts) -->
     <javafx.version>23.0.2</javafx.version>
@@ -112,7 +112,7 @@
         <artifactId>javafx-maven-plugin</artifactId>
         <version>0.0.8</version>
         <configuration>
-         
+
           <mainClass>Main.BudgetReviewFxMain</mainClass>
           <options>
             <option>--enable-native-access=javafx.graphics</option>

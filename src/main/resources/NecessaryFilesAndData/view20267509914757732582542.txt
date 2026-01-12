@@ -1,0 +1,3 @@
+Ministry of Interior 3000
+Ministry of Foreign Affairs 2000
+Ministry of National Defense 5000

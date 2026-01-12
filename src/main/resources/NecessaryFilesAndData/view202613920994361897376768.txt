@@ -1,0 +1,3 @@
+Ministry of Interior 1.000,50
+Ministry of Foreign Affairs 2.500
+Ministry of National Defense N/A

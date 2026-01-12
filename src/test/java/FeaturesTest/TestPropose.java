@@ -1,84 +1,106 @@
 package FeaturesTest;
 
-import UserFeatures.Propose;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Test;
-
 import java.io.File;
 import java.nio.file.Files;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.AfterEach;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import UserFeatures.Edit;
+import UserFeatures.EditHistoryList;
+import UserFeatures.Propose;
 
 public class TestPropose {
 
-    private static final String BASE_DIR =
-            "src/main/resources/NecessaryFilesAndData/ProposalsFromMinisters/";
+    private Propose propose;
+    private File proposalFile;
+
+    @BeforeEach
+    void setUp() {
+        propose = new Propose("Finance");
+        proposalFile = propose.getProposalFile();
+
+        // καθάρισμα αρχείου
+        if (proposalFile.exists()) {
+            proposalFile.delete();
+        }
+
+        // reset proposal state
+        Edit.history = new EditHistoryList();
+        Propose.sharedBalance = 1000;
+    }
 
     @AfterEach
-    void cleanup() throws Exception {
-        // Καθαρίζουμε test αρχεία για να μη συσσωρεύονται
-        File dir = new File(BASE_DIR);
-        if (dir.exists()) {
-            for (File f : dir.listFiles()) {
-                if (f.getName().startsWith("MinisterFor")) {
-                    Files.deleteIfExists(f.toPath());
-                }
-            }
+    void tearDown() {
+        if (proposalFile.exists()) {
+            proposalFile.delete();
         }
+        Edit.history.clear();
     }
 
     @Test
-    void testSubmitProposalAndReadBack() {
-        Propose propose = new Propose("Ministry of Health");
+    void testSubmitEditsProposalBlockCreatesFile() {
+        Edit e = new Edit("Ministry of Finance", "Increase", 100, "fixed");
+        Edit.history.addEdit(e);
 
-        propose.submitProposal("Increase hospital funding");
+        propose.submitEditsProposalBlock("Need more funds");
 
-        File proposalFile = propose.getProposalFile();
-        assertTrue(proposalFile.exists());
-
-        List<String> proposals = propose.getAllProposals();
-        assertEquals(1, proposals.size());
-        assertEquals("Increase hospital funding", proposals.get(0));
+        assertTrue(proposalFile.exists(), "Proposal file should exist");
     }
 
     @Test
-    void testMultipleProposalsAppended() {
-        Propose propose = new Propose("Ministry of Education");
+    void testProposalBlockStructureIsWritten() throws Exception {
+        Edit e = new Edit("Ministry of Finance", "Decrease", 50, "fixed");
+        Edit.history.addEdit(e);
 
-        propose.submitProposal("Renovate schools");
-        propose.submitProposal("Hire more teachers");
+        propose.submitEditsProposalBlock("Budget adjustment");
 
-        List<String> proposals = propose.getAllProposals();
+        List<String> lines = Files.readAllLines(proposalFile.toPath());
 
-        assertEquals(2, proposals.size());
-        assertTrue(proposals.contains("Renovate schools"));
-        assertTrue(proposals.contains("Hire more teachers"));
+        assertTrue(lines.stream().anyMatch(l -> l.startsWith("PROPOSAL|")));
+        assertTrue(lines.stream().anyMatch(l -> l.startsWith("EDIT|")));
+        assertTrue(lines.stream().anyMatch(l -> l.startsWith("REASON|Budget adjustment")));
+        assertTrue(lines.stream().anyMatch(l -> l.equals("ENDPROPOSAL")));
     }
 
     @Test
-    void testSubmitProposalRejectsEmptyText() {
-        Propose propose = new Propose("Ministry of Culture");
-
-        assertThrows(IllegalArgumentException.class,
-                () -> propose.submitProposal("   "));
+    void testSubmitEditsThrowsIfNoEdits() {
+        assertThrows(IllegalStateException.class, () ->
+                propose.submitEditsProposalBlock("Nothing to submit")
+        );
     }
 
     @Test
-    void testGetProposalFileWithoutMinistryNameFails() {
-        Propose propose = new Propose();
+    void testMultipleProposalBlocksAppend() throws Exception {
+        Edit.history.addEdit(
+                new Edit("Ministry of Finance", "Increase", 100, "fixed")
+        );
+        propose.submitEditsProposalBlock("First proposal");
 
-        assertThrows(IllegalStateException.class,
-                propose::getProposalFile);
+        Edit.history.clear();
+        Edit.history.addEdit(
+                new Edit("Ministry of Finance", "Decrease", 50, "fixed")
+        );
+        propose.submitEditsProposalBlock("Second proposal");
+
+        List<String> lines = Files.readAllLines(proposalFile.toPath());
+
+        long proposalCount = lines.stream()
+                .filter(l -> l.startsWith("PROPOSAL|"))
+                .count();
+
+        assertEquals(2, proposalCount);
     }
 
     @Test
-    void testSafeFileNameGeneration() {
-        Propose propose = new Propose("Ministry of Climate Crisis & Civil Protection");
-
-        File file = propose.getProposalFile();
-
-        // Δεν πρέπει να έχει κενά ή ειδικούς χαρακτήρες
-        assertTrue(file.getName().matches("MinisterFor[A-Za-z0-9]+\\.txt"));
+    void testProposalDirectoryExists() {
+        File dir = proposalFile.getParentFile();
+        assertTrue(dir.exists());
+        assertTrue(dir.isDirectory());
     }
 }
