@@ -170,3 +170,25 @@ Ministry of Health                                                          1.10
                                             ========== New Change ==========
 Ministry of Health                                                          1.000                1.200
 Ministry of Health                                                          1.200                1.000
+                                            ========== New Change ==========
+Ministry of Health                                                          1.000                1.100
+Ministry of Education                                                       2.000                2.200
+                                            ========== New Change ==========
+Ministry of Health                                                          1.000                  800
+                                            ========== New Change ==========
+Ministry of Health                                                          1.000                1.100
+                                            ========== New Change ==========
+Ministry of Health                                                          1.000                1.150
+Ministry of Health                                                          1.150                1.000
+                                            ========== New Change ==========
+Ministry of Health                                                          1.000                  800
+                                            ========== New Change ==========
+Ministry of Health                                                          1.000                1.150
+Ministry of Health                                                          1.150                1.000
+                                            ========== New Change ==========
+Ministry of Health                                                          1.000                1.100
+                                            ========== New Change ==========
+Ministry of Health                                                          1.100                1.050
+                                            ========== New Change ==========
+Ministry of Health                                                          1.000                1.200
+Ministry of Health                                                          1.200                1.000

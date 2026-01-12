@@ -1,12 +1,14 @@
 package FeaturesTest;
 
-import UserFeatures.Compare;
-import UserFeatures.Compare.CompareRow;
-import org.junit.jupiter.api.Test;
-
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Test;
+
+import UserFeatures.Compare;
+import UserFeatures.Compare.CompareRow;
 
 public class TestCompare {
 
@@ -49,5 +51,44 @@ public class TestCompare {
         // Assert
         assertNotNull(rows);
         assertTrue(rows.isEmpty(), "Invalid years should return empty list");
+    }
+    @Test
+    void testNullMinistryArrayReturnsEmptyList() {
+        List<CompareRow> rows =
+                Compare.getComparisonRowsForGui(-1, -1);
+
+        assertNotNull(rows);
+        assertTrue(rows.isEmpty());
+    }
+    @Test
+    void testComparisonRowsAreSortedByMinistryName() {
+        List<CompareRow> rows =
+                Compare.getComparisonRowsForGui(2025, 2026);
+
+        assertTrue(rows.size() > 1);
+
+        for (int i = 1; i < rows.size(); i++) {
+            assertTrue(
+                    rows.get(i - 1).getMinistry()
+                            .compareTo(rows.get(i).getMinistry()) <= 0,
+                    "Rows should be sorted alphabetically"
+            );
+        }
+    }
+    @Test
+    void testComparisonHandlesMissingMinistryInOneYear() {
+        List<CompareRow> rows =
+                Compare.getComparisonRowsForGui(2020, 2026);
+
+        assertNotNull(rows);
+        assertFalse(rows.isEmpty());
+
+        boolean hasDash =
+                rows.stream().anyMatch(r ->
+                        r.getFirstYearBudget().equals("-")
+                        || r.getSecondYearBudget().equals("-")
+                );
+
+        assertTrue(hasDash, "Missing ministry should produce '-'");
     }
 }
