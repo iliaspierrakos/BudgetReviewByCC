@@ -1,13 +1,11 @@
-// BulkEditDraftScreen.java
 package guiFolder;
 
-import UserFeatures.CreatingMinistries;
+import UserFeatures.DraftEditSession;
 import UserFeatures.Ministry;
 import UserManagement.CurrentSession;
 import UserManagement.MinistryMember;
 import UserManagement.User;
 import UserManagement.UserManager;
-import guiFolder.ProposeScreen;
 import javafx.animation.FadeTransition;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -16,19 +14,31 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.Label;
+import javafx.scene.control.SelectionMode;
+import javafx.scene.control.Separator;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
+import javafx.scene.control.TextFormatter;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
-import javafx.scene.layout.*;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.ColumnConstraints;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-
-
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * BulkEditDraftScreen
@@ -36,14 +46,11 @@ import java.util.List;
  * Minister-only screen that performs draft bulk edits.
  *
  * Rules:
- *  - Applies edits to DraftEditSession sandbox only.
- *  - Records edits into DraftEditSession history (via DraftEditSession.applyFixed).
- *  - Increase operations restricted by available draft balance (DraftBudgetBalanceProvider).
- *  - Sending/exporting proposal happens only from ProposeScreen.
- *
- * UI:
- *  - Main screen already matches BulkEditScreen.
- *  - Dialogs (Percentage All, Fixed All, Selected) are now styled/layout-identical to BulkEditScreen.
+ *  - Applies edits ONLY to DraftEditSession sandbox.
+ *  - DraftEditSession is the single source of truth for:
+ *      - sandbox budgets
+ *      - draft history
+ *      - draft balance
  */
 public class BulkEditDraftScreen {
 
@@ -104,10 +111,9 @@ public class BulkEditDraftScreen {
 
         CurrentSession.setUser(user);
 
-        // Ensure draft session exists (ProposeScreen usually initializes it)
+        // Ensure draft session exists
         if (!DraftEditSession.isInitialized()) {
-            DraftEditSession.resetFromCurrentBudgets();
-            CreatingMinistries.ministries2026 = DraftEditSession.getSandbox();
+            DraftEditSession.resetFromCurrent(0);
         }
 
         // ---------- Top bar ----------
@@ -294,7 +300,7 @@ public class BulkEditDraftScreen {
         return side;
     }
 
-    /** Clickable action card (same UI structure as BulkEditScreen). */
+    /** Clickable action card */
     private VBox actionCard(String title, String desc, String iconPath, Runnable onClick) {
         Node iconNode = safeIcon(iconPath, 34);
 
@@ -356,10 +362,10 @@ public class BulkEditDraftScreen {
     }
 
     /* =========================================================
-       DIALOGS (Draft) - UI matches BulkEditScreen
+       DIALOGS (Draft)
        ========================================================= */
 
-    /** Percentage Draft (All) - UI same as BulkEditScreen, logic uses sandbox + DraftBudgetBalanceProvider. */
+    /** Percentage Draft (All) - uses DraftEditSession.applyPercent so history keeps mode=percent. */
     private void showPercentageAllDialog(Stage parent, Label balanceChip) {
         Stage dialog = baseDialog(parent, "Percentage Draft (All)");
 
@@ -390,8 +396,8 @@ public class BulkEditDraftScreen {
         percentField.setPromptText("Percentage (e.g., 5)");
         percentField.setTextFormatter(positiveNumberFormatter());
 
-        Label balance = new Label("Available Balance: "
-                + Ministry.getFormattedBudget(DraftBudgetBalanceProvider.availableBalance()));
+        Label balance = new Label("Available Draft Balance: "
+                + Ministry.getFormattedBudget(DraftEditSession.getDraftBalance()));
         balance.getStyleClass().add("subtitle");
 
         Label info = new Label("Preview first, then Apply.");
@@ -427,8 +433,8 @@ public class BulkEditDraftScreen {
             if (pct <= 0) { error.setText("Percentage must be positive."); return; }
 
             boolean isIncrease = (typeGroup.getSelectedToggle() == incBtn);
-            if (!isIncrease) pct = -pct;
-            if (pct <= -100) { error.setText("Cannot decrease by 100% or more."); return; }
+            double signed = isIncrease ? pct : -pct;
+            if (signed <= -100) { error.setText("Cannot decrease by 100% or more."); return; }
 
             Ministry[] sandbox = DraftEditSession.getSandbox();
             ObservableList<PreviewRow> rows = FXCollections.observableArrayList();
@@ -438,7 +444,7 @@ public class BulkEditDraftScreen {
                 if (m == null) continue;
 
                 double oldB = m.getBudget();
-                double newB = oldB * (1 + pct / 100.0);
+                double newB = oldB * (1 + signed / 100.0);
 
                 if (newB < 0) { error.setText("Would create negative budget for: " + m.getMinistryName()); return; }
 
@@ -453,9 +459,9 @@ public class BulkEditDraftScreen {
                 ));
             }
 
-            double available = DraftBudgetBalanceProvider.availableBalance();
-            if (totalPositive > available) {
-                error.setText("Insufficient balance for this increase.");
+            double available = DraftEditSession.getDraftBalance();
+            if (totalPositive > available + 1e-9) {
+                error.setText("Insufficient draft balance for this increase.");
                 return;
             }
 
@@ -476,49 +482,37 @@ public class BulkEditDraftScreen {
             if (pct <= 0) { error.setText("Percentage must be positive."); return; }
 
             boolean isIncrease = (typeGroup.getSelectedToggle() == incBtn);
-            if (!isIncrease) pct = -pct;
-            if (pct <= -100) { error.setText("Cannot decrease by 100% or more."); return; }
+            double signed = isIncrease ? pct : -pct;
+            if (signed <= -100) { error.setText("Cannot decrease by 100% or more."); return; }
 
+            // Re-check affordability using current sandbox values
             Ministry[] sandbox = DraftEditSession.getSandbox();
             double totalPositive = 0;
-
             for (Ministry m : sandbox) {
                 if (m == null) continue;
-
                 double oldB = m.getBudget();
-                double newB = oldB * (1 + pct / 100.0);
-
+                double newB = oldB * (1 + signed / 100.0);
                 if (newB < 0) { error.setText("Would create negative budget for: " + m.getMinistryName()); return; }
-
                 double delta = newB - oldB;
                 if (delta > 0) totalPositive += delta;
             }
 
-            double available = DraftBudgetBalanceProvider.availableBalance();
-            if (totalPositive > available) {
-                error.setText("Insufficient balance for this increase.");
+            double available = DraftEditSession.getDraftBalance();
+            if (totalPositive > available + 1e-9) {
+                error.setText("Insufficient draft balance for this increase.");
                 return;
             }
 
+            double absPct = Math.abs(pct);
             for (Ministry m : sandbox) {
                 if (m == null) continue;
 
-                double oldB = m.getBudget();
-                double newB = oldB * (1 + pct / 100.0);
-                double delta = newB - oldB;
-                if (Math.abs(delta) < 1e-9) continue;
-
-                boolean inc = delta > 0;
-                double absDelta = Math.abs(delta);
-
-                String err = DraftEditSession.applyFixed(m.getMinistryName(), inc, absDelta);
+                String err = DraftEditSession.applyPercent(m.getMinistryName(), isIncrease, absPct);
                 if (err != null) { error.setText(err); return; }
-
-                DraftBudgetBalanceProvider.consumeIfIncrease(inc, absDelta);
             }
 
-            balance.setText("Available Balance: "
-                    + Ministry.getFormattedBudget(DraftBudgetBalanceProvider.availableBalance()));
+            balance.setText("Available Draft Balance: "
+                    + Ministry.getFormattedBudget(DraftEditSession.getDraftBalance()));
             balanceChip.setText("Draft Balance: " + Ministry.getFormattedBudget(DraftEditSession.getDraftBalance()));
             dialog.close();
         });
@@ -537,7 +531,7 @@ public class BulkEditDraftScreen {
         dialog.show();
     }
 
-    /** Fixed Amount Draft (All) - UI same as BulkEditScreen, logic uses sandbox + DraftBudgetBalanceProvider. */
+    /** Fixed Amount Draft (All) - uses DraftEditSession.applyFixed (mode=fixed). */
     private void showFixedAllDialog(Stage parent, Label balanceChip) {
         Stage dialog = baseDialog(parent, "Fixed Amount Draft (All)");
 
@@ -568,8 +562,8 @@ public class BulkEditDraftScreen {
         amountField.setPromptText("Amount (e.g., 50000)");
         amountField.setTextFormatter(positiveNumberFormatter());
 
-        Label balance = new Label("Available Balance: "
-                + Ministry.getFormattedBudget(DraftBudgetBalanceProvider.availableBalance()));
+        Label balance = new Label("Available Draft Balance: "
+                + Ministry.getFormattedBudget(DraftEditSession.getDraftBalance()));
         balance.getStyleClass().add("subtitle");
 
         Label info = new Label("Preview first, then Apply.");
@@ -607,13 +601,13 @@ public class BulkEditDraftScreen {
             if (amount <= 0) { error.setText("Amount must be positive."); return; }
 
             boolean isIncrease = (typeGroup.getSelectedToggle() == incBtn);
-            if (!isIncrease) amount = -amount;
+            double signed = isIncrease ? amount : -amount;
 
             Ministry[] sandbox = DraftEditSession.getSandbox();
 
             for (Ministry m : sandbox) {
                 if (m == null) continue;
-                if (m.getBudget() + amount < 0) {
+                if (m.getBudget() + signed < 0) {
                     error.setText("Would create negative budget for: " + m.getMinistryName());
                     return;
                 }
@@ -623,17 +617,17 @@ public class BulkEditDraftScreen {
             for (Ministry m : sandbox) if (m != null) count++;
             cachedCount[0] = count;
 
-            if (amount > 0) {
-                double totalCost = amount * count;
-                double available = DraftBudgetBalanceProvider.availableBalance();
-                if (totalCost > available) { error.setText("Insufficient balance."); return; }
+            if (signed > 0) {
+                double totalCost = signed * count;
+                double available = DraftEditSession.getDraftBalance();
+                if (totalCost > available + 1e-9) { error.setText("Insufficient draft balance."); return; }
             }
 
             ObservableList<PreviewRow> rows = FXCollections.observableArrayList();
             for (Ministry m : sandbox) {
                 if (m == null) continue;
                 double oldB = m.getBudget();
-                double newB = oldB + amount;
+                double newB = oldB + signed;
 
                 rows.add(new PreviewRow(
                         m.getMinistryName(),
@@ -660,39 +654,37 @@ public class BulkEditDraftScreen {
             if (amount <= 0) { error.setText("Amount must be positive."); return; }
 
             boolean isIncrease = (typeGroup.getSelectedToggle() == incBtn);
-            if (!isIncrease) amount = -amount;
+            double signed = isIncrease ? amount : -amount;
 
             Ministry[] sandbox = DraftEditSession.getSandbox();
 
             for (Ministry m : sandbox) {
                 if (m == null) continue;
-                if (m.getBudget() + amount < 0) {
+                if (m.getBudget() + signed < 0) {
                     error.setText("Would create negative budget for: " + m.getMinistryName());
                     return;
                 }
             }
 
-            if (amount > 0) {
-                double totalCost = amount * cachedCount[0];
-                double available = DraftBudgetBalanceProvider.availableBalance();
-                if (totalCost > available) { error.setText("Insufficient balance."); return; }
+            if (signed > 0) {
+                double totalCost = signed * cachedCount[0];
+                double available = DraftEditSession.getDraftBalance();
+                if (totalCost > available + 1e-9) { error.setText("Insufficient draft balance."); return; }
             }
 
             for (Ministry m : sandbox) {
                 if (m == null) continue;
-                if (Math.abs(amount) < 1e-9) continue;
+                if (Math.abs(signed) < 1e-9) continue;
 
-                boolean inc = amount > 0;
-                double abs = Math.abs(amount);
+                boolean inc = signed > 0;
+                double abs = Math.abs(signed);
 
                 String err = DraftEditSession.applyFixed(m.getMinistryName(), inc, abs);
                 if (err != null) { error.setText(err); return; }
-
-                DraftBudgetBalanceProvider.consumeIfIncrease(inc, abs);
             }
 
-            balance.setText("Available Balance: "
-                    + Ministry.getFormattedBudget(DraftBudgetBalanceProvider.availableBalance()));
+            balance.setText("Available Draft Balance: "
+                    + Ministry.getFormattedBudget(DraftEditSession.getDraftBalance()));
             balanceChip.setText("Draft Balance: " + Ministry.getFormattedBudget(DraftEditSession.getDraftBalance()));
             dialog.close();
         });
@@ -711,7 +703,7 @@ public class BulkEditDraftScreen {
         dialog.show();
     }
 
-    /** Selected Ministries Draft - UI same as BulkEditScreen, logic uses sandbox + DraftBudgetBalanceProvider. */
+    /** Selected Ministries Draft - uses applyPercent for percent mode, applyFixed for fixed mode. */
     private void showSelectedMinistriesDialog(Stage parent, Label balanceChip) {
         Stage dialog = baseDialog(parent, "Draft Selected Ministries");
 
@@ -725,8 +717,8 @@ public class BulkEditDraftScreen {
         Label subtitle = new Label("Select ministries, choose mode, preview, then apply (draft).");
         subtitle.getStyleClass().add("subtitle");
 
-        Label balance = new Label("Available Balance: "
-                + Ministry.getFormattedBudget(DraftBudgetBalanceProvider.availableBalance()));
+        Label balance = new Label("Available Draft Balance: "
+                + Ministry.getFormattedBudget(DraftEditSession.getDraftBalance()));
         balance.getStyleClass().add("subtitle");
         balance.setStyle("-fx-text-fill: rgba(212,175,55,0.85);");
 
@@ -849,8 +841,8 @@ public class BulkEditDraftScreen {
 
             boolean isPercent = (modeGroup.getSelectedToggle() == percentBtn);
             boolean isIncrease = (typeGroup.getSelectedToggle() == incBtn);
-            double signed = isIncrease ? value : -value;
 
+            double signed = isIncrease ? value : -value;
             if (isPercent && signed <= -100) {
                 error.setText("Cannot decrease by 100% or more.");
                 return;
@@ -882,9 +874,9 @@ public class BulkEditDraftScreen {
                 ));
             }
 
-            double available = DraftBudgetBalanceProvider.availableBalance();
-            if (totalPositive > available) {
-                error.setText("Insufficient balance for this increase.");
+            double available = DraftEditSession.getDraftBalance();
+            if (totalPositive > available + 1e-9) {
+                error.setText("Insufficient draft balance for this increase.");
                 return;
             }
 
@@ -913,10 +905,11 @@ public class BulkEditDraftScreen {
 
             boolean isPercent = (modeGroup.getSelectedToggle() == percentBtn);
             boolean isIncrease = (typeGroup.getSelectedToggle() == incBtn);
-            double signed = isIncrease ? value : -value;
 
+            double signed = isIncrease ? value : -value;
             if (isPercent && signed <= -100) { error.setText("Cannot decrease by 100% or more."); return; }
 
+            // Safety re-check against current draft balance
             double totalPositive = 0;
             for (MinistryPickRow r : selected) {
                 Ministry m = DraftEditSession.getSandbox()[r.getIndex()];
@@ -931,30 +924,24 @@ public class BulkEditDraftScreen {
                 if (delta > 0) totalPositive += delta;
             }
 
-            double available = DraftBudgetBalanceProvider.availableBalance();
-            if (totalPositive > available) { error.setText("Insufficient balance for this increase."); return; }
+            double available = DraftEditSession.getDraftBalance();
+            if (totalPositive > available + 1e-9) { error.setText("Insufficient draft balance for this increase."); return; }
 
             for (MinistryPickRow r : selected) {
                 Ministry m = DraftEditSession.getSandbox()[r.getIndex()];
                 if (m == null) continue;
 
-                double oldB = m.getBudget();
-                double newB = isPercent ? oldB * (1 + signed / 100.0) : oldB + signed;
-                double delta = newB - oldB;
-
-                if (Math.abs(delta) < 1e-9) continue;
-
-                boolean inc = delta > 0;
-                double absDelta = Math.abs(delta);
-
-                String err = DraftEditSession.applyFixed(m.getMinistryName(), inc, absDelta);
-                if (err != null) { error.setText(err); return; }
-
-                DraftBudgetBalanceProvider.consumeIfIncrease(inc, absDelta);
+                if (isPercent) {
+                    String err = DraftEditSession.applyPercent(m.getMinistryName(), isIncrease, value);
+                    if (err != null) { error.setText(err); return; }
+                } else {
+                    String err = DraftEditSession.applyFixed(m.getMinistryName(), isIncrease, value);
+                    if (err != null) { error.setText(err); return; }
+                }
             }
 
-            balance.setText("Available Balance: "
-                    + Ministry.getFormattedBudget(DraftBudgetBalanceProvider.availableBalance()));
+            balance.setText("Available Draft Balance: "
+                    + Ministry.getFormattedBudget(DraftEditSession.getDraftBalance()));
             balanceChip.setText("Draft Balance: " + Ministry.getFormattedBudget(DraftEditSession.getDraftBalance()));
             dialog.close();
         });
@@ -1013,7 +1000,6 @@ public class BulkEditDraftScreen {
        TABLE HELPERS
        ========================================================= */
 
-    /** Preview table with horizontal scroll support (same as BulkEditScreen). */
     private TableView<PreviewRow> buildPreviewTable() {
         TableView<PreviewRow> table = new TableView<>();
         table.getStyleClass().addAll("table-view", "budget-table");
@@ -1045,7 +1031,6 @@ public class BulkEditDraftScreen {
         return table;
     }
 
-    /** Formats delta with +/- */
     private String formatDelta(double delta) {
         String s = Ministry.getFormattedBudget(Math.abs(delta));
         if (delta > 0) return "+" + s;
@@ -1053,7 +1038,6 @@ public class BulkEditDraftScreen {
         return "0";
     }
 
-    /** Restricts input to positive numbers (up to 2 decimals). */
     private TextFormatter<String> positiveNumberFormatter() {
         return new TextFormatter<>(change -> {
             String t = change.getControlNewText().trim();
@@ -1063,7 +1047,6 @@ public class BulkEditDraftScreen {
         });
     }
 
-    /** Validates positive numeric string. */
     private boolean isValidPositiveNumber(String txt) {
         if (txt == null) return false;
         txt = txt.trim();
@@ -1121,29 +1104,5 @@ public class BulkEditDraftScreen {
             stage.setX(x);
             stage.setY(y);
         }
-    }
-
-    /* =========================================================
-       BALANCE PROVIDER (Draft constraint)
-       ========================================================= */
-
-    /**
-     * Centralizes the "available funds" rule for draft mode.
-     * Uses Edit.balance as the shared wallet, then syncs DraftEditSession draft balance.
-     */
-    static final class DraftBudgetBalanceProvider {
-        private DraftBudgetBalanceProvider() {}
-
-        static double availableBalance() {
-            return UserFeatures.Edit.balance;
-        }
-
-       static void consumeIfIncrease(boolean isIncrease, double amount) {
-            if (!isIncrease) return;
-
-            // Consume from the shared wallet.
-            UserFeatures.Edit.balance -= amount;
-        }
-
     }
 }
