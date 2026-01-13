@@ -1,27 +1,42 @@
 package guiFolder;
 
-import UserFeatures.Edit;
+import java.util.Arrays;
+
+import UserFeatures.DraftEditSession;
+import UserFeatures.DraftProposalExporter;
 import UserFeatures.Ministry;
 import UserManagement.CurrentSession;
 import UserManagement.User;
 import UserManagement.UserManager;
-
 import javafx.animation.FadeTransition;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Scene;
 import javafx.scene.Node;
-import javafx.scene.control.*;
+import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.Separator;
+import javafx.scene.control.TextField;
+import javafx.scene.control.TextFormatter;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
-import javafx.scene.layout.*;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.ColumnConstraints;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-
-import java.util.Arrays;
 
 public class MinisterVirtualEditScreen {
 
@@ -39,9 +54,8 @@ public class MinisterVirtualEditScreen {
 
         // init draft session if not initialized
         if (!DraftEditSession.isInitialized()) {
-            // starting balance: you can choose 0, or Edit.balance snapshot.
-            // If ministers should not use official Edit.balance, set to 0.
-            DraftEditSession.resetFromCurrent(Edit.balance);
+            // consistent rule: start from 0 balance (reallocation-only)
+            DraftEditSession.resetFromCurrent(0);
         }
 
         Label appLogo = new Label("BudgetReviewByCC");
@@ -93,7 +107,7 @@ public class MinisterVirtualEditScreen {
                 "Bulk Draft Edit",
                 "Apply changes to multiple ministries (draft).",
                 "/icons/bulk.png",
-                () -> new BulkEditDraftScreen(user, userManager).show(stage) // uses draft session conceptually
+                () -> new BulkEditDraftScreen(user, userManager).show(stage)
         );
         bulkEdit.getStyleClass().add("primary-action");
 
@@ -121,14 +135,11 @@ public class MinisterVirtualEditScreen {
         );
         reset.getStyleClass().addAll("danger-action");
 
-        // Layout: 2 rows, 2 cols 
         grid.add(simpleEdit, 0, 0);
         grid.add(bulkEdit,   1, 0);
         grid.add(history,    0, 1);
         grid.add(send,       1, 1);
-
-        // extra row for reset 
-        grid.add(reset, 0, 2);
+        grid.add(reset,      0, 2);
         GridPane.setColumnSpan(reset, 2);
 
         VBox content = new VBox(16, heroCard, new Separator(), grid);
@@ -309,8 +320,12 @@ public class MinisterVirtualEditScreen {
             errorLabel.setText("");
             if (n != null) {
                 int idx = DraftEditSession.findIndexByName(n);
-                double budget = DraftEditSession.getSandbox()[idx].getBudget();
-                currentBudgetLabel.setText("Current Draft Budget: " + Ministry.getFormattedBudget(budget));
+                if (idx >= 0 && DraftEditSession.getSandbox()[idx] != null) {
+                    double budget = DraftEditSession.getSandbox()[idx].getBudget();
+                    currentBudgetLabel.setText("Current Draft Budget: " + Ministry.getFormattedBudget(budget));
+                } else {
+                    currentBudgetLabel.setText("Current Draft Budget: —");
+                }
             } else {
                 currentBudgetLabel.setText("Current Draft Budget: —");
             }
@@ -336,23 +351,9 @@ public class MinisterVirtualEditScreen {
             String err = DraftEditSession.applyFixed(ministry, isIncrease, amount);
             if (err != null) { errorLabel.setText(err); return; }
 
-            // refresh chips/labels
             balanceChip.setText("Draft Balance: " + Ministry.getFormattedBudget(DraftEditSession.getDraftBalance()));
             editsChip.setText("Draft edits: " + DraftEditSession.getHistory().size());
             balanceLabel.setText("Draft Balance: " + Ministry.getFormattedBudget(DraftEditSession.getDraftBalance()));
-
-            int idx = DraftEditSession.findIndexByName(ministry);
-            double newBudget = DraftEditSession.getSandbox()[idx].getBudget();
-
-            showThemedAlert(
-                    Alert.AlertType.INFORMATION,
-                    "Draft Applied",
-                    "Draft budget updated (NOT official)",
-                    "Ministry: " + ministry + "\n" +
-                            "Action: " + (isIncrease ? "Increase" : "Decrease") + " by " + Ministry.getFormattedBudget(amount) + "\n" +
-                            "New Draft Budget: " + Ministry.getFormattedBudget(newBudget) + "\n" +
-                            "Draft Balance: " + Ministry.getFormattedBudget(DraftEditSession.getDraftBalance())
-            );
 
             dialog.close();
         });
@@ -381,7 +382,7 @@ public class MinisterVirtualEditScreen {
         confirm.initModality(Modality.WINDOW_MODAL);
         confirm.setTitle("Reset Draft");
         confirm.setHeaderText("Discard draft edits?");
-        confirm.setContentText("This will restore draft sandbox from current official budgets.");
+        confirm.setContentText("This will restore draft sandbox from current loaded budgets.");
 
         var css = getClass().getResource("/css/DarkTheme.css");
         if (css != null) confirm.getDialogPane().getStylesheets().add(css.toExternalForm());
@@ -389,24 +390,12 @@ public class MinisterVirtualEditScreen {
         confirm.showAndWait().ifPresent(btn -> {
             if (btn != ButtonType.OK) return;
 
-            DraftEditSession.resetFromCurrent(Edit.balance);
+            DraftEditSession.resetFromCurrent(0);
             balanceChip.setText("Draft Balance: " + Ministry.getFormattedBudget(DraftEditSession.getDraftBalance()));
             editsChip.setText("Draft edits: " + DraftEditSession.getHistory().size());
 
             show(stage);
         });
-    }
-
-    private void showThemedAlert(Alert.AlertType type, String title, String header, String content) {
-        Alert alert = new Alert(type);
-        alert.setTitle(title);
-        alert.setHeaderText(header);
-        alert.setContentText(content);
-
-        var css = getClass().getResource("/css/DarkTheme.css");
-        if (css != null) alert.getDialogPane().getStylesheets().add(css.toExternalForm());
-
-        alert.showAndWait();
     }
 
     private static void applyScenePreserveWindow(Stage stage, Scene scene, String title) {
