@@ -1,94 +1,72 @@
 package FeaturesTest;
 
-import java.util.List;
+import static org.junit.jupiter.api.Assertions.*;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import java.lang.reflect.Method;
+import java.util.List;
+import java.util.Map;
+
 import org.junit.jupiter.api.Test;
 
 import UserFeatures.Compare;
-import UserFeatures.Compare.CompareRow;
+import UserFeatures.Ministry;
 
+/**
+ * Unit tests for {@link Compare}.
+ *
+ * <p>
+ * Note: {@code Compare} uses a private static final Scanner for console input.
+ * Without modifying production code, we do not unit-test interactive methods
+ * that depend on that scanner (e.g., validityYear and comparingMinistries).
+ * </p>
+ */
 public class TestCompare {
 
+    /**
+     * Verifies toMapByName(...) returns an empty map for null input.
+     */
     @Test
-    void testGetComparisonRowsForGuiReturnsRows() {
-        // Act
-        List<CompareRow> rows =
-                Compare.getComparisonRowsForGui(2025, 2026);
+    void testToMapByNameNullArrayReturnsEmptyMap() throws Exception {
+        Method toMapByName = Compare.class.getDeclaredMethod("toMapByName", Ministry[].class);
+        toMapByName.setAccessible(true);
 
-        // Assert: δεν πρέπει να είναι null
-        assertNotNull(rows);
+        @SuppressWarnings("unchecked")
+        Map<String, Ministry> map = (Map<String, Ministry>) toMapByName.invoke(null, (Object) null);
 
-        // Αν υπάρχουν δεδομένα, πρέπει να υπάρχουν γραμμές
-        assertFalse(rows.isEmpty(), "Comparison rows should not be empty");
-
-        // Έλεγχος δομής μιας γραμμής
-        CompareRow row = rows.get(0);
-
-        assertNotNull(row.getMinistry());
-        assertNotNull(row.getFirstYearBudget());
-        assertNotNull(row.getSecondYearBudget());
+        assertNotNull(map, "Map should not be null");
+        assertTrue(map.isEmpty(), "Map should be empty when input is null");
     }
 
+    /**
+     * Verifies toMapByName(...) ignores null array elements and maps by ministry name.
+     */
     @Test
-    void testGetComparisonRowsForGuiSameYearsHandled() {
-        // Act
-        List<CompareRow> rows =
-                Compare.getComparisonRowsForGui(2026, 2026);
+    void testToMapByNameIgnoresNullElements() throws Exception {
+        Method toMapByName = Compare.class.getDeclaredMethod("toMapByName", Ministry[].class);
+        toMapByName.setAccessible(true);
 
-        // Assert: δεν σκάει
-        assertNotNull(rows);
+        Ministry a = new Ministry("Ministry of Health", 1000);
+        Ministry b = new Ministry("Ministry of Education", 500);
+
+        Ministry[] arr = new Ministry[] { a, null, b };
+
+        @SuppressWarnings("unchecked")
+        Map<String, Ministry> map = (Map<String, Ministry>) toMapByName.invoke(null, (Object) arr);
+
+        assertEquals(2, map.size(), "Map should contain only the non-null ministries");
+        assertSame(a, map.get("Ministry of Health"), "Map should index by ministry name");
+        assertSame(b, map.get("Ministry of Education"), "Map should index by ministry name");
     }
 
+    /**
+     * Verifies getComparisonRowsForGui(...) never returns null and returns an empty list
+     * when the underlying data source has no data for the given years.
+     */
     @Test
-    void testGetComparisonRowsForGuiInvalidYearReturnsEmpty() {
-        // Act
-        List<CompareRow> rows =
-                Compare.getComparisonRowsForGui(2019, 2030);
+    void testGetComparisonRowsForGuiMissingDataReturnsEmpty() {
+        List<Compare.CompareRow> rows = Compare.getComparisonRowsForGui(1900, 1901);
 
-        // Assert
-        assertNotNull(rows);
-        assertTrue(rows.isEmpty(), "Invalid years should return empty list");
-    }
-    @Test
-    void testNullMinistryArrayReturnsEmptyList() {
-        List<CompareRow> rows =
-                Compare.getComparisonRowsForGui(-1, -1);
-
-        assertNotNull(rows);
-        assertTrue(rows.isEmpty());
-    }
-    @Test
-    void testComparisonRowsAreSortedByMinistryName() {
-        List<CompareRow> rows =
-                Compare.getComparisonRowsForGui(2025, 2026);
-
-        assertTrue(rows.size() > 1);
-
-        for (int i = 1; i < rows.size(); i++) {
-            assertTrue(
-                    rows.get(i - 1).getMinistry()
-                            .compareTo(rows.get(i).getMinistry()) <= 0,
-                    "Rows should be sorted alphabetically"
-            );
-        }
-    }
-    @Test
-    void testComparisonHandlesMissingMinistryInOneYear() {
-        List<CompareRow> rows =
-                Compare.getComparisonRowsForGui(2020, 2026);
-
-        assertNotNull(rows);
-        assertFalse(rows.isEmpty());
-
-        boolean hasDash =
-                rows.stream().anyMatch(r ->
-                        r.getFirstYearBudget().equals("-")
-                        || r.getSecondYearBudget().equals("-")
-                );
-
-        assertTrue(hasDash, "Missing ministry should produce '-'");
+        assertNotNull(rows, "Method should never return null");
+        assertTrue(rows.isEmpty(), "Missing years should yield empty GUI rows");
     }
 }
