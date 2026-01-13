@@ -4,7 +4,6 @@ import UserFeatures.Compare;
 import UserFeatures.Compare.CompareRow;
 import UserManagement.User;
 import UserManagement.UserManager;
-
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -31,8 +30,8 @@ import javafx.stage.Stage;
  * JavaFX screen for comparing ministry budgets between two years.
  * (UI improved – logic untouched)
  *
- * ✔ Adds Δ column (Second - First) with robust parsing for EU/US formatted numbers.
- * ✔ Adds hero/header + more "dashboard" layout (pure UI).
+ *  Adds Deviation column (Second - First) with robust parsing for EU/US formatted numbers.
+ *  Adds hero/header + more "dashboard" layout (pure UI).
  */
 public class CompareScreen {
 
@@ -47,7 +46,7 @@ public class CompareScreen {
     public void show(Stage stage) {
 
         // =========================
-        // Window state snapshot (so it doesn't jump/resize)
+        // Window state snapshot 
         // =========================
         final boolean wasMaximized = stage.isMaximized();
         final boolean wasFullScreen = stage.isFullScreen();
@@ -146,7 +145,7 @@ public class CompareScreen {
         TableColumn<CompareRow, String> secondCol = new TableColumn<>("Second Year");
         secondCol.setCellValueFactory(cd -> new SimpleStringProperty(cd.getValue().getSecondYearBudget()));
 
-        //  Δ = Second - First (robust parsing)
+        //  Deviation = Second - First (robust parsing)
         TableColumn<CompareRow, String> deltaCol = new TableColumn<>("Deviation = Second Year − First Year");
         deltaCol.setCellValueFactory(cd -> {
             CompareRow r = cd.getValue();

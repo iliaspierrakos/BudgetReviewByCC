@@ -41,51 +41,34 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 
 /**
- * GovernorCheckScreen
+ * <h1>GovernorCheckScreen</h1>
  *
- * <p>JavaFX screen that allows the Governor to review, accept, or reject
- * budget proposals submitted by ministers via text files stored on disk.</p>
- *
- * <h2>Supported proposal formats</h2>
- * <p>This screen supports the current "human-readable" proposal format:</p>
- * <pre>
- * MINISTER PROPOSAL
- * From: 1
- * Submitted: 2026-01-10T16:35:39.148120300
- *
- * Draft edits:
- * Ministry of Climate Crisis and Civil Protection Decreased by 2.000 fixed
- * </pre>
- *
- * <p>It also supports machine-readable edit lines if present:</p>
- * <pre>
- * EDIT|Ministry of Health|Increase|2000|fixed
- * </pre>
- *
- * <h2>Behavior</h2>
- * <ul>
- *   <li>Lists proposals from {@link #PROPOSALS_DIR} (e.g. files starting with {@code proposal_}).</li>
- *   <li>Shows a preview of all draft edits in a table (right side).</li>
- *   <li>Accept applies all edits to the real budgets via {@link Edit#applyEdit(Edit, boolean, boolean)}
- *       and deletes the proposal file.</li>
- *   <li>Reject deletes the proposal file without applying changes.</li>
- *   <li>Accept is disabled when no valid edits are found.</li>
- * </ul>
- *
- * <h2>UI Note (Scroll behavior)</h2>
  * <p>
- * The right-side edits table is configured to always be scrollable when rows exceed the available
- * height. This is achieved by:
+ * JavaFX inbox screen for the Governor/Prime Minister to review minister proposals
+ * stored under {@code ProposalsFromMinisters/}. A proposal is displayed, parsed into
+ * draft edits, and can be either accepted (applied to the official budgets) or rejected
+ * (deleted without applying).
  * </p>
+ *
+ * <h2>Proposal format compatibility</h2>
  * <ul>
- *   <li>Allowing the table and its parent cards to be compressible: {@code setMinHeight(0)}</li>
- *   <li>Letting VBox allocate remaining height to the table: {@code VBox.setVgrow(editsTable, Priority.ALWAYS)}</li>
- *   <li>Letting the overall center row fill remaining space: {@code VBox.setVgrow(centerRow, Priority.ALWAYS)}</li>
+ *   <li>Human-readable lines under {@code Draft edits:} (legacy/loose parsing).</li>
+ *   <li>Machine-readable lines in exact format:
+ *     {@code EDIT|<ministry>|<Increase/Decrease>|<amount>|<fixed/percent>}</li>
  * </ul>
+ *
+ * <h2>Important parsing rule</h2>
+ * <p>
+ * If a proposal file contains any {@code EDIT|...} lines, this screen will parse and use
+ * <b>only</b> those machine-readable edits. The human-readable draft section will be ignored
+ * to prevent duplicate entries in the UI table.
+ * </p>
  */
 public class GovernorCheckScreen {
 
-    /** Directory containing incoming proposal files. */
+    /**
+     * The proposals directory (classpath/resources location used by the exporter).
+     */
     private static final Path PROPOSALS_DIR = Paths.get(
             "src/main/resources/NecessaryFilesAndData/ProposalsFromMinisters"
     );
@@ -94,10 +77,10 @@ public class GovernorCheckScreen {
     private final UserManager userManager;
 
     /**
-     * Constructs the Governor proposal review screen.
+     * Creates a new Governor proposals inbox screen.
      *
-     * @param user the currently authenticated user (Governor)
-     * @param userManager the application user manager
+     * @param user the active user
+     * @param userManager application user manager
      */
     public GovernorCheckScreen(User user, UserManager userManager) {
         this.user = user;
@@ -105,17 +88,25 @@ public class GovernorCheckScreen {
     }
 
     /**
-     * Displays the Governor proposal review screen.
+     * Builds and displays the proposals inbox on the given stage.
      *
-     * <p>This method builds the JavaFX scene, loads proposal rows, binds
-     * selection listeners, and wires up Accept/Reject actions.</p>
+     * <p>
+     * The screen lists proposals, shows a parsed preview with edits and reasoning,
+     * and allows accepting or rejecting a proposal.
+     * </p>
      *
-     * @param stage the JavaFX stage to render onto
+     * @param stage the primary application stage
      */
     public void show(Stage stage) {
         CurrentSession.setUser(user);
 
-        // ---------- Top bar ----------
+        final boolean wasMaximized = stage.isMaximized();
+        final boolean wasFullScreen = stage.isFullScreen();
+        final double prevW = stage.getWidth();
+        final double prevH = stage.getHeight();
+        final double prevX = stage.getX();
+        final double prevY = stage.getY();
+
         Label appLogo = new Label("BudgetReviewByCC");
         appLogo.getStyleClass().add("app-logo");
 
@@ -127,7 +118,6 @@ public class GovernorCheckScreen {
         topBar.setAlignment(Pos.CENTER_LEFT);
         topBar.setPadding(new Insets(14, 18, 14, 18));
 
-        // ---------- Header ----------
         Label title = new Label("Governor • Proposals Inbox");
         title.getStyleClass().add("title");
 
@@ -139,13 +129,10 @@ public class GovernorCheckScreen {
         heroCard.setMaxWidth(Double.MAX_VALUE);
         heroCard.setMinHeight(Region.USE_PREF_SIZE);
 
-        // ---------- Left: proposals list ----------
         TableView<FileRow> filesTable = new TableView<>();
         filesTable.getStyleClass().addAll("budget-table");
         filesTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         filesTable.setFixedCellSize(44);
-
-        // good resizing & scroll behaviors in split layouts
         filesTable.setMinHeight(0);
         filesTable.setMaxHeight(Double.MAX_VALUE);
 
@@ -177,14 +164,11 @@ public class GovernorCheckScreen {
         VBox listCard = new VBox(12, leftHeader, filesTable);
         listCard.getStyleClass().addAll("card", "table-card");
         listCard.setPadding(new Insets(14));
-
-        //  must allow VBox to shrink/grow this card
         listCard.setMinHeight(0);
         listCard.setMaxHeight(Double.MAX_VALUE);
 
         VBox.setVgrow(filesTable, Priority.ALWAYS);
 
-        // ---------- Right: preview ----------
         Label selectedLabel = new Label("No proposal selected.");
         selectedLabel.getStyleClass().add("subtitle");
 
@@ -195,8 +179,6 @@ public class GovernorCheckScreen {
         editsTable.getStyleClass().addAll("budget-table", "proposal-table");
         editsTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         editsTable.setFixedCellSize(42);
-
-        //  do NOT pin prefHeight; allow VBox to allocate height
         editsTable.setMinHeight(0);
         editsTable.setMaxHeight(Double.MAX_VALUE);
 
@@ -218,7 +200,6 @@ public class GovernorCheckScreen {
 
         editsTable.getColumns().addAll(cAction, cMin, cType, cAmount, cRaw);
 
-        // Colorize Increase/Decrease
         cAction.setCellFactory(col -> new TableCell<>() {
             @Override
             protected void updateItem(String item, boolean empty) {
@@ -276,14 +257,11 @@ public class GovernorCheckScreen {
         VBox previewCard = new VBox(12, selectedLabel, metaRow, editsTable, reasonTitle, reasonArea, error, actions);
         previewCard.getStyleClass().add("card");
         previewCard.setPadding(new Insets(14));
-
-        //  critical: allow this card to be resized so the table can scroll
         previewCard.setMinHeight(0);
         previewCard.setMaxHeight(Double.MAX_VALUE);
 
         VBox.setVgrow(editsTable, Priority.ALWAYS);
 
-        // ---------- Footer ----------
         Button backBtn = new Button("⟵ Back");
         backBtn.getStyleClass().addAll("button", "subtle");
         backBtn.setOnAction(e -> new ViewEditBudgetScreen(user, userManager).show(stage));
@@ -293,13 +271,11 @@ public class GovernorCheckScreen {
         footer.setPadding(new Insets(12, 18, 18, 18));
         footer.setMinHeight(Region.USE_PREF_SIZE);
 
-        // ---------- Layout ----------
         HBox centerRow = new HBox(16, listCard, previewCard);
         centerRow.setPadding(new Insets(18));
         HBox.setHgrow(listCard, Priority.ALWAYS);
         HBox.setHgrow(previewCard, Priority.ALWAYS);
 
-        // critical: centerRow must consume remaining vertical space
         VBox center = new VBox(14, heroCard, centerRow);
         VBox.setVgrow(centerRow, Priority.ALWAYS);
 
@@ -308,15 +284,41 @@ public class GovernorCheckScreen {
         root.setCenter(center);
         root.setBottom(footer);
 
-        Scene scene = new Scene(root, 1180, 760);
-        var css = getClass().getResource("/css/DarkTheme.css");
-        if (css != null) scene.getStylesheets().add(css.toExternalForm());
+        Scene scene = stage.getScene();
+        if (scene == null) {
+            scene = new Scene(
+                    root,
+                    stage.getWidth() > 0 ? stage.getWidth() : 1180,
+                    stage.getHeight() > 0 ? stage.getHeight() : 760
+            );
+            var cssUrl = getClass().getResource("/css/DarkTheme.css");
+            if (cssUrl != null) scene.getStylesheets().add(cssUrl.toExternalForm());
+            stage.setScene(scene);
+        } else {
+            scene.setRoot(root);
+            var cssUrl = getClass().getResource("/css/DarkTheme.css");
+            if (cssUrl != null) {
+                String css = cssUrl.toExternalForm();
+                if (!scene.getStylesheets().contains(css)) scene.getStylesheets().add(css);
+            }
+        }
 
-        stage.setScene(scene);
         stage.setTitle("Governor • Proposals");
         stage.show();
 
-        // ---------- Data bindings ----------
+        if (wasFullScreen) {
+            stage.setFullScreen(true);
+        } else if (wasMaximized) {
+            stage.setMaximized(true);
+        } else {
+            if (prevW > 0 && prevH > 0) {
+                stage.setWidth(prevW);
+                stage.setHeight(prevH);
+                stage.setX(prevX);
+                stage.setY(prevY);
+            }
+        }
+
         ObservableList<FileRow> rows = FXCollections.observableArrayList();
         ObservableList<EditRow> editRows = FXCollections.observableArrayList();
         editsTable.setItems(editRows);
@@ -340,7 +342,6 @@ public class GovernorCheckScreen {
 
         refreshBtn.setOnAction(e -> reload.run());
 
-        // selection -> parse file -> preview
         filesTable.getSelectionModel().selectedItemProperty().addListener((obs, ov, row) -> {
             error.setText("");
 
@@ -372,12 +373,10 @@ public class GovernorCheckScreen {
             }
         });
 
-        // convenience delete key -> reject
         filesTable.setOnKeyPressed(ev -> {
             if (ev.getCode() == KeyCode.DELETE) rejectBtn.fire();
         });
 
-        // Accept
         acceptBtn.setOnAction(e -> {
             error.setText("");
             FileRow selected = filesTable.getSelectionModel().getSelectedItem();
@@ -398,7 +397,6 @@ public class GovernorCheckScreen {
             }
         });
 
-        // Reject
         rejectBtn.setOnAction(e -> {
             error.setText("");
             FileRow selected = filesTable.getSelectionModel().getSelectedItem();
@@ -419,7 +417,6 @@ public class GovernorCheckScreen {
             }
         });
 
-        // initial load
         reload.run();
 
         FadeTransition ft = new FadeTransition(Duration.millis(220), root);
@@ -428,10 +425,14 @@ public class GovernorCheckScreen {
         ft.play();
     }
 
-    /* =========================================================
-       Loading proposals
-       ========================================================= */
-
+    /**
+     * Loads proposal files from disk and maps them into table rows.
+     *
+     * <p>Files must end with {@code .txt} and contain {@code proposal} in the name,
+     * matching the exporter/inbox filtering convention.</p>
+     *
+     * @return sorted list of proposal file rows (newest first)
+     */
     private List<FileRow> loadProposalRows() {
         try {
             if (!Files.exists(PROPOSALS_DIR)) return new ArrayList<>();
@@ -455,6 +456,12 @@ public class GovernorCheckScreen {
         }
     }
 
+    /**
+     * Builds a table row for a single proposal file by reading its metadata from content.
+     *
+     * @param file proposal file path
+     * @return resolved file row (best-effort)
+     */
     private FileRow buildFileRow(Path file) {
         try {
             List<String> lines = Files.readAllLines(file, StandardCharsets.UTF_8);
@@ -467,10 +474,13 @@ public class GovernorCheckScreen {
         }
     }
 
-    /* =========================================================
-       Accept / Reject
-       ========================================================= */
-
+    /**
+     * Accepts a proposal by parsing its edits, applying them to official budgets,
+     * then deleting the proposal file from the inbox.
+     *
+     * @param proposalFile proposal path
+     * @throws Exception if parsing/applying or deletion fails
+     */
     private void acceptProposal(Path proposalFile) throws Exception {
         List<String> lines = Files.readAllLines(proposalFile, StandardCharsets.UTF_8);
         List<Edit> edits = parseEdits(lines);
@@ -486,14 +496,22 @@ public class GovernorCheckScreen {
         Files.deleteIfExists(proposalFile);
     }
 
+    /**
+     * Rejects a proposal by deleting it from the inbox without applying changes.
+     *
+     * @param proposalFile proposal path
+     * @throws Exception if deletion fails
+     */
     private void rejectProposal(Path proposalFile) throws Exception {
         Files.deleteIfExists(proposalFile);
     }
 
-    /* =========================================================
-       Parsing proposal content
-       ========================================================= */
-
+    /**
+     * Extracts the sender username from a proposal file content.
+     *
+     * @param lines file lines
+     * @return sender username or empty string
+     */
     private String findFrom(List<String> lines) {
         for (String raw : lines) {
             String t = raw == null ? "" : raw.trim();
@@ -504,6 +522,15 @@ public class GovernorCheckScreen {
         return "";
     }
 
+    /**
+     * Extracts a submitted timestamp from a proposal file content.
+     *
+     * <p>Normalizes ISO timestamps by removing fractional seconds and using a space
+     * between date and time.</p>
+     *
+     * @param lines file lines
+     * @return timestamp string or empty string
+     */
     private String findSubmittedTimestamp(List<String> lines) {
         for (String raw : lines) {
             String t = raw == null ? "" : raw.trim();
@@ -516,6 +543,12 @@ public class GovernorCheckScreen {
         return "";
     }
 
+    /**
+     * Attempts to extract the first ministry name from the human draft section.
+     *
+     * @param lines proposal file lines
+     * @return ministry name (without "Ministry of") or empty string
+     */
     private String findFirstMinistryName(List<String> lines) {
         boolean inDraft = false;
         for (String raw : lines) {
@@ -537,6 +570,12 @@ public class GovernorCheckScreen {
         return "";
     }
 
+    /**
+     * Extracts the reasoning string from the proposal file.
+     *
+     * @param lines file lines
+     * @return reasoning text or "—" when missing
+     */
     private String findReasoning(List<String> lines) {
         for (String raw : lines) {
             String t = raw == null ? "" : raw.trim();
@@ -547,18 +586,38 @@ public class GovernorCheckScreen {
         return "—";
     }
 
+    /**
+     * Parses edits from proposal file content.
+     *
+     * <p>
+     * <b>De-duplication guarantee:</b> If any machine-readable {@code EDIT|...} lines exist,
+     * the parser returns only those edits and ignores the human {@code Draft edits:} section.
+     * This prevents duplicate edits from appearing in the preview table.
+     * </p>
+     *
+     * @param lines proposal file lines
+     * @return parsed edits (possibly empty)
+     */
     private List<Edit> parseEdits(List<String> lines) {
         List<Edit> edits = new ArrayList<>();
+
+        // 1) Prefer machine-readable edits.
+        for (String raw : lines) {
+            String t = raw == null ? "" : raw.trim();
+            if (t.startsWith("EDIT|")) {
+                try { edits.add(Edit.parse(t)); } catch (Exception ignore) {}
+            }
+        }
+
+        // If any EDIT| lines exist, return only these (avoid duplicates from the human section).
+        if (!edits.isEmpty()) return edits;
+
+        // 2) Fallback to human-readable "Draft edits:" section.
         boolean inDraft = false;
 
         for (String raw : lines) {
             String t = raw == null ? "" : raw.trim();
             if (t.isBlank()) continue;
-
-            if (t.startsWith("EDIT|")) {
-                try { edits.add(Edit.parse(t)); } catch (Exception ignore) {}
-                continue;
-            }
 
             if (t.equalsIgnoreCase("Draft edits:")) {
                 inDraft = true;
@@ -573,6 +632,18 @@ public class GovernorCheckScreen {
         return edits;
     }
 
+    /**
+     * Parses a human-readable draft edit line.
+     *
+     * <p>Expected patterns:</p>
+     * <ul>
+     *   <li>{@code <Ministry> Increased by <amount> <fixed/percent>}</li>
+     *   <li>{@code <Ministry> Decreased by <amount> <fixed/percent>}</li>
+     * </ul>
+     *
+     * @param line line text
+     * @return parsed {@link Edit} or null if unsupported/unparseable
+     */
     private Edit parseHumanDraftEditLine(String line) {
         String lower = line.toLowerCase(Locale.ROOT);
 
@@ -613,6 +684,13 @@ public class GovernorCheckScreen {
         return new Edit(namePart, change, amount, changeType);
     }
 
+    /**
+     * Extracts the ministry name portion from a human draft line
+     * by removing the trailing "increased/decreased by ..." part.
+     *
+     * @param line the full human draft line
+     * @return ministry name portion
+     */
     private String extractMinistryNameFromDraftLine(String line) {
         String lower = line.toLowerCase(Locale.ROOT);
         int idx1 = lower.indexOf(" increased by ");
@@ -623,6 +701,17 @@ public class GovernorCheckScreen {
         return (cut == -1) ? line.trim() : line.substring(0, cut).trim();
     }
 
+    /**
+     * Parses a numeric amount token in a "loose" way, supporting:
+     * <ul>
+     *   <li>Thousand separators: {@code 1.234.567}</li>
+     *   <li>Comma decimals: {@code 123,45}</li>
+     *   <li>Mixed formats: resolves the last separator as decimal</li>
+     * </ul>
+     *
+     * @param token amount token
+     * @return parsed double value
+     */
     private double parseAmountLoose(String token) {
         String t = token.trim();
 
@@ -646,6 +735,12 @@ public class GovernorCheckScreen {
         return Double.parseDouble(t);
     }
 
+    /**
+     * Converts parsed edits into UI table rows.
+     *
+     * @param edits parsed edits
+     * @return list of edit rows (never null)
+     */
     private List<EditRow> buildEditRows(List<Edit> edits) {
         List<EditRow> out = new ArrayList<>();
         for (Edit e : edits) out.add(EditRow.from(e));
@@ -653,6 +748,9 @@ public class GovernorCheckScreen {
         return out;
     }
 
+    /**
+     * Table model representing a proposal file entry in the left list.
+     */
     private static class FileRow {
         private final Path path;
         private final String ministryDisplay;
@@ -686,6 +784,9 @@ public class GovernorCheckScreen {
         }
     }
 
+    /**
+     * Table model representing a single parsed edit for preview.
+     */
     public static class EditRow {
         private final SimpleStringProperty action = new SimpleStringProperty("");
         private final SimpleStringProperty ministry = new SimpleStringProperty("");
@@ -729,10 +830,15 @@ public class GovernorCheckScreen {
         }
     }
 
-    /* =========================================================
-       Dialog helpers
-       ========================================================= */
-
+    /**
+     * Shows a confirmation dialog.
+     *
+     * @param owner owner stage
+     * @param title dialog title
+     * @param header dialog header
+     * @param content dialog body
+     * @return true if user confirms (OK)
+     */
     private boolean confirm(Stage owner, String title, String header, String content) {
         Alert a = new Alert(Alert.AlertType.CONFIRMATION);
         a.initOwner(owner);
@@ -747,6 +853,14 @@ public class GovernorCheckScreen {
         return a.showAndWait().filter(b -> b == ButtonType.OK).isPresent();
     }
 
+    /**
+     * Shows an informational dialog.
+     *
+     * @param owner owner stage
+     * @param title dialog title
+     * @param header dialog header
+     * @param content dialog body
+     */
     private void info(Stage owner, String title, String header, String content) {
         Alert a = new Alert(Alert.AlertType.INFORMATION);
         a.initOwner(owner);

@@ -1,6 +1,5 @@
-package guiFolder;
+package UserFeatures;
 
-import UserFeatures.Ministry;
 import UserManagement.MinistryMember;
 import UserManagement.User;
 import javafx.scene.control.Alert;
@@ -15,23 +14,7 @@ import java.util.List;
 /**
  * DraftProposalExporter
  *
- * <p>Exports the current minister draft session into a proposal text file that the Governor/Prime Minister
- * can read and accept via {@code GovernorCheckScreen}.</p>
- *
- * <h2>Compatibility guarantees</h2>
- * <ul>
- *   <li>Writes under {@code ProposalsFromMinisters} (resolved robustly across run modes).</li>
- *   <li>Filename contains {@code "proposal"} so UI inbox filters can discover it.</li>
- *   <li>Writes both:
- *     <ul>
- *       <li><b>Human-readable</b> lines under {@code Draft edits:} (supported by GovernorCheckScreen).</li>
- *       <li><b>Machine-readable</b> lines in exact format:
- *           {@code EDIT|<ministry>|<Increase/Decrease>|<amount>|<fixed/percent>}</li>
- *     </ul>
- *   </li>
- *   <li>Normalizes change type to <b>exactly</b> {@code Increase} or {@code Decrease} so {@code Edit.parse(...)}
- *       does not reject edits.</li>
- * </ul>
+ * Exports the current draft session into a proposal text file for Governor/Prime Minister review.
  */
 public final class DraftProposalExporter {
 
@@ -45,12 +28,6 @@ public final class DraftProposalExporter {
 
     private DraftProposalExporter() {}
 
-    /**
-     * Exports the current draft edits to disk and shows a JavaFX dialog with the result.
-     *
-     * @param owner owner JavaFX stage
-     * @param user  current user (must be {@link MinistryMember})
-     */
     public static void exportAndNotify(Stage owner, User user) {
         if (!(user instanceof MinistryMember)) {
             show(owner, Alert.AlertType.ERROR, "Access denied",
@@ -84,12 +61,10 @@ public final class DraftProposalExporter {
         String ministry = safeToken(((MinistryMember) user).getMinistryName(), "UnknownMinistry");
         String stamp = LocalDateTime.now().format(FILE_TS);
 
-        // IMPORTANT: GovernorCheckScreen may filter by (startsWith proposal_ OR contains proposal)
         Path out = dir.resolve("proposal_" + from + "_" + ministry + "_" + stamp + ".txt");
 
         try {
             String payload = buildPayload(user, edits);
-
             Files.writeString(out, payload, StandardCharsets.UTF_8, StandardOpenOption.CREATE_NEW);
 
             show(owner, Alert.AlertType.INFORMATION, "Proposal submitted",
@@ -100,9 +75,6 @@ public final class DraftProposalExporter {
         }
     }
 
-    /**
-     * Builds proposal content that is compatible with GovernorCheckScreen parsing.
-     */
     private static String buildPayload(User user, List<DraftEditSession.DraftEdit> edits) {
         StringBuilder sb = new StringBuilder();
 
@@ -119,17 +91,14 @@ public final class DraftProposalExporter {
             String mode = (e.mode == null || e.mode.isBlank()) ? "fixed" : e.mode.trim();
             double amount = e.amount;
 
-            // Normalize to EXACT tokens expected by Edit.parse / Governor UI.
             String change = normalizeChange(e.changeType);
 
-            // Human-readable (GovernorCheckScreen parses under "Draft edits:")
             if ("Increase".equalsIgnoreCase(change)) {
                 sb.append(ministry).append(" Increased by ").append(formatHuman(amount)).append(" ").append(mode).append("\n");
             } else {
                 sb.append(ministry).append(" Decreased by ").append(formatHuman(amount)).append(" ").append(mode).append("\n");
             }
 
-            // Machine-readable (GovernorCheckScreen parses via Edit.parse("EDIT|..."))
             sb.append("EDIT|")
               .append(ministry).append("|")
               .append(change).append("|")
@@ -142,9 +111,6 @@ public final class DraftProposalExporter {
         return sb.toString();
     }
 
-    /**
-     * Resolves the proposals directory robustly (same idea as console GovernorCheck).
-     */
     private static Path resolveProposalsDir() {
         for (Path p : CANDIDATE_DIRS) {
             if (Files.exists(p) && Files.isDirectory(p)) return p;
@@ -152,10 +118,6 @@ public final class DraftProposalExporter {
         return CANDIDATE_DIRS[0];
     }
 
-    /**
-     * Normalizes any change text to exactly "Increase" or "Decrease".
-     * Accepts also "Increased"/"Decreased" etc.
-     */
     private static String normalizeChange(String raw) {
         if (raw == null) return "Increase";
         String s = raw.trim().toLowerCase();
@@ -163,17 +125,10 @@ public final class DraftProposalExporter {
         return "Increase";
     }
 
-    /**
-     * Formats amount in a human-friendly way that your loose parser accepts.
-     * Uses your Ministry formatter and strips currency.
-     */
     private static String formatHuman(double amount) {
         return Ministry.getFormattedBudget(amount).replace("€", "").trim();
     }
 
-    /**
-     * Sanitizes tokens for file names.
-     */
     private static String safeToken(String raw, String fallback) {
         String v = raw == null ? "" : raw.trim();
         if (v.isBlank()) v = fallback;
@@ -182,9 +137,6 @@ public final class DraftProposalExporter {
         return v;
     }
 
-    /**
-     * Shows themed JavaFX alert.
-     */
     private static void show(Stage owner, Alert.AlertType type, String title, String msg) {
         Alert a = new Alert(type);
         a.initOwner(owner);
