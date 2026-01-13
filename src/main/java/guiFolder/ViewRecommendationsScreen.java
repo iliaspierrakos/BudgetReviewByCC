@@ -58,17 +58,14 @@ public class ViewRecommendationsScreen {
         /* ================= ACCESS CONTROL ================= */
         if (!(user instanceof MinistryMember)) {
             Alert a = new Alert(Alert.AlertType.ERROR,
-                "Access denied: Only Ministry Members can view recommendations.");
-
+            "Access denied: Only Ministry Members can view recommendations.");
             var css = getClass().getResource("/css/DarkTheme.css");
             if (css != null) a.getDialogPane().getStylesheets().add(css.toExternalForm());
-
             a.getDialogPane().setStyle(
-                "-fx-border-color: rgba(212,175,55,0.22);" +
-                "-fx-border-radius: 16;" +
-                "-fx-background-radius: 16;"
+            "-fx-border-color: rgba(212,175,55,0.22);" +
+            "-fx-border-radius: 16;" +
+            "-fx-background-radius: 16;"
             );
-
             a.showAndWait();
             return;
         }
@@ -126,9 +123,9 @@ public class ViewRecommendationsScreen {
         table.getColumns().addAll(categoryCol, votesCol, probCol);
 
         Label placeholder = new Label(
-                hasFile
-                        ? "No data rows found in file."
-                        : "No citizen recommendations have been submitted yet for this ministry."
+            hasFile
+            ? "No data rows found in file."
+            : "No citizen recommendations have been submitted yet for this ministry."
         );
         placeholder.getStyleClass().add("subtitle");
         table.setPlaceholder(placeholder);
@@ -210,7 +207,7 @@ public class ViewRecommendationsScreen {
         Tooltip.install(pieButton, new Tooltip("Show distribution as a pie chart (probabilities)."));
 
         pieButton.setOnAction(e ->
-                new ViewRecommendationStatisticsScreen(user, userManager).show(stage)
+            new ViewRecommendationStatisticsScreen(user, userManager).show(stage)
         );
 
         Button backButton = new Button("Back");
@@ -218,7 +215,7 @@ public class ViewRecommendationsScreen {
         backButton.setStyle("-fx-border-color: rgba(212,175,55,0.18);");
 
         backButton.setOnAction(e ->
-                new ViewEditBudgetScreen(user, userManager).show(stage)
+            new ViewEditBudgetScreen(user, userManager).show(stage)
         );
 
         Region spacer = new Region();

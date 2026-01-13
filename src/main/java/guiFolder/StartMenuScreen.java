@@ -1,7 +1,15 @@
 package guiFolder;
 
 import UserManagement.UserManager;
-import javafx.animation.*;
+import javafx.animation.Animation;
+import javafx.animation.FadeTransition;
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
+import javafx.animation.ParallelTransition;
+import javafx.animation.ScaleTransition;
+import javafx.animation.Timeline;
+import javafx.animation.TranslateTransition;
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -19,6 +27,7 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 
 public class StartMenuScreen {
+
     private final UserManager userManager;
 
     public StartMenuScreen(UserManager userManager) {
@@ -27,7 +36,14 @@ public class StartMenuScreen {
 
     public void show(Stage stage) {
 
-        // ---------- Background layers (WOW) ----------
+        final boolean wasShowing = stage.isShowing();
+        final boolean wasMaximized = stage.isMaximized();
+        final boolean wasFullScreen = stage.isFullScreen();
+        final double prevW = stage.getWidth();
+        final double prevH = stage.getHeight();
+        final double prevX = stage.getX();
+        final double prevY = stage.getY();
+
         Rectangle vignette = new Rectangle();
         vignette.getStyleClass().add("start-vignette");
         vignette.setManaged(false);
@@ -40,7 +56,6 @@ public class StartMenuScreen {
         sweep.getStyleClass().add("start-sweep");
         sweep.setManaged(false);
 
-        // ---------- Logo ----------
         ImageView logo = new ImageView();
         var logoStream = getClass().getResourceAsStream("/guiFolder/logo1.png");
         if (logoStream != null) logo.setImage(new Image(logoStream));
@@ -52,7 +67,6 @@ public class StartMenuScreen {
         StackPane logoFrame = new StackPane(logo);
         logoFrame.getStyleClass().add("start-logo-frame");
 
-        // ---------- Titles ----------
         Label title = new Label("Prime Minister for a Day");
         title.getStyleClass().addAll("title", "start-title");
 
@@ -62,7 +76,6 @@ public class StartMenuScreen {
         Separator sep = new Separator();
         sep.getStyleClass().add("start-sep");
 
-        // ---------- Buttons (MATCH YOUR CSS) ----------
         Button loginButton = new Button("Login");
         loginButton.getStyleClass().addAll("button", "primary", "start-btn");
 
@@ -78,12 +91,8 @@ public class StartMenuScreen {
 
         loginButton.setOnAction(e -> new LoginScreen(userManager).show(stage));
         registerButton.setOnAction(e -> new RegisterScreen(userManager).show(stage));
-        exitButton.setOnAction(e -> {
-            stage.close();
-            System.exit(0);
-        });
+        exitButton.setOnAction(e -> Platform.exit());
 
-        // ---------- Card ----------
         VBox cardContent = new VBox(
                 14,
                 logoFrame,
@@ -102,7 +111,6 @@ public class StartMenuScreen {
         card.getStyleClass().addAll("card", "start-card");
         card.setMaxWidth(520);
 
-        // Rounded clip
         Rectangle clip = new Rectangle();
         clip.setArcWidth(26);
         clip.setArcHeight(26);
@@ -116,31 +124,53 @@ public class StartMenuScreen {
         shadow.setOffsetY(18);
         card.setEffect(shadow);
 
-        // ---------- Root ----------
         StackPane root = new StackPane(vignette, grid, sweep, card);
         root.getStyleClass().add("start-root");
 
-        // Bind background rectangles to scene size
         root.widthProperty().addListener((obs, o, w) -> {
-            vignette.setWidth(w.doubleValue());
-            grid.setWidth(w.doubleValue());
-            sweep.setWidth(w.doubleValue());
+            double ww = w.doubleValue();
+            vignette.setWidth(ww);
+            grid.setWidth(ww);
+            sweep.setWidth(ww);
         });
         root.heightProperty().addListener((obs, o, h) -> {
-            vignette.setHeight(h.doubleValue());
-            grid.setHeight(h.doubleValue());
-            sweep.setHeight(h.doubleValue());
+            double hh = h.doubleValue();
+            vignette.setHeight(hh);
+            grid.setHeight(hh);
+            sweep.setHeight(hh);
         });
 
         StackPane.setAlignment(card, Pos.CENTER);
         StackPane.setMargin(card, new Insets(24));
 
-        Scene scene = new Scene(root, 720, 560);
-        scene.getStylesheets().add(getClass().getResource("/css/DarkTheme.css").toExternalForm());
+        Scene scene = stage.getScene();
+        if (scene == null) {
+            scene = new Scene(root, 720, 560);
+            safeAddCss(scene, "/css/DarkTheme.css");
+            stage.setScene(scene);
+        } else {
+            scene.setRoot(root);
+            safeAddCss(scene, "/css/DarkTheme.css");
+        }
 
         stage.setTitle("Welcome");
-        stage.setScene(scene);
         stage.show();
+
+        if (wasFullScreen) {
+            stage.setFullScreen(true);
+        } else if (wasMaximized) {
+            stage.setMaximized(true);
+        } else if (wasShowing) {
+            if (prevW > 0 && prevH > 0) {
+                stage.setWidth(prevW);
+                stage.setHeight(prevH);
+                stage.setX(prevX);
+                stage.setY(prevY);
+            }
+        } else {
+            stage.centerOnScreen();
+        }
+
         ScaleTransition st = new ScaleTransition(Duration.seconds(3), logoFrame);
         st.setFromX(1.0);
         st.setFromY(1.0);
@@ -149,9 +179,7 @@ public class StartMenuScreen {
         st.setAutoReverse(true);
         st.setCycleCount(Animation.INDEFINITE);
         st.play();
-        stage.centerOnScreen();
 
-        // ---------- Entrance animation ----------
         card.setOpacity(0);
         card.setTranslateY(18);
 
@@ -165,7 +193,6 @@ public class StartMenuScreen {
 
         new ParallelTransition(ft, tt).play();
 
-        // ---------- Light sweep animation (WOW) ----------
         sweep.setTranslateX(-900);
         Timeline sweepAnim = new Timeline(
                 new KeyFrame(Duration.ZERO, new KeyValue(sweep.translateXProperty(), -900)),
@@ -174,5 +201,12 @@ public class StartMenuScreen {
         sweepAnim.setCycleCount(Animation.INDEFINITE);
         sweepAnim.setDelay(Duration.seconds(0.4));
         sweepAnim.play();
+    }
+
+    private static void safeAddCss(Scene scene, String cssPath) {
+        var url = StartMenuScreen.class.getResource(cssPath);
+        if (url == null) return;
+        String css = url.toExternalForm();
+        if (!scene.getStylesheets().contains(css)) scene.getStylesheets().add(css);
     }
 }

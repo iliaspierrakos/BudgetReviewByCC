@@ -1,7 +1,6 @@
-// DraftHistoryScreen.java
 package guiFolder;
 
-import UserFeatures.Edit;
+import UserFeatures.DraftEditSession;
 import UserFeatures.Ministry;
 import UserManagement.User;
 import UserManagement.UserManager;
@@ -11,8 +10,15 @@ import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.scene.layout.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Label;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 public class DraftHistoryScreen {
@@ -36,7 +42,9 @@ public class DraftHistoryScreen {
     }
 
     public void show(Stage stage) {
-        if (!DraftEditSession.isInitialized()) DraftEditSession.resetFromCurrent(Edit.balance);
+        if (!DraftEditSession.isInitialized()) {
+            DraftEditSession.resetFromCurrentBudgets();
+        }
 
         Label title = new Label("Draft History");
         title.getStyleClass().add("title");
@@ -69,19 +77,16 @@ public class DraftHistoryScreen {
 
         table.getColumns().addAll(c1, c2, c3, c4, c5);
 
-        ObservableList<Row> rows = FXCollections.observableArrayList();
-        for (var e : DraftEditSession.getHistory()) rows.add(new Row(e));
-        table.setItems(rows);
+        refresh(table);
 
         Button back = new Button("Back");
         back.getStyleClass().addAll("button", "subtle");
-        // Keep navigation inside the new Minister Draft UI
-        back.setOnAction(e -> new MinisterDraftEditScreen(user, userManager).show(stage));
+        back.setOnAction(e -> new ProposeScreen(user, userManager).show(stage));
 
         Button undoLast = new Button("Undo Last");
         undoLast.getStyleClass().addAll("button", "subtle");
         undoLast.setOnAction(e -> {
-            String err = DraftEditSession.undoLast(Edit.balance);
+            String err = DraftEditSession.undoLast();
             if (err != null) warn(stage, "Undo failed", err);
 
             balance.setText("Draft Balance: " + Ministry.getFormattedBudget(DraftEditSession.getDraftBalance()));
@@ -95,7 +100,8 @@ public class DraftHistoryScreen {
             applyTheme(a);
             a.showAndWait().ifPresent(btn -> {
                 if (btn != ButtonType.OK) return;
-                DraftEditSession.resetFromCurrent(Edit.balance);
+
+                DraftEditSession.resetFromCurrentBudgets();
                 balance.setText("Draft Balance: " + Ministry.getFormattedBudget(DraftEditSession.getDraftBalance()));
                 refresh(table);
             });

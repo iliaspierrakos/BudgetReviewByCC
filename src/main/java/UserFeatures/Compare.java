@@ -30,6 +30,18 @@ public class Compare {
     private static final Scanner SCANNER = new Scanner(System.in);
 
     /**
+     * Test hook: allows supplying fake ministry data for a given year
+     * without touching files or the normal data source.
+     *
+     * <p>Set this to a lambda in your tests like:
+     * <pre>
+     * Compare.TEST_MINISTRY_PROVIDER = year -> new Ministry[]{ ... };
+     * </pre>
+     * and it will be used instead of {@link ViewGovernmentBudget#ministryYear(int)}.
+     */
+    public static java.util.function.IntFunction<Ministry[]> TEST_MINISTRY_PROVIDER = null;
+
+    /**
      * Initiates an interactive comparison between two selected years.
      *
      * <p>The method validates user input, retrieves ministry data
@@ -43,8 +55,13 @@ public class Compare {
         System.out.println("Please type the second year that you want to compare:");
         int secondYear = validityYear(firstYear);
 
-        Ministry[] firstYearMinistry = ViewGovernmentBudget.ministryYear(firstYear);
-        Ministry[] secondYearMinistry = ViewGovernmentBudget.ministryYear(secondYear);
+        Ministry[] firstYearMinistry = (TEST_MINISTRY_PROVIDER != null)
+                ? TEST_MINISTRY_PROVIDER.apply(firstYear)
+                : ViewGovernmentBudget.ministryYear(firstYear);
+
+        Ministry[] secondYearMinistry = (TEST_MINISTRY_PROVIDER != null)
+                ? TEST_MINISTRY_PROVIDER.apply(secondYear)
+                : ViewGovernmentBudget.ministryYear(secondYear);
 
         if (firstYearMinistry == null || secondYearMinistry == null) {
             System.out.println("Cannot compare - missing data for one or both years.");
@@ -215,8 +232,13 @@ public class Compare {
     public static List<CompareRow> getComparisonRowsForGui(int firstYear, int secondYear) {
         List<CompareRow> rows = new ArrayList<>();
 
-        Ministry[] a = ViewGovernmentBudget.ministryYear(firstYear);
-        Ministry[] b = ViewGovernmentBudget.ministryYear(secondYear);
+        Ministry[] a = (TEST_MINISTRY_PROVIDER != null)
+                ? TEST_MINISTRY_PROVIDER.apply(firstYear)
+                : ViewGovernmentBudget.ministryYear(firstYear);
+
+        Ministry[] b = (TEST_MINISTRY_PROVIDER != null)
+                ? TEST_MINISTRY_PROVIDER.apply(secondYear)
+                : ViewGovernmentBudget.ministryYear(secondYear);
 
         if (a == null || b == null) return rows;
 

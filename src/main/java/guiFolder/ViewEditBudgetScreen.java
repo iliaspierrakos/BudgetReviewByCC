@@ -208,7 +208,7 @@ public class ViewEditBudgetScreen {
                 recTitle = "View Statistics";
                 recDesc = "Review trends, totals and distributions.";
                 recIcon = "/icons/stats.png";
-                recAction = () -> new ViewStatisticsScreen(user).show(stage);
+                recAction = () -> new ViewStatisticsScreen(user, userManager).show(stage);
             }
             case CITIZEN -> {
                 recTitle = "Submit Recommendation";
@@ -312,15 +312,12 @@ public class ViewEditBudgetScreen {
            ========================= */
         Scene scene = stage.getScene();
         if (scene == null) {
-            scene = new Scene(root);
-            scene.getStylesheets().add(
-                    getClass().getResource("/css/DarkTheme.css").toExternalForm()
-            );
+            scene = new Scene(root, 1100, 720);
+            safeAddCss(scene, "/css/DarkTheme.css");
             stage.setScene(scene);
         } else {
             scene.setRoot(root);
-            String css = getClass().getResource("/css/DarkTheme.css").toExternalForm();
-            if (!scene.getStylesheets().contains(css)) scene.getStylesheets().add(css);
+            safeAddCss(scene, "/css/DarkTheme.css");
         }
 
         stage.setTitle("Main Menu");
@@ -415,16 +412,16 @@ public class ViewEditBudgetScreen {
         return side;
     }
 
+    /**
+     * SAFE action card: will never crash if an icon is missing.
+     * If a resource is missing, it prints in console:
+     *   MISSING ICON: /icons/xxx.png
+     */
     private static VBox actionCard(String title, String desc, String iconPath, Runnable onClick, boolean featured) {
 
-        ImageView icon = new ImageView(new Image(
-                ViewEditBudgetScreen.class.getResourceAsStream(iconPath)
-        ));
-        icon.setFitWidth(34);
-        icon.setFitHeight(34);
-        icon.getStyleClass().add("action-icon");
+        Node iconNode = safeIcon(iconPath, 34);
 
-        VBox iconBadge = new VBox(icon);
+        VBox iconBadge = new VBox(iconNode);
         iconBadge.setAlignment(Pos.CENTER);
         iconBadge.getStyleClass().add("icon-badge");
         if (featured) iconBadge.getStyleClass().add("icon-badge-gold");
@@ -454,6 +451,41 @@ public class ViewEditBudgetScreen {
 
         card.setOnMouseClicked(e -> onClick.run());
         return card;
+    }
+
+    private static Node safeIcon(String iconPath, double size) {
+        try {
+            var stream = ViewEditBudgetScreen.class.getResourceAsStream(iconPath);
+            if (stream == null) throw new IllegalStateException("MISSING ICON: " + iconPath);
+
+            ImageView icon = new ImageView(new Image(stream));
+            icon.setFitWidth(size);
+            icon.setFitHeight(size);
+            icon.getStyleClass().add("action-icon");
+            return icon;
+
+        } catch (Exception ex) {
+            System.err.println(ex.getMessage());
+            Label fallback = new Label("⬤");
+            fallback.setMinSize(size, size);
+            fallback.setAlignment(Pos.CENTER);
+            fallback.getStyleClass().add("icon-fallback");
+            return fallback;
+        }
+    }
+
+    private static void safeAddCss(Scene scene, String cssPath) {
+        try {
+            var url = ViewEditBudgetScreen.class.getResource(cssPath);
+            if (url == null) {
+                System.err.println("MISSING CSS: " + cssPath);
+                return;
+            }
+            String css = url.toExternalForm();
+            if (!scene.getStylesheets().contains(css)) scene.getStylesheets().add(css);
+        } catch (Exception ex) {
+            System.err.println("CSS LOAD FAILED: " + cssPath + " -> " + ex.getMessage());
+        }
     }
 
     private static String roleText(User.Role role) {
