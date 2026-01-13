@@ -1,5 +1,13 @@
 package guiFolder;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Stream;
+
 import UserManagement.MinistryMember;
 import UserManagement.User;
 import UserManagement.UserManager;
@@ -17,21 +25,13 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Stream;
-
 public class ViewRecommendationStatisticsScreen {
 
     private final User user;
     private final UserManager userManager;
 
     private static final Path DATA_DIR =
-            Path.of("src/main/resources/NecessaryFilesAndData/ProposalsFromCitizens");
+        Path.of("src/main/resources/NecessaryFilesAndData/ProposalsFromCitizens");
 
     public ViewRecommendationStatisticsScreen(User user, UserManager userManager) {
         this.user = user;
@@ -238,10 +238,10 @@ public class ViewRecommendationStatisticsScreen {
             // votes ≈ prob * total. But we want exact votes from file.
             // We'll look it up from 'rows' by category name.
             int votes = rows.stream()
-                .filter(r -> r.cat.equals(d.getName()))
-                .map(r -> r.votes)
-                .findFirst()
-                .orElse((int) Math.round(d.getPieValue() * finalTotal));
+            .filter(r -> r.cat.equals(d.getName()))
+            .map(r -> r.votes)
+            .findFirst()
+            .orElse((int) Math.round(d.getPieValue() * finalTotal));
             double pct = (votes * 100.0) / finalTotal;
 
             // Label text = category (votes, %)
@@ -323,7 +323,7 @@ public class ViewRecommendationStatisticsScreen {
 
     private String extractMinistryName(String fileName) {
         return fileName
-            .replace("CitizenForMinistry of ", "")
-            .replace(".txt", "");
+        .replace("CitizenForMinistry of ", "")
+        .replace(".txt", "");
     }
 }
