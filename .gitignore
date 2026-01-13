@@ -44,3 +44,7 @@ users.txt
 target/site/
 jacoco.exec
 
+
+# runtime/generated
+src/main/resources/NecessaryFilesAndData/ProposalsFromMinisters/
+src/main/resources/NecessaryFilesAndData/UserBudgets/
