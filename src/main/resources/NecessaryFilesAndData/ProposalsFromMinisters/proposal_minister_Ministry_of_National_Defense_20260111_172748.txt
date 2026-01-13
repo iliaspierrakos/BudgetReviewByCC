@@ -1,0 +1,47 @@
+MINISTER PROPOSAL
+From: minister
+Submitted: 2026-01-11T17:27:48.096912100
+
+Draft edits:
+Ministry of Interior Decreased by 100 fixed
+EDIT|Ministry of Interior|Decrease|100.0|fixed
+Ministry of Foreign Affairs Decreased by 100 fixed
+EDIT|Ministry of Foreign Affairs|Decrease|100.0|fixed
+Ministry of National Defense Decreased by 100 fixed
+EDIT|Ministry of National Defense|Decrease|100.0|fixed
+Ministry of Health Decreased by 100 fixed
+EDIT|Ministry of Health|Decrease|100.0|fixed
+Ministry of Justice Decreased by 100 fixed
+EDIT|Ministry of Justice|Decrease|100.0|fixed
+Ministry of Education, Religious Affairs, and Sports Decreased by 100 fixed
+EDIT|Ministry of Education, Religious Affairs, and Sports|Decrease|100.0|fixed
+Ministry of Culture Decreased by 100 fixed
+EDIT|Ministry of Culture|Decrease|100.0|fixed
+Ministry of National Economy and Finance Decreased by 100 fixed
+EDIT|Ministry of National Economy and Finance|Decrease|100.0|fixed
+Ministry of Rural Development and Food Decreased by 100 fixed
+EDIT|Ministry of Rural Development and Food|Decrease|100.0|fixed
+Ministry of Environment and Energy Decreased by 100 fixed
+EDIT|Ministry of Environment and Energy|Decrease|100.0|fixed
+Ministry of Labor and Social Security Decreased by 100 fixed
+EDIT|Ministry of Labor and Social Security|Decrease|100.0|fixed
+Ministry of Social Cohesion and Family Decreased by 100 fixed
+EDIT|Ministry of Social Cohesion and Family|Decrease|100.0|fixed
+Ministry of Development Decreased by 100 fixed
+EDIT|Ministry of Development|Decrease|100.0|fixed
+Ministry of Infrastructure and Transport Decreased by 100 fixed
+EDIT|Ministry of Infrastructure and Transport|Decrease|100.0|fixed
+Ministry of Shipping and Island Policy Decreased by 100 fixed
+EDIT|Ministry of Shipping and Island Policy|Decrease|100.0|fixed
+Ministry of Tourism Decreased by 100 fixed
+EDIT|Ministry of Tourism|Decrease|100.0|fixed
+Ministry of Digital Governance Decreased by 100 fixed
+EDIT|Ministry of Digital Governance|Decrease|100.0|fixed
+Ministry of Migration and Asylum Decreased by 100 fixed
+EDIT|Ministry of Migration and Asylum|Decrease|100.0|fixed
+Ministry of Citizen Protection Decreased by 100 fixed
+EDIT|Ministry of Citizen Protection|Decrease|100.0|fixed
+Ministry of Climate Crisis and Civil Protection Decreased by 100 fixed
+EDIT|Ministry of Climate Crisis and Civil Protection|Decrease|100.0|fixed
+
+Reason: —

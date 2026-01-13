@@ -1,6 +1,6 @@
-Total Votes for Ministry of National Defense: 2
+Total Votes for Ministry of National Defense: 5
 New military equipment, Votes from Citizens: 0, 0%
-Soldier training, Votes from Citizens: 1, 50%
-Military bases upgrades, Votes from Citizens: 0, 0%
-Cyber defense, Votes from Citizens: 0, 0%
-Defense research, Votes from Citizens: 1, 50%
+Soldier training, Votes from Citizens: 2, 40%
+Military bases upgrades, Votes from Citizens: 1, 20%
+Cyber defense, Votes from Citizens: 1, 20%
+Defense research, Votes from Citizens: 1, 20%
