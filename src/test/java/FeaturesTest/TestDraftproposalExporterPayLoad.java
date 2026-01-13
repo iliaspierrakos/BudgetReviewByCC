@@ -27,7 +27,7 @@ import UserManagement.User;
  * Reflection is used to avoid widening production visibility solely for tests.
  * </p>
  */
-public class TestDraftProposalExporterPayLoad {
+public class TestDraftproposalExporterPayLoad {
 
     /** Reflective reference to private: buildPayload(User, List). */
     private Method buildPayload;
