@@ -68,7 +68,7 @@ public class ViewRecommendationStatisticsScreen {
 
         title.setText("Citizen Recommendations – Ministry of " + ministryName);
 
-        Path targetFile = DATA_DIR.resolve("CitizenForMinistry of " + ministryName + ".txt");
+        Path targetFile = DATA_DIR.resolve("CitizenFor" + ministryName + ".txt");
 
         if (Files.exists(targetFile)) {
             PieChart chart = createProbabilityChartForFile(targetFile);

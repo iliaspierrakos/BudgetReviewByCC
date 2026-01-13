@@ -83,7 +83,7 @@ public class ViewRecommendationsScreen {
         MinistryMember mm = (MinistryMember) user;
         String ministryName = mm.getMinistryName();
 
-        Path filePath = DATA_DIR.resolve("CitizenForMinistry of " + ministryName + ".txt");
+        Path filePath = DATA_DIR.resolve("CitizenFor" + ministryName + ".txt");
         boolean hasFile = Files.exists(filePath);
 
         /* ================= HEADER ================= */
