@@ -16,37 +16,32 @@ import UserFeatures.Ministry;
  * Unit tests for {@link DraftEditSession}.
  *
  * <p>
- * These tests verify the correct behavior of the draft budget editing session,
- * including initialization, fixed and percentage edits, undo functionality,
- * draft balance handling, and history tracking.
+ * These tests verify the correct behavior of the draft budget editing session, including initialization, fixed and
+ * percentage edits, undo functionality, draft balance handling, and history tracking.
  * </p>
  *
  * <p>
- * Each test starts from a clean static state to ensure isolation and
- * reproducibility.
+ * Each test starts from a clean static state to ensure isolation and reproducibility.
  * </p>
  */
 public class TestDraftEditSession {
 
     /**
-     * Resets all static state and initializes a fresh draft session
-     * from the current official ministries before each test.
+     * Resets all static state and initializes a fresh draft session from the current official ministries before each
+     * test.
      */
     @BeforeEach
     void resetState() {
         forceResetDraftSession();
 
-        CreatingMinistries.ministries2026 = new Ministry[] {
-                new Ministry("Ministry of Health", 1000),
-                new Ministry("Ministry of Education", 500)
-        };
+        CreatingMinistries.ministries2026 = new Ministry[] { new Ministry("Ministry of Health", 1000),
+                new Ministry("Ministry of Education", 500) };
 
         DraftEditSession.resetFromCurrentBudgets();
     }
 
     /**
-     * Verifies that resetting from current budgets creates
-     * a deep copy of ministries rather than reusing references.
+     * Verifies that resetting from current budgets creates a deep copy of ministries rather than reusing references.
      */
     @Test
     void testResetFromCurrentCreatesSandboxCopyNotSameObjects() {
@@ -57,8 +52,7 @@ public class TestDraftEditSession {
         assertEquals(official.getBudget(), sandbox.getBudget());
 
         sandbox.setBudget(777);
-        assertEquals(1000, official.getBudget(),
-                "Official ministry budget must not be affected by sandbox changes");
+        assertEquals(1000, official.getBudget(), "Official ministry budget must not be affected by sandbox changes");
     }
 
     /**
@@ -98,8 +92,7 @@ public class TestDraftEditSession {
     }
 
     /**
-     * Tests that a fixed decrease updates the budget,
-     * increases draft balance, and records history.
+     * Tests that a fixed decrease updates the budget, increases draft balance, and records history.
      */
     @Test
     void testApplyFixedDecreaseIncreasesBalanceAndAddsHistory() {
@@ -114,8 +107,7 @@ public class TestDraftEditSession {
     }
 
     /**
-     * Verifies that a fixed increase succeeds after a prior decrease
-     * has created sufficient draft balance.
+     * Verifies that a fixed increase succeeds after a prior decrease has created sufficient draft balance.
      */
     @Test
     void testApplyFixedIncreaseAfterDecreaseSucceeds() {
@@ -134,11 +126,9 @@ public class TestDraftEditSession {
      */
     @Test
     void testApplyFixedRejectsInvalidInput() {
-        assertEquals("Please select a ministry.",
-                DraftEditSession.applyFixed(" ", true, 100));
+        assertEquals("Please select a ministry.", DraftEditSession.applyFixed(" ", true, 100));
 
-        assertEquals("Amount must be positive.",
-                DraftEditSession.applyFixed("Ministry of Health", true, 0));
+        assertEquals("Amount must be positive.", DraftEditSession.applyFixed("Ministry of Health", true, 0));
     }
 
     /**
@@ -164,10 +154,7 @@ public class TestDraftEditSession {
 
         String err = DraftEditSession.applyPercent("Ministry of Health", true, 10);
 
-        assertEquals(
-                "Insufficient draft balance for this increase. Decrease another ministry first.",
-                err
-        );
+        assertEquals("Insufficient draft balance for this increase. Decrease another ministry first.", err);
         assertEquals(1000, m.getBudget());
     }
 
@@ -206,8 +193,7 @@ public class TestDraftEditSession {
     }
 
     /**
-     * Forces a full reset of private static state using reflection.
-     * Used to guarantee test isolation.
+     * Forces a full reset of private static state using reflection. Used to guarantee test isolation.
      */
     private static void forceResetDraftSession() {
         try {
