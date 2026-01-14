@@ -136,8 +136,6 @@ This design improves maintainability, extensibility, and clarity of the system.
 
 ## Repository Structure
 
-## Repository Structure
-
 ```text
 BudgetReviewByCC/
 ├── README.md                     # Project documentation
