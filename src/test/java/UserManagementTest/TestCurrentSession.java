@@ -14,21 +14,19 @@ import UserManagement.User.Role;
  * Unit tests for {@link CurrentSession}.
  *
  * <p>
- * These tests verify correct storage and retrieval of the
- * currently logged-in user using static session access.
+ * These tests verify correct storage and retrieval of the currently logged-in user using static session access.
  * </p>
  */
 public class TestCurrentSession {
 
     @AfterEach
     void clearSession() {
-    CurrentSession.setUser(null);
+        CurrentSession.setUser(null);
     }
 
     @Test
     void testGetUserInitiallyNull() {
-        assertNull(CurrentSession.getUser(),
-        "Current user should be null before any login");
+        assertNull(CurrentSession.getUser(), "Current user should be null before any login");
     }
 
     @Test
@@ -37,10 +35,8 @@ public class TestCurrentSession {
 
         CurrentSession.setUser(user);
 
-        assertNotNull(CurrentSession.getUser(),
-        "User should not be null after setting");
-        assertSame(user, CurrentSession.getUser(),
-        "Retrieved user should be the same instance that was set");
+        assertNotNull(CurrentSession.getUser(), "User should not be null after setting");
+        assertSame(user, CurrentSession.getUser(), "Retrieved user should be the same instance that was set");
     }
 
     @Test
@@ -50,8 +46,7 @@ public class TestCurrentSession {
 
         CurrentSession.setUser(null);
 
-        assertNull(CurrentSession.getUser(),
-            "Current user should be null after clearing the session");
+        assertNull(CurrentSession.getUser(), "Current user should be null after clearing the session");
     }
 
     @Test
@@ -62,7 +57,6 @@ public class TestCurrentSession {
         CurrentSession.setUser(user1);
         CurrentSession.setUser(user2);
 
-        assertSame(user2, CurrentSession.getUser(),
-                "New user should replace the previous user in the session");
+        assertSame(user2, CurrentSession.getUser(), "New user should replace the previous user in the session");
     }
 }
