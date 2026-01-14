@@ -21,11 +21,8 @@ public class TestViewGovernmentBudget {
         view = new ViewGovernmentBudget();
 
         // Setup ministries for 2026
-        CreatingMinistries.ministries2026 = new Ministry[]{
-                new Ministry("Ministry of Health", 3000),
-                new Ministry("Ministry of Education", 2000),
-                new Ministry("Ministry of Finance", 5000)
-        };
+        CreatingMinistries.ministries2026 = new Ministry[] { new Ministry("Ministry of Health", 3000),
+                new Ministry("Ministry of Education", 2000), new Ministry("Ministry of Finance", 5000) };
 
         // Other years empty but initialized
         CreatingMinistries.ministries2020 = new Ministry[0];
@@ -38,9 +35,9 @@ public class TestViewGovernmentBudget {
         Edit.balance = 1000;
     }
 
-    /* ===============================
-       ministryYear
-       =============================== */
+    /*
+     * =============================== ministryYear ===============================
+     */
 
     @Test
     void testMinistryYearValid() {
@@ -54,9 +51,9 @@ public class TestViewGovernmentBudget {
         assertNull(ViewGovernmentBudget.ministryYear(2018));
     }
 
-    /* ===============================
-       sortingBudgets
-       =============================== */
+    /*
+     * =============================== sortingBudgets ===============================
+     */
 
     @Test
     void testSortingBudgetsByDescendingBudget() {
@@ -71,10 +68,7 @@ public class TestViewGovernmentBudget {
 
     @Test
     void testSortingBudgetsTieBreakAlphabetically() {
-        Ministry[] arr = new Ministry[]{
-                new Ministry("B Ministry", 1000),
-                new Ministry("A Ministry", 1000)
-        };
+        Ministry[] arr = new Ministry[] { new Ministry("B Ministry", 1000), new Ministry("A Ministry", 1000) };
 
         view.sortingBudgets(arr);
 
@@ -82,9 +76,9 @@ public class TestViewGovernmentBudget {
         assertEquals("B Ministry", arr[1].getMinistryName());
     }
 
-    /* ===============================
-       viewGovBudget
-       =============================== */
+    /*
+     * =============================== viewGovBudget ===============================
+     */
 
     @Test
     void testViewGovBudgetCreatesFileWithoutSort() {
@@ -104,17 +98,13 @@ public class TestViewGovernmentBudget {
 
     @Test
     void testViewGovBudgetWithZeroTotalBudgetDoesNotThrow() {
-        CreatingMinistries.ministries2026 = new Ministry[]{
-                new Ministry("Empty Ministry", 0)
-        };
+        CreatingMinistries.ministries2026 = new Ministry[] { new Ministry("Empty Ministry", 0) };
 
-        assertDoesNotThrow(() ->
-                view.viewGovBudget(2026, false));
+        assertDoesNotThrow(() -> view.viewGovBudget(2026, false));
     }
 
     @Test
     void testViewGovBudgetWithInvalidYearDoesNotThrow() {
-        assertDoesNotThrow(() ->
-                view.viewGovBudget(2019, false));
+        assertDoesNotThrow(() -> view.viewGovBudget(2019, false));
     }
 }
