@@ -28,11 +28,8 @@ public class TestCreatingMinistries {
     void testMinistryCreationFromLoadedBudgets() throws Exception {
         // Arrange: fake CSV budgets
         Path csv = Files.createTempFile("MinistriesBudgets2026", ".csv");
-        Files.write(csv, List.of(
-                "Υπουργείο Υγείας 3000",
-                "Υπουργείο Παιδείας 4000",
-                "Υπουργείο Οικονομικών 5000"
-        ), StandardCharsets.UTF_8);
+        Files.write(csv, List.of("Υπουργείο Υγείας 3000", "Υπουργείο Παιδείας 4000", "Υπουργείο Οικονομικών 5000"),
+                StandardCharsets.UTF_8);
 
         // Act
         CreatingMinistries.ministryCreationFromLoadedBudgets(2026);
@@ -58,11 +55,8 @@ public class TestCreatingMinistries {
         CreatingMinistries.ministries2026[1] = new Ministry("Ministry of Education", 1000);
 
         Path csv = Files.createTempFile("UserBudgets", ".csv");
-        Files.write(csv, List.of(
-                "BALANCE,5000",
-                "\"Ministry of Health\",2500",
-                "\"Ministry of Education\",1500"
-        ), StandardCharsets.UTF_8);
+        Files.write(csv, List.of("BALANCE,5000", "\"Ministry of Health\",2500", "\"Ministry of Education\",1500"),
+                StandardCharsets.UTF_8);
 
         // Act
         CreatingMinistries.loadUserBudgets(csv, 2026);
@@ -98,8 +92,7 @@ public class TestCreatingMinistries {
 
         // Assert: όλο το array δεν έχει null
         for (int i = 0; i < CreatingMinistries.ministries2026.length; i++) {
-            assertNotNull(CreatingMinistries.ministries2026[i],
-                    "Ministry at index " + i + " is null!");
+            assertNotNull(CreatingMinistries.ministries2026[i], "Ministry at index " + i + " is null!");
         }
     }
 }
