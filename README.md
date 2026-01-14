@@ -123,7 +123,6 @@ This design improves maintainability, extensibility, and clarity of the system.
 
   * Tax calculated based on:
 
-    * Name
     * Age
     * Number of children
     * Income
