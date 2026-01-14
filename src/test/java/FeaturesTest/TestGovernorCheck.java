@@ -23,22 +23,20 @@ import UserFeatures.GovernorCheck;
  * These tests validate console-driven logic in a deterministic way by:
  * </p>
  * <ul>
- *   <li>Injecting scripted input into the internal {@link Scanner}</li>
- *   <li>Capturing {@code System.out} to verify user-facing messages</li>
- *   <li>Creating and cleaning proposal files under the same path used by production code</li>
+ * <li>Injecting scripted input into the internal {@link Scanner}</li>
+ * <li>Capturing {@code System.out} to verify user-facing messages</li>
+ * <li>Creating and cleaning proposal files under the same path used by production code</li>
  * </ul>
  *
  * <p>
- * Note: The "accept" path triggers {@code new EditHistoryList().applyingEdits()},
- * which can have broad side effects. Therefore, tests focus on the "reject"
- * path and input validation logic.
+ * Note: The "accept" path triggers {@code new EditHistoryList().applyingEdits()}, which can have broad side effects.
+ * Therefore, tests focus on the "reject" path and input validation logic.
  * </p>
  */
 public class TestGovernorCheck {
 
-    private static final Path PROPOSALS_DIR = Path.of(
-            "src", "main", "resources", "NecessaryFilesAndData", "ProposalsFromMinisters"
-    );
+    private static final Path PROPOSALS_DIR = Path.of("src", "main", "resources", "NecessaryFilesAndData",
+            "ProposalsFromMinisters");
 
     private PrintStream originalOut;
     private ByteArrayOutputStream outBuffer;
@@ -54,7 +52,10 @@ public class TestGovernorCheck {
         if (Files.exists(PROPOSALS_DIR)) {
             try (var stream = Files.list(PROPOSALS_DIR)) {
                 stream.forEach(p -> {
-                    try { Files.deleteIfExists(p); } catch (Exception ignored) {}
+                    try {
+                        Files.deleteIfExists(p);
+                    } catch (Exception ignored) {
+                    }
                 });
             }
         } else {
@@ -68,8 +69,8 @@ public class TestGovernorCheck {
     }
 
     /**
-     * Verifies that {@link GovernorCheck#budgetChecking()} returns {@code true}
-     * when the user answers "yes" (case-insensitive).
+     * Verifies that {@link GovernorCheck#budgetChecking()} returns {@code true} when the user answers "yes"
+     * (case-insensitive).
      */
     @Test
     void testBudgetCheckingYesReturnsTrue() throws Exception {
@@ -82,8 +83,8 @@ public class TestGovernorCheck {
     }
 
     /**
-     * Verifies that {@link GovernorCheck#budgetChecking()} returns {@code false}
-     * when the user answers "no" (case-insensitive).
+     * Verifies that {@link GovernorCheck#budgetChecking()} returns {@code false} when the user answers "no"
+     * (case-insensitive).
      */
     @Test
     void testBudgetCheckingNoReturnsFalse() throws Exception {
@@ -96,8 +97,8 @@ public class TestGovernorCheck {
     }
 
     /**
-     * Verifies that {@link GovernorCheck#budgetChecking()} keeps prompting until
-     * a valid answer ("yes" or "no") is given.
+     * Verifies that {@link GovernorCheck#budgetChecking()} keeps prompting until a valid answer ("yes" or "no") is
+     * given.
      */
     @Test
     void testBudgetCheckingLoopsUntilValidInput() throws Exception {
@@ -109,8 +110,7 @@ public class TestGovernorCheck {
         assertTrue(result, "Expected budgetChecking() to eventually accept 'yes' and return true");
 
         String printed = outBuffer.toString(StandardCharsets.UTF_8);
-        assertTrue(printed.contains("Please type yes or no"),
-                "Expected a prompt for invalid inputs");
+        assertTrue(printed.contains("Please type yes or no"), "Expected a prompt for invalid inputs");
     }
 
     /**
@@ -130,13 +130,11 @@ public class TestGovernorCheck {
 
         assertFalse(Files.exists(proposalFile), "Rejected proposal should be deleted");
         String printed = outBuffer.toString(StandardCharsets.UTF_8);
-        assertTrue(printed.contains("File deleted successfully"),
-                "Expected success deletion message");
+        assertTrue(printed.contains("File deleted successfully"), "Expected success deletion message");
     }
 
     /**
-     * Verifies that when the proposals folder does not exist, the UI reports it as
-     * "Folder not found or empty."
+     * Verifies that when the proposals folder does not exist, the UI reports it as "Folder not found or empty."
      */
     @Test
     void testViewProposalsNamesFolderNotFoundOrEmptyMessage() throws Exception {
@@ -145,7 +143,10 @@ public class TestGovernorCheck {
         // So we delete directory if possible.
         try (var stream = Files.list(PROPOSALS_DIR)) {
             stream.forEach(p -> {
-                try { Files.deleteIfExists(p); } catch (Exception ignored) {}
+                try {
+                    Files.deleteIfExists(p);
+                } catch (Exception ignored) {
+                }
             });
         }
         Files.deleteIfExists(PROPOSALS_DIR);
@@ -161,8 +162,7 @@ public class TestGovernorCheck {
     }
 
     /**
-     * Verifies that when the proposals folder exists but contains no files,
-     * the UI reports "Folder empty."
+     * Verifies that when the proposals folder exists but contains no files, the UI reports "Folder empty."
      */
     @Test
     void testViewProposalsNamesEmptyFolderPrintsFolderEmpty() throws Exception {
@@ -185,11 +185,11 @@ public class TestGovernorCheck {
     /**
      * Verifies the end-to-end "reject flow" via {@link GovernorCheck#viewProposalsNames()}:
      * <ul>
-     *   <li>Lists a proposal file</li>
-     *   <li>Accepts user selection</li>
-     *   <li>Displays file contents</li>
-     *   <li>Rejects changes ("no")</li>
-     *   <li>Deletes the proposal file</li>
+     * <li>Lists a proposal file</li>
+     * <li>Accepts user selection</li>
+     * <li>Displays file contents</li>
+     * <li>Rejects changes ("no")</li>
+     * <li>Deletes the proposal file</li>
      * </ul>
      */
     @Test
@@ -208,7 +208,7 @@ public class TestGovernorCheck {
         // Act
         gc.viewProposalsNames();
 
-        ///or Assert
+        /// or Assert
         String printed = outBuffer.toString(StandardCharsets.UTF_8);
         assertTrue(printed.contains(fileName + ".txt"), "Expected file to be listed by name");
         assertTrue(printed.contains("LINE1"), "Expected proposal content to be printed");
@@ -221,11 +221,13 @@ public class TestGovernorCheck {
     // ----------------- helper -----------------
 
     /**
-     * Replaces the internal {@code scanner} field with a scripted scanner,
-     * enabling deterministic tests without real console input.
+     * Replaces the internal {@code scanner} field with a scripted scanner, enabling deterministic tests without real
+     * console input.
      *
-     * @param gc the {@link GovernorCheck} instance
-     * @param inputScript newline-separated answers
+     * @param gc
+     *            the {@link GovernorCheck} instance
+     * @param inputScript
+     *            newline-separated answers
      */
     private static void injectScanner(GovernorCheck gc, String inputScript) throws Exception {
         Field f = GovernorCheck.class.getDeclaredField("scanner");
