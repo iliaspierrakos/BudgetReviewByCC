@@ -17,11 +17,9 @@ public class TestMinistry {
 
     @Test
     void testConstructorWithInvalidName() {
-        assertThrows(IllegalArgumentException.class,
-                () -> new Ministry("", 1000));
+        assertThrows(IllegalArgumentException.class, () -> new Ministry("", 1000));
 
-        assertThrows(IllegalArgumentException.class,
-                () -> new Ministry(null, 1000));
+        assertThrows(IllegalArgumentException.class, () -> new Ministry(null, 1000));
     }
 
     @Test
@@ -36,11 +34,9 @@ public class TestMinistry {
     void testSetMinistryNameInvalid() {
         Ministry m = new Ministry("Education", 500);
 
-        assertThrows(IllegalArgumentException.class,
-                () -> m.setMinistryName(""));
+        assertThrows(IllegalArgumentException.class, () -> m.setMinistryName(""));
 
-        assertThrows(IllegalArgumentException.class,
-                () -> m.setMinistryName(null));
+        assertThrows(IllegalArgumentException.class, () -> m.setMinistryName(null));
     }
 
     @Test
@@ -55,8 +51,7 @@ public class TestMinistry {
     void testSetBudgetNegative() {
         Ministry m = new Ministry("Finance", 1000);
 
-        assertThrows(IllegalArgumentException.class,
-                () -> m.setBudget(-1));
+        assertThrows(IllegalArgumentException.class, () -> m.setBudget(-1));
     }
 
     @Test
@@ -64,7 +59,7 @@ public class TestMinistry {
         Ministry m1 = new Ministry("Health", 1000);
         Ministry m2 = new Ministry("Education", 2000);
 
-        Ministry[] ministries = {m1, m2};
+        Ministry[] ministries = { m1, m2 };
 
         Ministry result = Ministry.findByName("education", ministries);
 
@@ -75,7 +70,7 @@ public class TestMinistry {
     @Test
     void testFindByNameNotFound() {
         Ministry m1 = new Ministry("Health", 1000);
-        Ministry[] ministries = {m1};
+        Ministry[] ministries = { m1 };
 
         Ministry result = Ministry.findByName("Defense", ministries);
 
@@ -87,7 +82,7 @@ public class TestMinistry {
         Ministry m1 = new Ministry("Health", 1000);
         Ministry m2 = new Ministry("Education", 2000);
 
-        Ministry[] ministries = {m1, m2};
+        Ministry[] ministries = { m1, m2 };
 
         double budget = Ministry.budgetSearchByName("Health", ministries);
 
@@ -97,10 +92,9 @@ public class TestMinistry {
     @Test
     void testBudgetSearchByNameNotFound() {
         Ministry m1 = new Ministry("Health", 1000);
-        Ministry[] ministries = {m1};
+        Ministry[] ministries = { m1 };
 
-        assertThrows(IllegalArgumentException.class,
-                () -> Ministry.budgetSearchByName("Defense", ministries));
+        assertThrows(IllegalArgumentException.class, () -> Ministry.budgetSearchByName("Defense", ministries));
     }
 
     @Test
