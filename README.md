@@ -360,3 +360,11 @@ You are free to use, modify, and distribute the source code, provided that the
 original copyright notice and license are included.
 
 See the `LICENSE` file for full license text.
+## Media & Presentation License
+
+The project presentation material (slides) and the accompanying video
+are released under the **Creative Commons Attribution 4.0 International
+(CC BY 4.0)** license.
+
+This means the material may be shared and adapted, provided appropriate
+credit is given to the original authors.
