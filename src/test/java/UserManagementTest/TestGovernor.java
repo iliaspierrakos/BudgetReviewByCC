@@ -13,22 +13,21 @@ import UserManagement.Governor;
  * Unit tests for {@link Governor}.
  *
  * <p>
- * This suite validates that a {@code Governor} is instantiated correctly and that
- * its textual representation matches the class contract.
+ * This suite validates that a {@code Governor} is instantiated correctly and that its textual representation matches
+ * the class contract.
  * </p>
  *
  * <p>
- * Since {@code Governor} extends {@code User}, the tests primarily assert the
- * externally observable behavior (username propagation and {@code toString()} output).
- * Optional checks for role and password are performed only when the corresponding
- * information is accessible (via public getters or fields).
+ * Since {@code Governor} extends {@code User}, the tests primarily assert the externally observable behavior (username
+ * propagation and {@code toString()} output). Optional checks for role and password are performed only when the
+ * corresponding information is accessible (via public getters or fields).
  * </p>
  */
 public class TestGovernor {
 
     /**
-     * Verifies that the constructor stores the username and that {@link Governor#toString()}
-     * matches the expected format.
+     * Verifies that the constructor stores the username and that {@link Governor#toString()} matches the expected
+     * format.
      */
     @Test
     void testConstructorSetsUsernameAndToString() {
@@ -39,8 +38,8 @@ public class TestGovernor {
     }
 
     /**
-     * Verifies that the governor role is {@code GOVERNOR} when such information
-     * is accessible either through a public getter or via reflection.
+     * Verifies that the governor role is {@code GOVERNOR} when such information is accessible either through a public
+     * getter or via reflection.
      */
     @Test
     void testRoleIsGovernorWhenAccessible() throws Exception {
@@ -59,8 +58,8 @@ public class TestGovernor {
      * Verifies that the password is stored when such information is accessible.
      *
      * <p>
-     * Many systems avoid exposing passwords; therefore, this test only asserts
-     * when the password value is actually reachable from the object.
+     * Many systems avoid exposing passwords; therefore, this test only asserts when the password value is actually
+     * reachable from the object.
      * </p>
      */
     @Test
@@ -77,17 +76,22 @@ public class TestGovernor {
     }
 
     /**
-     * Attempts to read a value either via a no-arg getter method or via a field,
-     * walking up the class hierarchy if needed.
+     * Attempts to read a value either via a no-arg getter method or via a field, walking up the class hierarchy if
+     * needed.
      *
-     * @param instance  the object to inspect
-     * @param getterName candidate getter name (e.g. {@code getRole})
-     * @param fieldName candidate field name (e.g. {@code role})
+     * @param instance
+     *            the object to inspect
+     * @param getterName
+     *            candidate getter name (e.g. {@code getRole})
+     * @param fieldName
+     *            candidate field name (e.g. {@code role})
+     *
      * @return the value if found; otherwise {@code null}
-     * @throws Exception if reflection access fails unexpectedly
+     *
+     * @throws Exception
+     *             if reflection access fails unexpectedly
      */
-    private static Object readPropertyIfExists(Object instance, String getterName, String fieldName)
-            throws Exception {
+    private static Object readPropertyIfExists(Object instance, String getterName, String fieldName) throws Exception {
 
         // 1) Try public getter
         try {
