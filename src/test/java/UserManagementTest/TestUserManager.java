@@ -17,13 +17,13 @@ import UserManagement.UserManager;
  * Unit tests for {@link UserManager}.
  *
  * <p>
- * These tests validate the core (non-UI) behavior of the user management subsystem:
- * registration rules, login/logout behavior, and persistence to {@code data/users.txt}.
+ * These tests validate the core (non-UI) behavior of the user management subsystem: registration rules, login/logout
+ * behavior, and persistence to {@code data/users.txt}.
  * </p>
  *
  * <p>
- * {@link UserManager} uses a fixed relative storage path ({@code data/users.txt}).
- * Therefore, each test resets the file to ensure isolation and repeatability.
+ * {@link UserManager} uses a fixed relative storage path ({@code data/users.txt}). Therefore, each test resets the file
+ * to ensure isolation and repeatability.
  * </p>
  */
 public class TestUserManager {
@@ -34,7 +34,8 @@ public class TestUserManager {
     /**
      * Ensures the persistent user store starts empty for every test.
      *
-     * @throws IOException if file operations fail
+     * @throws IOException
+     *             if file operations fail
      */
     @BeforeEach
     void resetUsersFile() throws IOException {
@@ -44,8 +45,8 @@ public class TestUserManager {
     }
 
     /**
-     * Verifies that {@link UserManager} initializes storage on construction
-     * and guarantees that {@code data/users.txt} exists.
+     * Verifies that {@link UserManager} initializes storage on construction and guarantees that {@code data/users.txt}
+     * exists.
      */
     @Test
     void testConstructorInitializesStorageFile() {
@@ -54,10 +55,11 @@ public class TestUserManager {
     }
 
     /**
-     * Verifies that registering a Citizen succeeds and is persisted to disk,
-     * and that a fresh {@link UserManager} instance can load and authenticate that user.
+     * Verifies that registering a Citizen succeeds and is persisted to disk, and that a fresh {@link UserManager}
+     * instance can load and authenticate that user.
      *
-     * @throws IOException if reading the storage file fails
+     * @throws IOException
+     *             if reading the storage file fails
      */
     @Test
     void testRegisterCitizenPersistsAndLoads() throws IOException {
@@ -87,10 +89,8 @@ public class TestUserManager {
     void testRegisterDuplicateUsernameFails() {
         UserManager um = new UserManager();
 
-        assertTrue(um.registerUser("bob", "pw1", User.Role.CITIZEN),
-                "First registration should succeed");
-        assertFalse(um.registerUser("bob", "pw2", User.Role.CITIZEN),
-                "Duplicate username should be rejected");
+        assertTrue(um.registerUser("bob", "pw1", User.Role.CITIZEN), "First registration should succeed");
+        assertFalse(um.registerUser("bob", "pw2", User.Role.CITIZEN), "Duplicate username should be rejected");
     }
 
     /**
@@ -100,10 +100,8 @@ public class TestUserManager {
     void testOnlyOneGovernorAllowed() {
         UserManager um = new UserManager();
 
-        assertTrue(um.registerUser("gov1", "pw", User.Role.GOVERNOR),
-                "First governor should be allowed");
-        assertFalse(um.registerUser("gov2", "pw", User.Role.GOVERNOR),
-                "Second governor should be rejected");
+        assertTrue(um.registerUser("gov1", "pw", User.Role.GOVERNOR), "First governor should be allowed");
+        assertFalse(um.registerUser("gov2", "pw", User.Role.GOVERNOR), "Second governor should be rejected");
     }
 
     /**
@@ -133,10 +131,8 @@ public class TestUserManager {
             assertTrue(ok, "MinistryMember #" + i + " should be allowed");
         }
 
-        assertFalse(
-                um.registerUser("mm11", "pw", User.Role.MINISTRYMEMBER, "Ministry of Finance"),
-                "11th MinistryMember should be rejected (limit is 10)"
-        );
+        assertFalse(um.registerUser("mm11", "pw", User.Role.MINISTRYMEMBER, "Ministry of Finance"),
+                "11th MinistryMember should be rejected (limit is 10)");
     }
 
     /**
@@ -147,10 +143,8 @@ public class TestUserManager {
         UserManager um = new UserManager();
         um.registerUser("charlie", "secret", User.Role.CITIZEN);
 
-        assertNull(um.loginUser("charlie", "wrong"),
-                "Login should fail with wrong password");
-        assertNull(um.getCurrentUser(),
-                "Current user should remain null after failed login");
+        assertNull(um.loginUser("charlie", "wrong"), "Login should fail with wrong password");
+        assertNull(um.getCurrentUser(), "Current user should remain null after failed login");
 
         User logged = um.loginUser("charlie", "secret");
         assertNotNull(logged, "Login should succeed with correct password");
