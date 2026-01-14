@@ -70,29 +70,21 @@ public class TestPropose {
 
     @Test
     void testSubmitEditsThrowsIfNoEdits() {
-        assertThrows(IllegalStateException.class, () ->
-                propose.submitEditsProposalBlock("Nothing to submit")
-        );
+        assertThrows(IllegalStateException.class, () -> propose.submitEditsProposalBlock("Nothing to submit"));
     }
 
     @Test
     void testMultipleProposalBlocksAppend() throws Exception {
-        Edit.history.addEdit(
-                new Edit("Ministry of Finance", "Increase", 100, "fixed")
-        );
+        Edit.history.addEdit(new Edit("Ministry of Finance", "Increase", 100, "fixed"));
         propose.submitEditsProposalBlock("First proposal");
 
         Edit.history.clear();
-        Edit.history.addEdit(
-                new Edit("Ministry of Finance", "Decrease", 50, "fixed")
-        );
+        Edit.history.addEdit(new Edit("Ministry of Finance", "Decrease", 50, "fixed"));
         propose.submitEditsProposalBlock("Second proposal");
 
         List<String> lines = Files.readAllLines(proposalFile.toPath());
 
-        long proposalCount = lines.stream()
-                .filter(l -> l.startsWith("PROPOSAL|"))
-                .count();
+        long proposalCount = lines.stream().filter(l -> l.startsWith("PROPOSAL|")).count();
 
         assertEquals(2, proposalCount);
     }
