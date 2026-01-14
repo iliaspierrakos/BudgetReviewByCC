@@ -1,4 +1,5 @@
 package UserManagementTest;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.lang.reflect.Field;
@@ -12,21 +13,21 @@ import UserManagement.Citizen;
  * Unit tests for {@link Citizen}.
  *
  * <p>
- * This suite verifies that a {@code Citizen} is constructed correctly and that
- * its string representation matches the specification.
+ * This suite verifies that a {@code Citizen} is constructed correctly and that its string representation matches the
+ * specification.
  * </p>
  *
  * <p>
- * Since {@code Citizen} extends {@code User}, some checks are performed via
- * public getters when available. For optional properties (like role/password),
- * reflection-based fallbacks are used to keep tests robust across small API variations.
+ * Since {@code Citizen} extends {@code User}, some checks are performed via public getters when available. For optional
+ * properties (like role/password), reflection-based fallbacks are used to keep tests robust across small API
+ * variations.
  * </p>
  */
 public class TestCitizen {
 
     /**
-     * Verifies that the constructor stores the username and that {@link Citizen#toString()}
-     * includes the expected prefix and username.
+     * Verifies that the constructor stores the username and that {@link Citizen#toString()} includes the expected
+     * prefix and username.
      */
     @Test
     void testConstructorSetsUsernameAndToString() {
@@ -37,8 +38,8 @@ public class TestCitizen {
     }
 
     /**
-     * Verifies that the citizen role is {@code CITIZEN} when such information
-     * is accessible either through a public getter or via reflection.
+     * Verifies that the citizen role is {@code CITIZEN} when such information is accessible either through a public
+     * getter or via reflection.
      */
     @Test
     void testRoleIsCitizenWhenAccessible() throws Exception {
@@ -55,12 +56,12 @@ public class TestCitizen {
     }
 
     /**
-     * Verifies that the password is stored when such information is accessible
-     * either through a public getter or via reflection.
+     * Verifies that the password is stored when such information is accessible either through a public getter or via
+     * reflection.
      *
      * <p>
-     * Many systems intentionally do not expose raw passwords, so this test is
-     * tolerant: it only asserts when the value is actually reachable.
+     * Many systems intentionally do not expose raw passwords, so this test is tolerant: it only asserts when the value
+     * is actually reachable.
      * </p>
      */
     @Test
@@ -79,13 +80,16 @@ public class TestCitizen {
     /**
      * Attempts to read a value either via a no-arg getter method or via a field.
      *
-     * @param instance the object to inspect
-     * @param getterName candidate getter method name (e.g. "getRole")
-     * @param fieldName candidate field name (e.g. "role")
+     * @param instance
+     *            the object to inspect
+     * @param getterName
+     *            candidate getter method name (e.g. "getRole")
+     * @param fieldName
+     *            candidate field name (e.g. "role")
+     *
      * @return the value if found, otherwise {@code null}
      */
-    private static Object readPropertyIfExists(Object instance, String getterName, String fieldName)
-            throws Exception {
+    private static Object readPropertyIfExists(Object instance, String getterName, String fieldName) throws Exception {
 
         // 1) Try getter
         try {
