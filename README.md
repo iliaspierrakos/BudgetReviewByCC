@@ -158,7 +158,7 @@ BudgetReviewByCC/
 │   │   │   ├── UserFeatures/     # Budget logic, proposals, statistics
 │   │   │   ├── guiFolder/        # JavaFX UI screens
 │   │   │   └── NecessaryFilesAndData/
-│   │   │       └── UserBudgets/  # User-specific budget data
+│   │   │       └── UserBudgets/  #Budget data, csv files
 │   │   │
 │   │   └── resources/
 │   │       ├── NecessaryFilesAndData/   # Budget datasets (2020–2026)
