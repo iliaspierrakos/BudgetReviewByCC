@@ -317,4 +317,3 @@ open docs/index.html
 
 ---
 Opening this file in a web browser provides a complete, navigable view of the application's API documentation, including class hierarchies and package overviews.
-
