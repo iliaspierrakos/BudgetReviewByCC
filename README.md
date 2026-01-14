@@ -267,7 +267,42 @@ The system implements multiple algorithms to support decision-making, analysis, 
 mvn clean test
 ```
 
-* Code coverage generated using **JaCoCo**
+### Automated Testing
+
+The application includes an extensive suite of automated tests implemented
+using **JUnit 5**, focusing on validating the correctness of the core business
+logic.
+
+The tests primarily cover:
+- Budget management and modification logic
+- Proposal submission and aggregation
+- Tax calculation functionality
+- Ministry and budget data handling
+- User-related operations where applicable
+
+Test execution can be performed using:
+
+```bash
+mvn clean test
+```
+---
+### Code Coverage
+
+Code coverage analysis is performed using **JaCoCo**, which is integrated into
+the Maven build lifecycle of the project.
+
+JaCoCo is used to measure how much of the source code is exercised by the
+automated test suite during execution.
+
+- Coverage analysis is executed automatically during the `test` phase
+- The current test suite achieves approximately **70% overall code coverage**
+- The coverage primarily focuses on the core business logic of the application
+
+The generated HTML coverage report is available at:
+
+```text
+/target/site/jacoco/index.html
+```
 
 ---
 ## JavaDoc Comments and Code Documentation
@@ -315,41 +350,4 @@ open docs/index.html
 Opening this file in a web browser provides a complete, navigable view of the application's API documentation, including class hierarchies and package overviews.
 
 ---
-
-### Automated Testing
-
-The application includes an extensive suite of automated tests implemented
-using **JUnit 5**, focusing on validating the correctness of the core business
-logic.
-
-The tests primarily cover:
-- Budget management and modification logic
-- Proposal submission and aggregation
-- Tax calculation functionality
-- Ministry and budget data handling
-- User-related operations where applicable
-
-Test execution can be performed using:
-
-```bash
-mvn clean test
-```
----
-### Code Coverage
-
-Code coverage analysis is performed using **JaCoCo**, which is integrated into
-the Maven build lifecycle of the project.
-
-JaCoCo is used to measure how much of the source code is exercised by the
-automated test suite during execution.
-
-- Coverage analysis is executed automatically during the `test` phase
-- The current test suite achieves approximately **70% overall code coverage**
-- The coverage primarily focuses on the core business logic of the application
-
-The generated HTML coverage report is available at:
-
-```text
-/target/site/jacoco/index.html
-```
 
