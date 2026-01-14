@@ -23,13 +23,11 @@ public class TestCompare {
 
     @Test
     void toMapByName_nullArray_returnsEmptyMap() throws Exception {
-        Method m =
-                Compare.class.getDeclaredMethod("toMapByName", Ministry[].class);
+        Method m = Compare.class.getDeclaredMethod("toMapByName", Ministry[].class);
         m.setAccessible(true);
 
         @SuppressWarnings("unchecked")
-        Map<String, Ministry> result =
-                (Map<String, Ministry>) m.invoke(null, (Object) null);
+        Map<String, Ministry> result = (Map<String, Ministry>) m.invoke(null, (Object) null);
 
         assertNotNull(result);
         assertTrue(result.isEmpty());
@@ -37,8 +35,7 @@ public class TestCompare {
 
     @Test
     void toMapByName_ignoresNullElements() throws Exception {
-        Method m =
-                Compare.class.getDeclaredMethod("toMapByName", Ministry[].class);
+        Method m = Compare.class.getDeclaredMethod("toMapByName", Ministry[].class);
         m.setAccessible(true);
 
         Ministry a = new Ministry("Health", 1000);
@@ -47,8 +44,7 @@ public class TestCompare {
         Ministry[] input = { a, null, b };
 
         @SuppressWarnings("unchecked")
-        Map<String, Ministry> result =
-                (Map<String, Ministry>) m.invoke(null, (Object) input);
+        Map<String, Ministry> result = (Map<String, Ministry>) m.invoke(null, (Object) input);
 
         assertEquals(2, result.size());
         assertSame(a, result.get("Health"));
@@ -59,8 +55,7 @@ public class TestCompare {
 
     @Test
     void compareRow_getters_work() {
-        Compare.CompareRow row =
-                new Compare.CompareRow("Health", "1000", "2000");
+        Compare.CompareRow row = new Compare.CompareRow("Health", "1000", "2000");
 
         assertEquals("Health", row.getMinistry());
         assertEquals("1000", row.getFirstYearBudget());
@@ -73,21 +68,15 @@ public class TestCompare {
     void guiRows_bothYearsHaveData() {
         Compare.TEST_MINISTRY_PROVIDER = year -> {
             if (year == 2020) {
-                return new Ministry[] {
-                        new Ministry("Health", 1000),
-                        new Ministry("Education", 2000)
-                };
+                return new Ministry[] { new Ministry("Health", 1000), new Ministry("Education", 2000) };
             }
             if (year == 2021) {
-                return new Ministry[] {
-                        new Ministry("Health", 1500)
-                };
+                return new Ministry[] { new Ministry("Health", 1500) };
             }
             return null;
         };
 
-        List<Compare.CompareRow> rows =
-                Compare.getComparisonRowsForGui(2020, 2021);
+        List<Compare.CompareRow> rows = Compare.getComparisonRowsForGui(2020, 2021);
 
         assertEquals(2, rows.size());
 
@@ -106,8 +95,7 @@ public class TestCompare {
     void guiRows_missingYear_returnsEmpty() {
         Compare.TEST_MINISTRY_PROVIDER = year -> null;
 
-        List<Compare.CompareRow> rows =
-                Compare.getComparisonRowsForGui(2020, 2021);
+        List<Compare.CompareRow> rows = Compare.getComparisonRowsForGui(2020, 2021);
 
         assertNotNull(rows);
         assertTrue(rows.isEmpty());
