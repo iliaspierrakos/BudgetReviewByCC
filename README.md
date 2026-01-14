@@ -352,4 +352,11 @@ xdg-open docs/index.html
 Opening this file in a web browser provides a complete, navigable view of the application's API documentation, including class hierarchies and package overviews.
 
 ---
+## License
 
+This project is released under the **MIT License**.
+
+You are free to use, modify, and distribute the source code, provided that the
+original copyright notice and license are included.
+
+See the `LICENSE` file for full license text.
