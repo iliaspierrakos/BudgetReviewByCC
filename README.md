@@ -185,7 +185,7 @@ The diagram was created using **StarUML** and focuses on:
 - Service and logic classes (`Compare`, `TaxReceipt`, `RecommendationSystem`)
 - Key relationships such as inheritance, composition, and association
 
-### UML Diagram Location
+### UML Location
 
 The UML diagram is included in the root directory of the repository:
 ```text
