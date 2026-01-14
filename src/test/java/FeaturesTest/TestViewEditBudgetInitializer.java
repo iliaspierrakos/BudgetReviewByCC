@@ -27,17 +27,11 @@ public class TestViewEditBudgetInitializer {
     void testDirectoriesAreCreated() {
         ViewEditBudgetInitializer.ensureInitialized();
 
-        assertTrue(Files.exists(
-                Path.of("src/main/resources/NecessaryFilesAndData")
-        ));
+        assertTrue(Files.exists(Path.of("src/main/resources/NecessaryFilesAndData")));
 
-        assertTrue(Files.exists(
-                Path.of("src/main/resources/NecessaryFilesAndData/UserBudgets")
-        ));
+        assertTrue(Files.exists(Path.of("src/main/resources/NecessaryFilesAndData/UserBudgets")));
 
-        assertTrue(Files.exists(
-                Path.of("src/main/resources/NecessaryFilesAndData/OriginalBudget")
-        ));
+        assertTrue(Files.exists(Path.of("src/main/resources/NecessaryFilesAndData/OriginalBudget")));
     }
 
     @Test
@@ -45,9 +39,6 @@ public class TestViewEditBudgetInitializer {
         ViewEditBudgetInitializer.ensureInitialized();
 
         assertNotNull(CreatingMinistries.ministries2026);
-        assertTrue(
-                CreatingMinistries.ministries2026.length > 0,
-                "ministries2026 array should be initialized"
-        );
+        assertTrue(CreatingMinistries.ministries2026.length > 0, "ministries2026 array should be initialized");
     }
 }
