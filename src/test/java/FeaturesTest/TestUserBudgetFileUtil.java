@@ -22,11 +22,12 @@ public class TestUserBudgetFileUtil {
     void cleanup() throws Exception {
         Path dir = Path.of("src/main/resources/NecessaryFilesAndData/UserBudgets");
         if (Files.exists(dir)) {
-            Files.walk(dir)
-                    .filter(Files::isRegularFile)
-                    .forEach(p -> {
-                        try { Files.deleteIfExists(p); } catch (Exception ignored) {}
-                    });
+            Files.walk(dir).filter(Files::isRegularFile).forEach(p -> {
+                try {
+                    Files.deleteIfExists(p);
+                } catch (Exception ignored) {
+                }
+            });
         }
     }
 
@@ -53,10 +54,8 @@ public class TestUserBudgetFileUtil {
         // Arrange
         User user = new User("budgetuser", "pass", User.Role.CITIZEN);
 
-        CreatingMinistries.ministries2026 = new Ministry[]{
-                new Ministry("Ministry of Health", 1000),
-                new Ministry("Ministry of Education", 2000)
-        };
+        CreatingMinistries.ministries2026 = new Ministry[] { new Ministry("Ministry of Health", 1000),
+                new Ministry("Ministry of Education", 2000) };
 
         Edit.balance = 500;
 
