@@ -190,6 +190,7 @@ The diagram was created using **StarUML** and focuses on:
 The UML diagram is included in the root directory of the repository:
 ```text
 BudgetReviewByCC/uml-diagram.mdj
+```
 ---
 
 ## Data Structures & Algorithms Overview
