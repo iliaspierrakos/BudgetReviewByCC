@@ -158,17 +158,16 @@ BudgetReviewByCC/
 │   │   │   ├── UserFeatures/     # Budget logic, proposals, statistics
 │   │   │   ├── guiFolder/        # JavaFX UI screens
 │   │   │
-│   │   │      
-│   │   │
 │   │   └── resources/
-│   │       ├── NecessaryFilesAndData/   # Budget datasets(2020–2026), csv files
+│   │       ├── NecessaryFilesAndData/   # Budget datasets (2020–2026), csv files
 │   │       ├── css/                     # UI styles
 │   │       ├── icons/                   # UI icons
 │   │       └── guiFolder/               # Images and UI assets
 │   │
 │   └── test/
 │       └── java/
-│           └── FeaturesTest/            # JUnit test cases
+│           ├── FeaturesTest/            # JUnit tests for user features
+│           └── UserManagementTest/      # JUnit tests for user management
 │
 └── target/                       # Build output and reports
 ```
