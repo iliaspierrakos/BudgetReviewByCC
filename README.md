@@ -335,14 +335,19 @@ The use of JavaDoc improves:
 
 ### JavaDoc Access
 
-The generated JavaDoc output is included in the repository and can be accessed locally via:
+### JavaDoc Access
+
+The generated JavaDoc documentation can be accessed locally by opening the entry file:
 
 ```bash
-Windows
-start docs/index.html
 macOS
 open docs/index.html
 
+Windows
+start docs/index.html
+
+Linux
+xdg-open docs/index.html
 ```
 Opening this file in a web browser provides a complete, navigable view of the application's API documentation, including class hierarchies and package overviews.
 
