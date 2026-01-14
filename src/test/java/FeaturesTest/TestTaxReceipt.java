@@ -17,19 +17,15 @@ public class TestTaxReceipt {
     @BeforeEach
     void setup() {
         // Setup σταθερό κυβερνητικό budget
-        CreatingMinistries.ministries2026 = new Ministry[]{
-                new Ministry("Ministry of Health", 2000),
-                new Ministry("Ministry of Education", 3000),
-                new Ministry("Ministry of Finance", 5000)
-        };
+        CreatingMinistries.ministries2026 = new Ministry[] { new Ministry("Ministry of Health", 2000),
+                new Ministry("Ministry of Education", 3000), new Ministry("Ministry of Finance", 5000) };
     }
 
     @Test
     void testGenerateForGuiBasicScenario() {
-        TaxResult result = TaxReceipt.generateForGui(
-                30000, // income
-                1,     // kids
-                40     // age
+        TaxResult result = TaxReceipt.generateForGui(30000, // income
+                1, // kids
+                40 // age
         );
 
         assertNotNull(result);
@@ -57,10 +53,7 @@ public class TestTaxReceipt {
     void testDistributionSumsApproximatelyToTax() {
         TaxResult result = TaxReceipt.generateForGui(40000, 0, 45);
 
-        double sum = result.getRows()
-                .stream()
-                .mapToDouble(TaxRow::getShareValue)
-                .sum();
+        double sum = result.getRows().stream().mapToDouble(TaxRow::getShareValue).sum();
 
         // floating point ανοχή
         assertEquals(result.getTax(), sum, 0.01);
@@ -79,10 +72,7 @@ public class TestTaxReceipt {
 
     @Test
     void testYoungPersonTaxExemption() {
-        TaxResult result = TaxReceipt.generateForGui(
-                15000,
-                0,
-                23   // age <= 25 => μειωμένος/μηδενικός φόρος
+        TaxResult result = TaxReceipt.generateForGui(15000, 0, 23 // age <= 25 => μειωμένος/μηδενικός φόρος
         );
 
         assertEquals(0, result.getTax(), 0.01);
@@ -91,29 +81,23 @@ public class TestTaxReceipt {
 
     @Test
     void testInvalidIncomeThrows() {
-        assertThrows(IllegalArgumentException.class,
-                () -> TaxReceipt.generateForGui(-1, 0, 30));
+        assertThrows(IllegalArgumentException.class, () -> TaxReceipt.generateForGui(-1, 0, 30));
     }
 
     @Test
     void testInvalidKidsThrows() {
-        assertThrows(IllegalArgumentException.class,
-                () -> TaxReceipt.generateForGui(20000, -2, 30));
+        assertThrows(IllegalArgumentException.class, () -> TaxReceipt.generateForGui(20000, -2, 30));
     }
 
     @Test
     void testInvalidAgeThrows() {
-        assertThrows(IllegalArgumentException.class,
-                () -> TaxReceipt.generateForGui(20000, 1, 17));
+        assertThrows(IllegalArgumentException.class, () -> TaxReceipt.generateForGui(20000, 1, 17));
     }
 
     @Test
     void testZeroGovernmentBudgetThrows() {
-        CreatingMinistries.ministries2026 = new Ministry[]{
-                new Ministry("Ministry of Empty", 0)
-        };
+        CreatingMinistries.ministries2026 = new Ministry[] { new Ministry("Ministry of Empty", 0) };
 
-        assertThrows(IllegalStateException.class,
-                () -> TaxReceipt.generateForGui(20000, 0, 40));
+        assertThrows(IllegalStateException.class, () -> TaxReceipt.generateForGui(20000, 0, 40));
     }
 }
