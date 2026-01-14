@@ -22,11 +22,12 @@ public class TestUserBudgetPersistence {
     void cleanup() throws Exception {
         Path dir = Path.of("src/main/resources/NecessaryFilesAndData/UserBudgets");
         if (Files.exists(dir)) {
-            Files.walk(dir)
-                    .filter(Files::isRegularFile)
-                    .forEach(p -> {
-                        try { Files.deleteIfExists(p); } catch (Exception ignored) {}
-                    });
+            Files.walk(dir).filter(Files::isRegularFile).forEach(p -> {
+                try {
+                    Files.deleteIfExists(p);
+                } catch (Exception ignored) {
+                }
+            });
         }
     }
 
@@ -35,11 +36,8 @@ public class TestUserBudgetPersistence {
         // Arrange
         User user = new User("persistuser", "pass", User.Role.CITIZEN);
 
-        Ministry[] ministries = new Ministry[]{
-                new Ministry("Ministry of Health", 1500),
-                null,
-                new Ministry("Ministry of Education", 2500)
-        };
+        Ministry[] ministries = new Ministry[] { new Ministry("Ministry of Health", 1500), null,
+                new Ministry("Ministry of Education", 2500) };
 
         Edit.balance = 700;
 
@@ -55,11 +53,9 @@ public class TestUserBudgetPersistence {
         assertFalse(lines.isEmpty());
         assertEquals("BALANCE,700.0", lines.get(0));
 
-        assertTrue(lines.stream()
-                .anyMatch(l -> l.equals("Ministry of Health,1500.0")));
+        assertTrue(lines.stream().anyMatch(l -> l.equals("Ministry of Health,1500.0")));
 
-        assertTrue(lines.stream()
-                .anyMatch(l -> l.equals("Ministry of Education,2500.0")));
+        assertTrue(lines.stream().anyMatch(l -> l.equals("Ministry of Education,2500.0")));
 
         // Δεν πρέπει να υπάρχει γραμμή για null ministry
         assertEquals(3, lines.size());
@@ -71,7 +67,6 @@ public class TestUserBudgetPersistence {
         Ministry[] ministries = new Ministry[0];
         Edit.balance = 0;
 
-        assertDoesNotThrow(() ->
-                UserBudgetPersistence.saveUserBudgets(user, ministries, YEAR));
+        assertDoesNotThrow(() -> UserBudgetPersistence.saveUserBudgets(user, ministries, YEAR));
     }
 }
