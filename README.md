@@ -15,7 +15,7 @@ The application is built using **Java**, **Maven**, and **JavaFX**, and includes
 
 ## Prerequisites
 
-**Java **25**
+* Java **21+** (the project is compiled targeting Java 21; newer JDKs such as Java 25 are supported)
 * Apache **Maven**
 * JavaFX (handled via Maven dependencies)
 
