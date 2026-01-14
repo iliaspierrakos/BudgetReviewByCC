@@ -23,9 +23,7 @@ public class TestEditHistoryList {
         Edit.history = new EditHistoryList();
 
         // ensure ministry exists
-        CreatingMinistries.ministries2026 = new Ministry[]{
-                new Ministry("Ministry of Health", 1000)
-        };
+        CreatingMinistries.ministries2026 = new Ministry[] { new Ministry("Ministry of Health", 1000) };
 
         ministry = CreatingMinistries.ministries2026[0];
         history = new EditHistoryList();
