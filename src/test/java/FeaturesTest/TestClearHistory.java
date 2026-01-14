@@ -16,11 +16,7 @@ public class TestClearHistory {
     void testClearFileEmptiesExistingFile() throws Exception {
         // Arrange
         Path tempFile = Files.createTempFile("history", ".txt");
-        Files.write(tempFile, List.of(
-                "Line 1",
-                "Line 2",
-                "Line 3"
-        ), StandardCharsets.UTF_8);
+        Files.write(tempFile, List.of("Line 1", "Line 2", "Line 3"), StandardCharsets.UTF_8);
 
         assertTrue(Files.size(tempFile) > 0);
 
