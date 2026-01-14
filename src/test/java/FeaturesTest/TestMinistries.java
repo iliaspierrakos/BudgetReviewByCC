@@ -16,8 +16,7 @@ import UserFeatures.Ministries;
  * Unit tests for {@link Ministries}.
  *
  * <p>
- * These tests verify that the ministries list file is correctly created
- * and populated with the expected ministry names.
+ * These tests verify that the ministries list file is correctly created and populated with the expected ministry names.
  * </p>
  */
 public class TestMinistries {
@@ -46,13 +45,11 @@ public class TestMinistries {
     void testMinistriesFileIsCreated() {
         new Ministries().minlist();
 
-        assertTrue(Files.exists(outputFile),
-                "ministries.txt file should be created");
+        assertTrue(Files.exists(outputFile), "ministries.txt file should be created");
     }
 
     /**
-     * Verifies that the ministries file contains all expected ministry names
-     * in the correct order.
+     * Verifies that the ministries file contains all expected ministry names in the correct order.
      */
     @Test
     void testMinistriesFileContent() throws IOException {
@@ -60,8 +57,7 @@ public class TestMinistries {
 
         List<String> lines = Files.readAllLines(outputFile, StandardCharsets.UTF_8);
 
-        assertEquals(20, lines.size(),
-                "ministries.txt should contain exactly 20 ministries");
+        assertEquals(20, lines.size(), "ministries.txt should contain exactly 20 ministries");
 
         assertEquals("Ministry of Interior", lines.get(0));
         assertEquals("Ministry of Foreign Affairs", lines.get(1));
@@ -86,8 +82,8 @@ public class TestMinistries {
     }
 
     /**
-     * Verifies that calling {@code minlist()} multiple times
-     * overwrites the file instead of appending duplicate entries.
+     * Verifies that calling {@code minlist()} multiple times overwrites the file instead of appending duplicate
+     * entries.
      */
     @Test
     void testMinistriesFileIsOverwritten() throws IOException {
@@ -98,7 +94,6 @@ public class TestMinistries {
 
         List<String> lines = Files.readAllLines(outputFile, StandardCharsets.UTF_8);
 
-        assertEquals(20, lines.size(),
-                "Calling minlist() multiple times should not duplicate entries");
+        assertEquals(20, lines.size(), "Calling minlist() multiple times should not duplicate entries");
     }
 }
