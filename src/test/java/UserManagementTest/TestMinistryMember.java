@@ -16,15 +16,14 @@ import UserManagement.MinistryMember;
  * These tests validate the user-facing behavior of {@code MinistryMember}:
  * </p>
  * <ul>
- *   <li>Ministry association is stored and can be updated</li>
- *   <li>Username is propagated via the {@code User} superclass</li>
- *   <li>{@code toString()} includes username and ministry name</li>
+ * <li>Ministry association is stored and can be updated</li>
+ * <li>Username is propagated via the {@code User} superclass</li>
+ * <li>{@code toString()} includes username and ministry name</li>
  * </ul>
  *
  * <p>
- * Optional checks for role/password are performed only when those values are
- * accessible (via getters or fields). This keeps the test suite compatible
- * with different {@code User} encapsulation strategies.
+ * Optional checks for role/password are performed only when those values are accessible (via getters or fields). This
+ * keeps the test suite compatible with different {@code User} encapsulation strategies.
  * </p>
  */
 public class TestMinistryMember {
@@ -54,8 +53,8 @@ public class TestMinistryMember {
     }
 
     /**
-     * Verifies that {@link MinistryMember#toString()} includes the username and ministry name
-     * in the expected format: {@code "MinistryMember: <username> (<ministryName>)"}.
+     * Verifies that {@link MinistryMember#toString()} includes the username and ministry name in the expected format:
+     * {@code "MinistryMember: <username> (<ministryName>)"}.
      */
     @Test
     void testToStringFormat() {
@@ -66,8 +65,8 @@ public class TestMinistryMember {
     }
 
     /**
-     * Verifies that the role is {@code MINISTRYMEMBER} when such information is accessible
-     * either through a public getter or via reflection.
+     * Verifies that the role is {@code MINISTRYMEMBER} when such information is accessible either through a public
+     * getter or via reflection.
      */
     @Test
     void testRoleIsMinistryMemberWhenAccessible() throws Exception {
@@ -86,8 +85,8 @@ public class TestMinistryMember {
      * Verifies that the password is stored when such information is accessible.
      *
      * <p>
-     * In many designs, raw passwords are intentionally not exposed. Therefore,
-     * this test only asserts if the password can be read.
+     * In many designs, raw passwords are intentionally not exposed. Therefore, this test only asserts if the password
+     * can be read.
      * </p>
      */
     @Test
@@ -104,17 +103,22 @@ public class TestMinistryMember {
     }
 
     /**
-     * Attempts to read a value either via a no-arg getter method or via a field,
-     * walking up the class hierarchy if needed.
+     * Attempts to read a value either via a no-arg getter method or via a field, walking up the class hierarchy if
+     * needed.
      *
-     * @param instance  the object to inspect
-     * @param getterName candidate getter name (e.g. {@code getRole})
-     * @param fieldName candidate field name (e.g. {@code role})
+     * @param instance
+     *            the object to inspect
+     * @param getterName
+     *            candidate getter name (e.g. {@code getRole})
+     * @param fieldName
+     *            candidate field name (e.g. {@code role})
+     *
      * @return the value if found; otherwise {@code null}
-     * @throws Exception if reflection access fails unexpectedly
+     *
+     * @throws Exception
+     *             if reflection access fails unexpectedly
      */
-    private static Object readPropertyIfExists(Object instance, String getterName, String fieldName)
-            throws Exception {
+    private static Object readPropertyIfExists(Object instance, String getterName, String fieldName) throws Exception {
 
         // 1) Try public getter
         try {
