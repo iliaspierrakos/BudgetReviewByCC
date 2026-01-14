@@ -303,23 +303,18 @@ The use of JavaDoc improves:
 
 ---
 
-### JavaDoc Generation
-
-The JavaDoc documentation can be generated automatically using Maven:
-
-```bash
-mvn javadoc:javadoc
-```
-
----
-
 ### JavaDoc Access
 
 The generated JavaDoc output is included in the repository and can be accessed locally via:
 
-```text
-/docs/index.html
+```
+Windows
+start docs/index.html
+macOS
+open docs/index.html
+
 ```
 
+---
 Opening this file in a web browser provides a complete, navigable view of the application's API documentation, including class hierarchies and package overviews.
 
