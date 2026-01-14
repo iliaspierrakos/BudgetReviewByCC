@@ -109,15 +109,12 @@ class TestRecommendationSystem {
 
         RecommendationSystem newSystem = new RecommendationSystem();
 
-        assertEquals(
-                2,
-                newSystem.getTotalVotesForMinistry(ministry),
-                "Votes should persist after reload"
-        );
+        assertEquals(2, newSystem.getTotalVotesForMinistry(ministry), "Votes should persist after reload");
     }
 
     private static void deleteDirectory(File dir) {
-        if (!dir.exists()) return;
+        if (!dir.exists())
+            return;
 
         File[] files = dir.listFiles();
         if (files != null) {
