@@ -259,16 +259,6 @@ The system implements multiple algorithms to support decision-making, analysis, 
 ---
 
 ## Testing & Code Quality
-
-* Automated tests implemented using **JUnit 5**
-* Test execution:
-
-```bash
-mvn clean test
-```
-
-### Automated Testing
-
 The application includes an extensive suite of automated tests implemented
 using **JUnit 5**, focusing on validating the correctness of the core business
 logic.
