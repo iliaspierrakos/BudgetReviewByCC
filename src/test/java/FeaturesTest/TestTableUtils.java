@@ -24,11 +24,8 @@ public class TestTableUtils {
 
         TableUtils.appendTableRow(sb, "Ministry of Health", "1000", "2000");
 
-        String expected =
-                String.format("%-60s", "Ministry of Health") +
-                String.format(" %20s", "1000") +
-                String.format(" %20s", "2000") +
-                "\n";
+        String expected = String.format("%-60s", "Ministry of Health") + String.format(" %20s", "1000")
+                + String.format(" %20s", "2000") + "\n";
 
         assertEquals(expected, sb.toString());
     }
@@ -83,11 +80,8 @@ public class TestTableUtils {
 
         TableUtils.appendTableRowCustom(sb, 10, 5, "ABC", "1", "22");
 
-        String expected =
-                String.format("%-10s", "ABC") +
-                String.format(" %5s", "1") +
-                String.format(" %5s", "22") +
-                "\n";
+        String expected = String.format("%-10s", "ABC") + String.format(" %5s", "1") + String.format(" %5s", "22")
+                + "\n";
 
         assertEquals(expected, sb.toString());
 
