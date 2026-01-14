@@ -21,14 +21,13 @@ import UserManagement.UserManager;
  * Unit tests for {@link AuthUI}.
  *
  * <p>
- * The {@link AuthUI#start()} method is not tested because it is an interactive
- * infinite-loop menu relying on live console input and exit side effects.
+ * The {@link AuthUI#start()} method is not tested because it is an interactive infinite-loop menu relying on live
+ * console input and exit side effects.
  * </p>
  *
  * <p>
- * Instead, these tests validate deterministic behavior of internal UI actions
- * by invoking private methods via reflection and by injecting scripted input
- * into the {@code scanner} field.
+ * Instead, these tests validate deterministic behavior of internal UI actions by invoking private methods via
+ * reflection and by injecting scripted input into the {@code scanner} field.
  * </p>
  */
 public class TestAuthUI {
@@ -56,11 +55,10 @@ public class TestAuthUI {
         AuthUI ui = new AuthUI(new UserManagerStub());
         User user = new UserStub("alice", User.Role.CITIZEN);
 
-        invokePrivate(ui, "showRoleMenu", new Class<?>[]{User.class}, user);
+        invokePrivate(ui, "showRoleMenu", new Class<?>[] { User.class }, user);
 
         String printed = outBuffer.toString(StandardCharsets.UTF_8);
-        assertTrue(printed.contains("Role: Citizen"),
-                "Citizen role menu should print the Citizen access message");
+        assertTrue(printed.contains("Role: Citizen"), "Citizen role menu should print the Citizen access message");
     }
 
     /**
@@ -71,11 +69,10 @@ public class TestAuthUI {
         AuthUI ui = new AuthUI(new UserManagerStub());
         User user = new UserStub("pm", User.Role.GOVERNOR);
 
-        invokePrivate(ui, "showRoleMenu", new Class<?>[]{User.class}, user);
+        invokePrivate(ui, "showRoleMenu", new Class<?>[] { User.class }, user);
 
         String printed = outBuffer.toString(StandardCharsets.UTF_8);
-        assertTrue(printed.contains("Role: Governor"),
-                "Governor role menu should print the Governor access message");
+        assertTrue(printed.contains("Role: Governor"), "Governor role menu should print the Governor access message");
     }
 
     /**
@@ -86,7 +83,7 @@ public class TestAuthUI {
         AuthUI ui = new AuthUI(new UserManagerStub());
         User user = new UserStub("min1", User.Role.MINISTRYMEMBER);
 
-        invokePrivate(ui, "showRoleMenu", new Class<?>[]{User.class}, user);
+        invokePrivate(ui, "showRoleMenu", new Class<?>[] { User.class }, user);
 
         String printed = outBuffer.toString(StandardCharsets.UTF_8);
         assertTrue(printed.contains("Role: MinistryMember"),
@@ -94,8 +91,8 @@ public class TestAuthUI {
     }
 
     /**
-     * Verifies that {@code registerUserUI()} calls {@link UserManager#registerUser(String, String, User.Role)}
-     * with the correct parameters when registering a Citizen.
+     * Verifies that {@code registerUserUI()} calls {@link UserManager#registerUser(String, String, User.Role)} with the
+     * correct parameters when registering a Citizen.
      */
     @Test
     void testRegisterUserUICitizenCallsRegisterUser() throws Exception {
@@ -103,13 +100,9 @@ public class TestAuthUI {
         AuthUI ui = new AuthUI(um);
 
         // username, password, roleChoice(1 citizen)
-        injectScanner(ui, String.join("\n",
-                "myrto",
-                "pass123",
-                "1"
-        ) + "\n");
+        injectScanner(ui, String.join("\n", "myrto", "pass123", "1") + "\n");
 
-        invokePrivate(ui, "registerUserUI", new Class<?>[]{});
+        invokePrivate(ui, "registerUserUI", new Class<?>[] {});
 
         assertEquals("myrto", um.lastUsername, "UI should pass username to UserManager");
         assertEquals("pass123", um.lastPassword, "UI should pass password to UserManager");
@@ -127,14 +120,9 @@ public class TestAuthUI {
         AuthUI ui = new AuthUI(um);
 
         // username, password, roleChoice(2 ministry member), ministryName
-        injectScanner(ui, String.join("\n",
-                "minUser",
-                "pw",
-                "2",
-                "Ministry of Health"
-        ) + "\n");
+        injectScanner(ui, String.join("\n", "minUser", "pw", "2", "Ministry of Health") + "\n");
 
-        invokePrivate(ui, "registerUserUI", new Class<?>[]{});
+        invokePrivate(ui, "registerUserUI", new Class<?>[] {});
 
         assertEquals("minUser", um.lastUsername);
         assertEquals("pw", um.lastPassword);
@@ -144,8 +132,8 @@ public class TestAuthUI {
     }
 
     /**
-     * Verifies that {@code loginUser()} calls {@link UserManager#loginUser(String, String)}
-     * and prints a welcome message when authentication succeeds.
+     * Verifies that {@code loginUser()} calls {@link UserManager#loginUser(String, String)} and prints a welcome
+     * message when authentication succeeds.
      */
     @Test
     void testLoginUserSuccessPrintsWelcomeAndRole() throws Exception {
@@ -155,12 +143,9 @@ public class TestAuthUI {
         AuthUI ui = new AuthUI(um);
 
         // username, password
-        injectScanner(ui, String.join("\n",
-                "alice",
-                "pw"
-        ) + "\n");
+        injectScanner(ui, String.join("\n", "alice", "pw") + "\n");
 
-        invokePrivate(ui, "loginUser", new Class<?>[]{});
+        invokePrivate(ui, "loginUser", new Class<?>[] {});
 
         assertEquals("alice", um.lastLoginUsername);
         assertEquals("pw", um.lastLoginPassword);
@@ -234,8 +219,8 @@ public class TestAuthUI {
      * Minimal User stub used for role-menu printing tests.
      *
      * <p>
-     * This assumes {@code User} is a concrete class in your project.
-     * If {@code User} is abstract, this stub should extend it accordingly.
+     * This assumes {@code User} is a concrete class in your project. If {@code User} is abstract, this stub should
+     * extend it accordingly.
      * </p>
      */
     private static class UserStub extends User {
