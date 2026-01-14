@@ -307,7 +307,7 @@ The use of JavaDoc improves:
 
 The generated JavaDoc output is included in the repository and can be accessed locally via:
 
-```
+```bash
 Windows
 start docs/index.html
 macOS
