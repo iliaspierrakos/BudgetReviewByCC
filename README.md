@@ -174,14 +174,22 @@ BudgetReviewByCC/
 
 ## UML Design
 
-The UML class diagram illustrates the high-level design of the application,
-focusing on:
-- User role hierarchy
-- Core budget management logic
-- Key relationships between system components
+## UML Design
 
-The diagram is available at:
+The UML class diagram presents the overall design of the application,
+illustrating the core classes, user roles, and their relationships.
 
+The diagram was created using **StarUML** and focuses on:
+- The user role hierarchy (`User`, `Citizen`, `MinistryMember`, `Governor`)
+- Core budget-related entities (`Ministry`, `MinistriesBudgets`)
+- Service and logic classes (`Compare`, `TaxReceipt`, `RecommendationSystem`)
+- Key relationships such as inheritance, composition, and association
+
+### UML Diagram Location
+
+The UML diagram is included in the root directory of the repository:
+```text
+BudgetReviewByCC/uml-diagram.mdj
 ---
 
 ## Data Structures & Algorithms Overview
