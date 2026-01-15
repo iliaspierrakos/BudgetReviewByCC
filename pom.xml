@@ -103,6 +103,12 @@
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>0.8.10</version>
+                <configuration>
+                    <excludes>
+                        <exclude>**/NecessaryFilesAndData/**</exclude>
+                        <exclude>**/NecessaryFilesandData/**</exclude>
+                    </excludes>
+                </configuration>
                 <executions>
                     <execution>
                         <goals>
@@ -118,6 +124,7 @@
                     </execution>
                 </executions>
             </plugin>
+
 
             <!-- JavaFX plugin -->
             <plugin>
