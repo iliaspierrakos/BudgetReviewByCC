@@ -24,7 +24,6 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import javax.swing.plaf.synth.Region;
 
 
 
