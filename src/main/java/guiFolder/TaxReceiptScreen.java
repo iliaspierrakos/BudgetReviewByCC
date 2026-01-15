@@ -4,7 +4,6 @@ import UserFeatures.CreatingMinistries;
 import UserFeatures.Ministry;
 import UserManagement.User;
 import UserManagement.UserManager;
-import java.lang.classfile.Label;
 import java.util.ArrayList;
 import java.util.List;
 import javafx.collections.FXCollections;
